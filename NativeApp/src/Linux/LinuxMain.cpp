@@ -448,7 +448,7 @@ int x_main(int argc, const char* const* argv)
 
     if (glXCreateContextAttribsARB == nullptr)
     {
-        LOG_ERROR("glXCreateContextAttribsARB entry point not found. Aborting.");
+        DG_LOG_ERROR("glXCreateContextAttribsARB entry point not found. Aborting.");
         return 1;
     }
 
@@ -472,7 +472,7 @@ int x_main(int argc, const char* const* argv)
     GLXContext    ctx  = glXCreateContextAttribsARB(display, fbc[0], NULL, True, context_attribs);
     if (!ctx)
     {
-        LOG_ERROR("Failed to create GL context.");
+        DG_LOG_ERROR("Failed to create GL context.");
         return 1;
     }
     XFree(fbc);
@@ -481,7 +481,7 @@ int x_main(int argc, const char* const* argv)
     glXMakeCurrent(display, win, ctx);
     if (!TheApp->OnGLContextCreated(display, win))
     {
-        LOG_ERROR("Unable to initialize the application in OpenGL mode. Aborting");
+        DG_LOG_ERROR("Unable to initialize the application in OpenGL mode. Aborting");
         return 1;
     }
 

@@ -129,7 +129,7 @@ bool DXSDKMesh::CreateFromMemory(const Uint8* pData, Uint32 DataUint8s)
     // error condition
     if (m_pMeshHeader->Version != DXSDKMESH_FILE_VERSION)
     {
-        LOG_ERROR("Unexpected SDK mesh file version");
+        DG_LOG_ERROR("Unexpected SDK mesh file version");
         return false;
     }
 
@@ -182,7 +182,7 @@ static void LoadTexture(IRenderDevice*                    pDevice,
         }
         else
         {
-            LOG_ERROR("Failed to load texture ", Name);
+            DG_LOG_ERROR("Failed to load texture ", Name);
         }
         Barriers.emplace_back(*ppTexture, RESOURCE_STATE_UNKNOWN, RESOURCE_STATE_SHADER_RESOURCE, STATE_TRANSITION_FLAG_UPDATE_STATE);
     }

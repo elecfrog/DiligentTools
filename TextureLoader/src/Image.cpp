@@ -759,7 +759,7 @@ IMAGE_FILE_FORMAT CreateImageFromFile(const Char* FilePath,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create image from file: ", err.what());
+        DG_LOG_ERROR("Failed to create image from file: ", err.what());
     }
 
     return ImgFileFormat;
@@ -793,7 +793,7 @@ IMAGE_FILE_FORMAT CreateImageFromMemory(const void* pImageData,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create image from file: ", err.what());
+        DG_LOG_ERROR("Failed to create image from file: ", err.what());
     }
 
     return ImgFileFormat;

@@ -564,7 +564,7 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
         }
         catch (std::exception& e)
         {
-            LOG_ERROR(e.what());
+            DG_LOG_ERROR(e.what());
             return false;
         }
     };
@@ -724,7 +724,7 @@ void CreateRenderStateNotationParser(const RenderStateNotationParserCreateInfo& 
     }
     catch (...)
     {
-        LOG_ERROR("Failed create render state notation parser");
+        DG_LOG_ERROR("Failed create render state notation parser");
     }
 }
 

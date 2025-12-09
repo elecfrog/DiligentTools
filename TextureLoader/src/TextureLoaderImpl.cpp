@@ -499,7 +499,7 @@ void CreateTextureLoaderFromFile(const char*            FilePath,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create texture loader from file: ", err.what());
+        DG_LOG_ERROR("Failed to create texture loader from file: ", err.what());
     }
 }
 
@@ -524,7 +524,7 @@ void CreateTextureLoaderFromMemory(const void*            pData,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create texture loader from memory: ", err.what());
+        DG_LOG_ERROR("Failed to create texture loader from memory: ", err.what());
     }
 }
 
@@ -543,7 +543,7 @@ void CreateTextureLoaderFromDataBlob(RefCntAutoPtr<IDataBlob> pDataBlob,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create texture loader from data blob: ", err.what());
+        DG_LOG_ERROR("Failed to create texture loader from data blob: ", err.what());
     }
 }
 
@@ -567,7 +567,7 @@ void CreateTextureLoaderFromImage(Image*                 pSrcImage,
     }
     catch (std::runtime_error& err)
     {
-        LOG_ERROR("Failed to create texture loader from memory: ", err.what());
+        DG_LOG_ERROR("Failed to create texture loader from memory: ", err.what());
     }
 }
 
