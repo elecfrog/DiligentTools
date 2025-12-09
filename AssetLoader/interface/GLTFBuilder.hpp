@@ -120,7 +120,7 @@ private:
                    int                  GltfMeshIndex);
 
     template <typename GltfModelType>
-    Camera* LoadCamera(const GltfModelType& GltfModel,
+    spw::Camera* LoadCamera(const GltfModelType& GltfModel,
                        int                  GltfCameraIndex);
 
     template <typename GltfModelType>
@@ -482,7 +482,7 @@ Mesh* ModelBuilder::LoadMesh(const GltfModelType& GltfModel,
 }
 
 template <typename GltfModelType>
-Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
+spw::Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
                                  int                  GltfCameraIndex)
 {
     if (GltfCameraIndex < 0)
@@ -507,7 +507,7 @@ Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
 
     if (GltfCam.GetType() == "perspective")
     {
-        NewCamera.Type = Camera::Projection::Perspective;
+        NewCamera.Type = spw::Camera::Projection::Perspective;
 
         const auto& PerspectiveCam{GltfCam.GetPerspective()};
 
@@ -518,7 +518,7 @@ Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
     }
     else if (GltfCam.GetType() == "orthographic")
     {
-        NewCamera.Type = Camera::Projection::Orthographic;
+        NewCamera.Type = spw::Camera::Projection::Orthographic;
 
         const auto& OrthoCam{GltfCam.GetOrthographic()};
         NewCamera.Orthographic.XMag  = static_cast<float>(OrthoCam.GetXMag());

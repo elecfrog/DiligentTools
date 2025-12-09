@@ -49,6 +49,7 @@
 #include "../../../DiligentCore/Common/interface/AdvancedMath.hpp"
 #include "../../../DiligentCore/Common/interface/STDAllocator.hpp"
 #include "GLTFResourceManager.hpp"
+#include "../../../../../sparrow/camera/camera.hpp"
 
 namespace tinygltf
 {
@@ -480,38 +481,6 @@ struct Skin
     std::vector<const Node*> Joints;
 };
 
-struct Camera
-{
-    std::string Name;
-
-    enum class Projection
-    {
-        Unknown,
-        Perspective,
-        Orthographic
-    } Type = Projection::Unknown;
-
-    struct PerspectiveAttribs
-    {
-        float AspectRatio;
-        float YFov;
-        float ZNear;
-        float ZFar;
-    };
-    struct OrthographicAttribs
-    {
-        float XMag;
-        float YMag;
-        float ZNear;
-        float ZFar;
-    };
-    union
-    {
-        PerspectiveAttribs  Perspective = {};
-        OrthographicAttribs Orthographic;
-    };
-};
-
 struct Light
 {
     std::string Name;
@@ -554,7 +523,7 @@ struct Node
     std::vector<const Node*> Children;
 
     const Mesh*   pMesh   = nullptr;
-    const Camera* pCamera = nullptr;
+    const spw::Camera* pCamera = nullptr;
     const Skin*   pSkin   = nullptr;
     const Light*  pLight  = nullptr;
 
@@ -922,7 +891,7 @@ struct Model
     std::vector<Scene>       Scenes;
     std::vector<Node>        Nodes;
     std::vector<Mesh>        Meshes;
-    std::vector<Camera>      Cameras;
+    std::vector<spw::Camera>      Cameras;
     std::vector<Light>       Lights;
     std::vector<Skin>        Skins;
     std::vector<Material>    Materials;
