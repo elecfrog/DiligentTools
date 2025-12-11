@@ -43,11 +43,9 @@ namespace GLTF
 
 struct Model;
 struct ModelCreateInfo;
-struct Node;
 
 // {0BF00221-593F-40CE-B5BD-E47039D77F4A}
-static constexpr INTERFACE_ID IID_BufferInitData =
-    {0xbf00221, 0x593f, 0x40ce, {0xb5, 0xbd, 0xe4, 0x70, 0x39, 0xd7, 0x7f, 0x4a}};
+static constexpr INTERFACE_ID IID_BufferInitData = {0xbf00221, 0x593f, 0x40ce, {0xb5, 0xbd, 0xe4, 0x70, 0x39, 0xd7, 0x7f, 0x4a}};
 
 struct BufferInitData : ObjectBase<IObject>
 {
@@ -110,22 +108,22 @@ private:
 
     // Recursively loads nodes.
     template <typename GltfModelType>
-    Node* LoadNode(const GltfModelType& GltfModel,
-                   Node*                Parent,
-                   Scene&               scene,
-                   int                  GltfNodeIndex);
+    spw::Node* LoadNode(const GltfModelType& GltfModel,
+                        spw::Node*           Parent,
+                        Scene&               scene,
+                        int                  GltfNodeIndex);
 
     template <typename GltfModelType>
-    Mesh* LoadMesh(const GltfModelType& GltfModel,
-                   int                  GltfMeshIndex);
+    spw::Mesh* LoadMesh(const GltfModelType& GltfModel,
+                        int                  GltfMeshIndex);
 
     template <typename GltfModelType>
     spw::Camera* LoadCamera(const GltfModelType& GltfModel,
-                       int                  GltfCameraIndex);
+                            int                  GltfCameraIndex);
 
     template <typename GltfModelType>
-    Light* LoadLight(const GltfModelType& GltfModel,
-                     int                  GltfLightIndex);
+    spw::Light* LoadLight(const GltfModelType& GltfModel,
+                          int                  GltfLightIndex);
 
     void InitIndexBuffer(IRenderDevice* pDevice);
     void InitVertexBuffers(IRenderDevice* pDevice);
@@ -184,12 +182,10 @@ private:
     auto GetGltfDataInfo(const GltfModelType& GltfModel, int AccessorId);
 
     // Returns the node pointer from the node index in the source GLTF model.
-    Node* NodeFromGltfIndex(int GltfIndex) const
+    spw::Node* NodeFromGltfIndex(int GltfIndex) const
     {
         auto it = m_NodeIndexRemapping.find(GltfIndex);
-        return it != m_NodeIndexRemapping.end() ?
-            &m_Model.Nodes[it->second] :
-            nullptr;
+        return it != m_NodeIndexRemapping.end() ? &m_Model.Nodes[it->second] : nullptr;
     }
 
     template <typename GltfDataInfoType>
@@ -237,7 +233,7 @@ void ModelBuilder::LoadScenes(const GltfModelType& GltfModel, int SceneIndex)
 
         // Temporarily store node ids as pointers
         for (size_t i = 0; i < RootNodes.size(); ++i)
-            RootNodes[i] = reinterpret_cast<Node*>(static_cast<size_t>(GltfScene.GetNodeId(i)));
+            RootNodes[i] = reinterpret_cast<spw::Node*>(static_cast<size_t>(GltfScene.GetNodeId(i)));
     };
 
     if (const auto SceneCount = static_cast<int>(GltfModel.GetSceneCount()))
@@ -282,7 +278,7 @@ void ModelBuilder::LoadScenes(const GltfModelType& GltfModel, int SceneIndex)
 
         // Load all nodes if there are no scenes
         for (size_t node_idx = 0; node_idx < RootNodes.size(); ++node_idx)
-            RootNodes[node_idx] = reinterpret_cast<Node*>(node_idx);
+            RootNodes[node_idx] = reinterpret_cast<spw::Node*>(node_idx);
     }
 
     m_Model.Scenes.shrink_to_fit();
@@ -355,8 +351,8 @@ bool ModelBuilder::ComputePrimitiveBoundingBox(const GltfDataInfoType& PosData, 
 }
 
 template <typename GltfModelType>
-Mesh* ModelBuilder::LoadMesh(const GltfModelType& GltfModel,
-                             int                  GltfMeshIndex)
+spw::Mesh* ModelBuilder::LoadMesh(const GltfModelType& GltfModel,
+                                  int                  GltfMeshIndex)
 {
     if (GltfMeshIndex < 0)
         return nullptr;
@@ -483,7 +479,7 @@ Mesh* ModelBuilder::LoadMesh(const GltfModelType& GltfModel,
 
 template <typename GltfModelType>
 spw::Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
-                                 int                  GltfCameraIndex)
+                                      int                  GltfCameraIndex)
 {
     if (GltfCameraIndex < 0)
         return nullptr;
@@ -535,8 +531,8 @@ spw::Camera* ModelBuilder::LoadCamera(const GltfModelType& GltfModel,
 }
 
 template <typename GltfModelType>
-Light* ModelBuilder::LoadLight(const GltfModelType& GltfModel,
-                               int                  GltfLightIndex)
+spw::Light* ModelBuilder::LoadLight(const GltfModelType& GltfModel,
+                                    int                  GltfLightIndex)
 {
     // https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_lights_punctual
 
@@ -561,15 +557,15 @@ Light* ModelBuilder::LoadLight(const GltfModelType& GltfModel,
     NewLight.Name = GltfLight.GetName();
     if (GltfLight.GetType() == "directional")
     {
-        NewLight.Type = Light::TYPE::DIRECTIONAL;
+        NewLight.Type = spw::Light::TYPE::DIRECTIONAL;
     }
     else if (GltfLight.GetType() == "point")
     {
-        NewLight.Type = Light::TYPE::POINT;
+        NewLight.Type = spw::Light::TYPE::POINT;
     }
     else if (GltfLight.GetType() == "spot")
     {
-        NewLight.Type           = Light::TYPE::SPOT;
+        NewLight.Type           = spw::Light::TYPE::SPOT;
         NewLight.InnerConeAngle = static_cast<float>(GltfLight.GetInnerConeAngle());
         NewLight.OuterConeAngle = static_cast<float>(GltfLight.GetOuterConeAngle());
     }
@@ -589,10 +585,10 @@ Light* ModelBuilder::LoadLight(const GltfModelType& GltfModel,
 }
 
 template <typename GltfModelType>
-Node* ModelBuilder::LoadNode(const GltfModelType& GltfModel,
-                             Node*                Parent,
-                             Scene&               scene,
-                             int                  GltfNodeIndex)
+spw::Node* ModelBuilder::LoadNode(const GltfModelType& GltfModel,
+                                  spw::Node*           Parent,
+                                  Scene&               scene,
+                                  int                  GltfNodeIndex)
 {
     auto node_it = m_NodeIndexRemapping.find(GltfNodeIndex);
     VERIFY(node_it != m_NodeIndexRemapping.end(), "Node with GLTF index ", GltfNodeIndex, " is not present in the map. This appears to be a bug.");
@@ -666,8 +662,8 @@ auto ModelBuilder::GetGltfDataInfo(const GltfModelType& GltfModel, int AccessorI
     const auto  SrcCount      = GltfAccessor.GetCount();
     const auto  SrcByteStride = GltfAccessor.GetByteStride(GltfView);
     const auto* pSrcData      = SrcCount > 0 ?
-        GltfBuffer.GetData(GltfAccessor.GetByteOffset() + GltfView.GetByteOffset()) :
-        nullptr;
+             GltfBuffer.GetData(GltfAccessor.GetByteOffset() + GltfView.GetByteOffset()) :
+             nullptr;
 
     struct GltfDataInfo
     {

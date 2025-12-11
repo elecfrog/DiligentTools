@@ -406,145 +406,12 @@ public:
 };
 
 
-struct Primitive
-{
-    const Uint32 FirstIndex;
-    const Uint32 IndexCount;
-    const Uint32 FirstVertex;
-    const Uint32 VertexCount;
-    const Uint32 MaterialId;
-
-    const BoundBox BB;
-
-    Primitive(Uint32        _FirstIndex,
-              Uint32        _IndexCount,
-              Uint32        _FirstVertex,
-              Uint32        _VertexCount,
-              Uint32        _MaterialId,
-              const float3& _BBMin,
-              const float3& _BBMax) :
-        FirstIndex{_FirstIndex},
-        IndexCount{_IndexCount},
-        FirstVertex{_FirstVertex},
-        VertexCount{_VertexCount},
-        MaterialId{_MaterialId},
-        BB{_BBMin, _BBMax}
-    {
-    }
-
-    Primitive(Primitive&&) = default;
-
-    bool HasIndices() const
-    {
-        return IndexCount > 0;
-    }
-};
-
-struct Mesh
-{
-    std::string            Name;
-    std::vector<Primitive> Primitives;
-    BoundBox               BB;
-
-    // Any user-specific data. One way to set this field is from the
-    // MeshLoadCallback.
-    RefCntAutoPtr<IObject> pUserData;
-
-    // There may be no primitives in the mesh, in which
-    // case the bounding box will be invalid.
-    bool IsValidBB() const
-    {
-        return !Primitives.empty();
-    }
-
-    void UpdateBoundingBox()
-    {
-        if (!Primitives.empty())
-        {
-            BB = Primitives[0].BB;
-            for (size_t prim = 1; prim < Primitives.size(); ++prim)
-            {
-                const BoundBox& PrimBB{Primitives[prim].BB};
-                BB.Min = (std::min)(BB.Min, PrimBB.Min);
-                BB.Max = (std::max)(BB.Max, PrimBB.Max);
-            }
-        }
-    }
-};
-
-struct Node;
-struct Skin
-{
-    std::string              Name;
-    const Node*              pSkeletonRoot = nullptr;
-    std::vector<float4x4>    InverseBindMatrices;
-    std::vector<const Node*> Joints;
-};
-
-struct Light
-{
-    std::string Name;
-
-    enum class TYPE
-    {
-        UNKNOWN,
-        DIRECTIONAL,
-        POINT,
-        SPOT,
-    } Type = TYPE::UNKNOWN;
-
-    float3 Color = float3{1, 1, 1};
-
-    float Intensity = 1;
-
-    // Point and spot lights only.
-    //
-    // Recommended implementation is as follows:
-    //   Attenuation = clamp(1.0 - (Distance / Range)^4, 0, 1) / Distance^2
-    float Range = 0;
-
-    // Spot light only
-    float InnerConeAngle = 0;
-    float OuterConeAngle = 0;
-};
-
-struct Node
-{
-    // Index in Model.LinearNodes array.
-    const int Index;
-
-    // Index in ModelTransforms.Skins array.
-    int SkinTransformsIndex = -1;
-
-    std::string Name;
-
-    const Node* Parent = nullptr;
-
-    std::vector<const Node*> Children;
-
-    const Mesh*   pMesh   = nullptr;
-    const spw::Camera* pCamera = nullptr;
-    const Skin*   pSkin   = nullptr;
-    const Light*  pLight  = nullptr;
-
-    float3      Translation;
-    QuaternionF Rotation;
-    float3      Scale  = float3{1, 1, 1};
-    float4x4    Matrix = float4x4::Identity();
-
-    explicit Node(int _Index) :
-        Index{_Index}
-    {}
-
-    inline float4x4 ComputeLocalTransform() const;
-};
-
 struct Scene
 {
     std::string        Name;
-    std::vector<Node*> RootNodes;
+    std::vector<spw::Node*> RootNodes;
     // Linear list of all nodes in the scene.
-    std::vector<Node*> LinearNodes;
+    std::vector<spw::Node*> LinearNodes;
 };
 
 struct AnimationChannel
@@ -557,11 +424,11 @@ struct AnimationChannel
         WEIGHTS
     };
     PATH_TYPE const PathType;
-    Node* const     pNode;
+    spw::Node* const     pNode;
     Uint32 const    SamplerIndex;
 
     AnimationChannel(PATH_TYPE _PathType,
-                     Node*     _pNode,
+                     spw::Node*     _pNode,
                      Uint32    _SamplerIndex) :
         PathType{_PathType},
         pNode{_pNode},
@@ -711,7 +578,7 @@ struct ModelCreateInfo
     /// Optional resource manager to use when allocating resources for the model.
     ResourceManager* pResourceManager = nullptr;
 
-    using NodeLoadCallbackType = std::function<void(const void* pSrcModel, int SrcNodeIndex, const void* pSrcNode, Node& DstNode)>;
+    using NodeLoadCallbackType = std::function<void(const void* pSrcModel, int SrcNodeIndex, const void* pSrcNode, spw::Node& DstNode)>;
 
     /// Node loading callback function.
 
@@ -727,7 +594,7 @@ struct ModelCreateInfo
     /// depending on the loader it is using (e.g. `tinygltf::Node*`).
     NodeLoadCallbackType NodeLoadCallback = nullptr;
 
-    using MeshLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcMesh, Mesh& DstMesh)>;
+    using MeshLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcMesh, spw::Mesh& DstMesh)>;
 
     /// Mesh loading callback function.
 
@@ -742,7 +609,7 @@ struct ModelCreateInfo
     /// depending on the loader it is using (e.g. `tinygltf::Mesh*`).
     MeshLoadCallbackType MeshLoadCallback = nullptr;
 
-    using PrimitiveLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcPrim, Primitive& DstPrim)>;
+    using PrimitiveLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcPrim, spw::Primitive& DstPrim)>;
 
     /// Primitive loading callback function.
 
@@ -889,11 +756,11 @@ struct ModelTransforms
 struct Model
 {
     std::vector<Scene>       Scenes;
-    std::vector<Node>        Nodes;
-    std::vector<Mesh>        Meshes;
+    std::vector<spw::Node>        Nodes;
+    std::vector<spw::Mesh>        Meshes;
     std::vector<spw::Camera>      Cameras;
-    std::vector<Light>       Lights;
-    std::vector<Skin>        Skins;
+    std::vector<spw::Light>       Lights;
+    std::vector<spw::Skin>        Skins;
     std::vector<Material>    Materials;
     std::vector<Animation>   Animations;
     std::vector<std::string> Extensions;
@@ -1177,34 +1044,7 @@ private:
     std::vector<TextureInfo> Textures;
 };
 
-template <typename T>
-inline Matrix4x4<T> ComputeNodeLocalMatrix(const Vector3<T>&    Scale,
-                                           const Quaternion<T>& Rotation,
-                                           const Vector3<T>&    Translation,
-                                           const Matrix4x4<T>&  Matrix)
-{
-    // Translation, rotation, and scale properties and local space transformation are
-    // mutually exclusive as per GLTF spec.
 
-    // LocalMatrix = S * R * T * M
-    Matrix4x4<T> LocalMatrix = Matrix;
-
-    if (Translation != Vector3<T>{})
-        LocalMatrix = Matrix4x4<T>::Translation(Translation) * LocalMatrix;
-
-    if (Rotation != Quaternion<T>{})
-        LocalMatrix = Rotation.ToMatrix() * LocalMatrix;
-
-    if (Scale != Vector3<T>{1, 1, 1})
-        LocalMatrix = Matrix4x4<T>::Scale(Scale) * LocalMatrix;
-
-    return LocalMatrix;
-}
-
-inline float4x4 Node::ComputeLocalTransform() const
-{
-    return ComputeNodeLocalMatrix(Scale, Rotation, Translation, Matrix);
-}
 
 inline size_t AnimationSampler::FindKeyFrame(float Time) const
 {

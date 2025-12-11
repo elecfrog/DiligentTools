@@ -399,8 +399,8 @@ struct TextureInitData : public ObjectBase<IObject>
             const LevelData& FineLevel = Levels[mip - 1];
 
             // Note that we can't use GetMipLevelProperties here
-            Level.Width  = AlignUp(std::max(FineLevel.Width / 2u, 1u), Uint32{FmtAttribs.BlockWidth});
-            Level.Height = AlignUp(std::max(FineLevel.Height / 2u, 1u), Uint32{FmtAttribs.BlockHeight});
+            Level.Width  = AlignUp((std::max)(FineLevel.Width / 2u, 1u), Uint32{FmtAttribs.BlockWidth});
+            Level.Height = AlignUp((std::max)(FineLevel.Height / 2u, 1u), Uint32{FmtAttribs.BlockHeight});
 
             Level.SubResData.Stride =
                 Uint64{Level.Width} / Uint64{FmtAttribs.BlockWidth} * Uint64{FmtAttribs.ComponentSize} *
@@ -2003,7 +2003,7 @@ BoundBox Model::ComputeBoundingBox(Uint32 SceneIndex, const ModelTransforms& Tra
         ModelAABB.Min = float3{+FLT_MAX, +FLT_MAX, +FLT_MAX};
         ModelAABB.Max = float3{-FLT_MAX, -FLT_MAX, -FLT_MAX};
 
-        for (const Node* pN : scene.LinearNodes)
+        for (const spw::Node* pN : scene.LinearNodes)
         {
             VERIFY_EXPR(pN != nullptr);
             if (pN->pMesh != nullptr && pN->pMesh->IsValidBB())
@@ -2024,12 +2024,12 @@ BoundBox Model::ComputeBoundingBox(Uint32 SceneIndex, const ModelTransforms& Tra
     return ModelAABB;
 }
 
-static void UpdateNodeGlobalTransform(const Node& node, const float4x4& ParentMatrix, ModelTransforms& Transforms)
+static void UpdateNodeGlobalTransform(const spw::Node& node, const float4x4& ParentMatrix, ModelTransforms& Transforms)
 {
     const float4x4& LocalMat  = Transforms.NodeLocalMatrices[node.Index];
     float4x4&       GlobalMat = Transforms.NodeGlobalMatrices[node.Index];
     GlobalMat                 = LocalMat * ParentMatrix;
-    for (const Node* pChild : node.Children)
+    for (const spw::Node* pChild : node.Children)
     {
         UpdateNodeGlobalTransform(*pChild, GlobalMat, Transforms);
     }
@@ -2062,7 +2062,7 @@ void Model::ComputeTransforms(Uint32           SceneIndex,
     else
     {
         Transforms.Skins.clear();
-        for (Node* pNode : scene.LinearNodes)
+        for (auto* pNode : scene.LinearNodes)
         {
             VERIFY_EXPR(pNode != nullptr);
             Transforms.NodeLocalMatrices[pNode->Index] = pNode->ComputeLocalTransform();
@@ -2070,17 +2070,17 @@ void Model::ComputeTransforms(Uint32           SceneIndex,
     }
 
     // Compute global transforms
-    for (Node* pRoot : scene.RootNodes)
+    for (auto* pRoot : scene.RootNodes)
         UpdateNodeGlobalTransform(*pRoot, RootTransform, Transforms);
 
     // Update join matrices
     if (!Transforms.Skins.empty())
     {
-        for (const Node* pNode : scene.LinearNodes)
+        for (const auto* pNode : scene.LinearNodes)
         {
             VERIFY_EXPR(pNode != nullptr);
-            const Mesh* pMesh = pNode->pMesh;
-            const Skin* pSkin = pNode->pSkin;
+            const auto* pMesh = pNode->pMesh;
+            const auto* pSkin = pNode->pSkin;
             if (pMesh == nullptr || pSkin == nullptr)
                 continue;
 
@@ -2095,7 +2095,7 @@ void Model::ComputeTransforms(Uint32           SceneIndex,
             const float4x4 InverseTransform = NodeGlobalMat.Inverse();
             for (size_t i = 0; i < pSkin->Joints.size(); i++)
             {
-                const Node*     JointNode          = pSkin->Joints[i];
+                const auto*     JointNode          = pSkin->Joints[i];
                 const float4x4& JointNodeGlobalMat = Transforms.NodeGlobalMatrices[JointNode->Index];
                 JointMatrices[i] =
                     pSkin->InverseBindMatrices[i] * JointNodeGlobalMat * InverseTransform;
@@ -2128,7 +2128,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
         Transforms.NodeAnimations.resize(scene.LinearNodes.size());
     VERIFY_EXPR(Transforms.NodeAnimations.size() == Transforms.NodeLocalMatrices.size());
 
-    for (const Node* pN : scene.LinearNodes)
+    for (const auto* pN : scene.LinearNodes)
     {
         VERIFY_EXPR(pN != nullptr);
         ModelTransforms::AnimationTransforms& A = Transforms.NodeAnimations[pN->Index];
@@ -2220,12 +2220,12 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
         }
     }
 
-    for (const Node* pN : scene.LinearNodes)
+    for (const auto* pN : scene.LinearNodes)
     {
         VERIFY_EXPR(pN != nullptr);
         const ModelTransforms::AnimationTransforms& A = Transforms.NodeAnimations[pN->Index];
 
-        Transforms.NodeLocalMatrices[pN->Index] = ComputeNodeLocalMatrix(A.Scale, A.Rotation, A.Translation, pN->Matrix);
+        Transforms.NodeLocalMatrices[pN->Index] = spw::ComputeNodeLocalMatrix(A.Scale, A.Rotation, A.Translation, pN->Matrix);
     }
 }
 
