@@ -110,7 +110,7 @@ private:
     template <typename GltfModelType>
     spw::Node* LoadNode(const GltfModelType& GltfModel,
                         spw::Node*           Parent,
-                        Scene&               scene,
+                        spw::Scene&               scene,
                         int                  GltfNodeIndex);
 
     template <typename GltfModelType>
@@ -587,7 +587,7 @@ spw::Light* ModelBuilder::LoadLight(const GltfModelType& GltfModel,
 template <typename GltfModelType>
 spw::Node* ModelBuilder::LoadNode(const GltfModelType& GltfModel,
                                   spw::Node*           Parent,
-                                  Scene&               scene,
+                                  spw::Scene&               scene,
                                   int                  GltfNodeIndex)
 {
     auto node_it = m_NodeIndexRemapping.find(GltfNodeIndex);

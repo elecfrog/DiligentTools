@@ -1998,7 +1998,7 @@ BoundBox Model::ComputeBoundingBox(Uint32 SceneIndex, const ModelTransforms& Tra
     if (CompatibleWithTransforms(Transforms))
     {
         VERIFY_EXPR(SceneIndex < Scenes.size());
-        const Scene& scene = Scenes[SceneIndex];
+        const spw::Scene& scene = Scenes[SceneIndex];
 
         ModelAABB.Min = float3{+FLT_MAX, +FLT_MAX, +FLT_MAX};
         ModelAABB.Max = float3{-FLT_MAX, -FLT_MAX, -FLT_MAX};
@@ -2046,7 +2046,7 @@ void Model::ComputeTransforms(Uint32           SceneIndex,
         DEV_ERROR("Invalid scene index ", SceneIndex);
         return;
     }
-    const Scene& scene = Scenes[SceneIndex];
+    const spw::Scene& scene = Scenes[SceneIndex];
 
     // Note that the matrices are indexed by the global node index,
     // not the linear node index in the scene.
@@ -2123,7 +2123,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
 
     time = clamp(time, animation.Start, animation.End);
 
-    const Scene& scene = Scenes[SceneIndex];
+    const spw::Scene& scene = Scenes[SceneIndex];
     if (Transforms.NodeAnimations.size() != scene.LinearNodes.size())
         Transforms.NodeAnimations.resize(scene.LinearNodes.size());
     VERIFY_EXPR(Transforms.NodeAnimations.size() == Transforms.NodeLocalMatrices.size());

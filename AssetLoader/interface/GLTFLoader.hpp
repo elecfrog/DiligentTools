@@ -405,15 +405,6 @@ public:
     }
 };
 
-
-struct Scene
-{
-    std::string             Name;
-    std::vector<spw::Node*> RootNodes;
-    // Linear list of all nodes in the scene.
-    std::vector<spw::Node*> LinearNodes;
-};
-
 struct AnimationChannel
 {
     enum class PATH_TYPE
@@ -755,7 +746,7 @@ struct ModelTransforms
 /// GLTF model.
 struct Model
 {
-    std::vector<Scene>       Scenes;
+    std::vector<spw::Scene>  Scenes;
     std::vector<spw::Node>   Nodes;
     std::vector<spw::Mesh>   Meshes;
     std::vector<spw::Camera> Cameras;
