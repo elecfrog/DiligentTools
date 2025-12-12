@@ -38,7 +38,6 @@
 #include <atomic>
 #include <functional>
 #include <string>
-#include <limits>
 #include <algorithm>
 
 #include "../../../DiligentCore/Platforms/interface/PlatformMisc.hpp"
@@ -49,7 +48,7 @@
 #include "../../../DiligentCore/Common/interface/AdvancedMath.hpp"
 #include "../../../DiligentCore/Common/interface/STDAllocator.hpp"
 #include "GLTFResourceManager.hpp"
-#include "../../../../../sparrow/camera/camera.hpp"
+#include "../../../../../sparrow/gltf/gltf_scene.hpp"
 
 namespace tinygltf
 {
@@ -405,60 +404,6 @@ public:
     }
 };
 
-struct AnimationChannel
-{
-    enum class PATH_TYPE
-    {
-        TRANSLATION,
-        ROTATION,
-        SCALE,
-        WEIGHTS
-    };
-    PATH_TYPE const  PathType;
-    spw::Node* const pNode;
-    Uint32 const     SamplerIndex;
-
-    AnimationChannel(PATH_TYPE  _PathType,
-                     spw::Node* _pNode,
-                     Uint32     _SamplerIndex) :
-        PathType{_PathType},
-        pNode{_pNode},
-        SamplerIndex{_SamplerIndex}
-    {}
-};
-
-
-struct AnimationSampler
-{
-    enum class INTERPOLATION_TYPE
-    {
-        LINEAR,
-        STEP,
-        CUBICSPLINE
-    };
-    const INTERPOLATION_TYPE Interpolation;
-
-    std::vector<float>  Inputs;
-    std::vector<float4> OutputsVec4;
-
-    // Returns the index of the key frame for the given animation time.
-    inline size_t FindKeyFrame(float Time) const;
-
-    explicit AnimationSampler(INTERPOLATION_TYPE _Interpolation) :
-        Interpolation{_Interpolation}
-    {}
-};
-
-struct Animation
-{
-    std::string                   Name;
-    std::vector<AnimationSampler> Samplers;
-    std::vector<AnimationChannel> Channels;
-
-    float Start = +(std::numeric_limits<float>::max)();
-    float End   = -(std::numeric_limits<float>::max)();
-};
-
 
 
 /// Vertex attribute description.
@@ -569,7 +514,7 @@ struct ModelCreateInfo
     /// Optional resource manager to use when allocating resources for the model.
     ResourceManager* pResourceManager = nullptr;
 
-    using NodeLoadCallbackType = std::function<void(const void* pSrcModel, int SrcNodeIndex, const void* pSrcNode, spw::Node& DstNode)>;
+    using NodeLoadCallbackType = std::function<void(int SrcNodeIndex, const void* pSrcNode, spw::Node& DstNode)>;
 
     /// Node loading callback function.
 
@@ -585,7 +530,7 @@ struct ModelCreateInfo
     /// depending on the loader it is using (e.g. `tinygltf::Node*`).
     NodeLoadCallbackType NodeLoadCallback = nullptr;
 
-    using MeshLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcMesh, spw::Mesh& DstMesh)>;
+    using MeshLoadCallbackType = std::function<void(const void* pSrcMesh, spw::Mesh& DstMesh)>;
 
     /// Mesh loading callback function.
 
@@ -600,7 +545,7 @@ struct ModelCreateInfo
     /// depending on the loader it is using (e.g. `tinygltf::Mesh*`).
     MeshLoadCallbackType MeshLoadCallback = nullptr;
 
-    using PrimitiveLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcPrim, spw::Primitive& DstPrim)>;
+    using PrimitiveLoadCallbackType = std::function<void(const void* pSrcPrim, spw::Primitive& DstPrim)>;
 
     /// Primitive loading callback function.
 
@@ -615,7 +560,7 @@ struct ModelCreateInfo
     /// depending on the loader it is using (e.g. `tinygltf::Primitive*`).
     PrimitiveLoadCallbackType PrimitiveLoadCallback = nullptr;
 
-    using MaterialLoadCallbackType = std::function<void(const void* pSrcModel, const void* pSrcMat, Material& DstMat)>;
+    using MaterialLoadCallbackType = std::function<void(const void* pSrcMat, Material& DstMat)>;
 
     /// Material loading callback function.
 
@@ -746,15 +691,15 @@ struct ModelTransforms
 /// GLTF model.
 struct Model
 {
-    std::vector<spw::Scene>  Scenes;
-    std::vector<spw::Node>   Nodes;
-    std::vector<spw::Mesh>   Meshes;
-    std::vector<spw::Camera> Cameras;
-    std::vector<spw::Light>  Lights;
-    std::vector<spw::Skin>   Skins;
-    std::vector<Material>    Materials;
-    std::vector<Animation>   Animations;
-    std::vector<std::string> Extensions;
+    std::vector<spw::Scene>     Scenes;
+    std::vector<spw::Node>      Nodes;
+    std::vector<spw::Mesh>      Meshes;
+    std::vector<spw::Camera>    Cameras;
+    std::vector<spw::Light>     Lights;
+    std::vector<spw::Skin>      Skins;
+    std::vector<Material>       Materials;
+    std::vector<spw::Animation> Animations;
+    std::vector<std::string>    Extensions;
 
     std::vector<RefCntAutoPtr<ISampler>> TextureSamplers;
 
@@ -1034,37 +979,6 @@ private:
     };
     std::vector<TextureInfo> Textures;
 };
-
-
-
-inline size_t AnimationSampler::FindKeyFrame(float Time) const
-{
-    if (Inputs.size() <= 2)
-        return 0;
-
-    const auto input_it = std::lower_bound(Inputs.begin(), Inputs.end(), Time);
-
-    size_t Idx = 0;
-    if (input_it == Inputs.begin())
-    {
-        VERIFY_EXPR(Time <= Inputs.front());
-        Idx = 0;
-    }
-    else if (input_it == Inputs.end())
-    {
-        VERIFY_EXPR(Time >= Inputs.back());
-        Idx = Inputs.size() - 1;
-    }
-    else
-    {
-        Idx = static_cast<size_t>(std::distance(Inputs.begin(), input_it));
-        VERIFY_EXPR(Idx > 0 && Idx < Inputs.size());
-        --Idx;
-        VERIFY_EXPR(Time >= Inputs[Idx] && Time <= Inputs[Idx + 1]);
-    }
-
-    return Idx;
-}
 
 } // namespace GLTF
 

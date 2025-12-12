@@ -9,14 +9,13 @@ set(INCLUDE
 set(INTERFACE
     interface/GLTFLoader.hpp
     interface/GLTFBuilder.hpp
-    interface/DXSDKMeshLoader.hpp
+    interface/gltf_utils.hpp
     interface/GLTFResourceManager.hpp
 )
 
 set(SOURCE 
     src/GLTFLoader.cpp
     src/GLTFBuilder.cpp
-    src/DXSDKMeshLoader.cpp
     src/GLTFResourceManager.cpp
 )
 

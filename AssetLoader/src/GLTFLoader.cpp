@@ -53,7 +53,7 @@
 #if defined(_MSC_VER) && defined(TINYGLTF_ENABLE_DRACO)
 #    pragma warning(disable : 4127) // warning C4127: conditional expression is constant
 #endif
-#include "../../ThirdParty/tinygltf/tiny_gltf.h"
+#include "tiny_gltf.h"
 
 namespace Diligent
 {
@@ -76,291 +76,6 @@ InputLayoutDescX VertexAttributesToInputLayout(const VertexAttributeDesc* pAttri
 
 namespace
 {
-
-VALUE_TYPE TinyGltfComponentTypeToValueType(int GltfCompType)
-{
-    switch (GltfCompType)
-    {
-            // clang-format off
-        case TINYGLTF_COMPONENT_TYPE_BYTE:           return VT_INT8;
-        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:  return VT_UINT8;
-        case TINYGLTF_COMPONENT_TYPE_SHORT:          return VT_INT16;
-        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: return VT_UINT16;
-        case TINYGLTF_COMPONENT_TYPE_INT:            return VT_INT32;
-        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:   return VT_UINT32;
-        case TINYGLTF_COMPONENT_TYPE_FLOAT:          return VT_FLOAT32;
-        case TINYGLTF_COMPONENT_TYPE_DOUBLE:         return VT_FLOAT64;
-        // clang-format on
-        default:
-            UNEXPECTED("Unknown GLTF component type");
-            return VT_UNDEFINED;
-    }
-}
-
-
-struct TinyGltfNodeWrapper
-{
-    const tinygltf::Node& Node;
-
-    const tinygltf::Node& Get() const { return Node; }
-
-    // clang-format off
-    const std::string&         GetName()        const { return Node.name; }
-    const std::vector<double>& GetTranslation() const { return Node.translation; }
-    const std::vector<double>& GetRotation()    const { return Node.rotation; }
-    const std::vector<double>& GetScale()       const { return Node.scale; }
-    const std::vector<double>& GetMatrix()      const { return Node.matrix; }
-    const std::vector<int>&    GetChildrenIds() const { return Node.children; }
-
-    int GetMeshId()   const { return Node.mesh; }
-    int GetCameraId() const { return Node.camera; }
-    int GetLightId()  const { return Node.light; }
-    int GetSkinId()   const { return Node.skin; }
-    // clang-format on
-};
-
-struct TinyGltfPrimitiveWrapper
-{
-    const tinygltf::Primitive& Primitive;
-
-    const int* GetAttribute(const char* Name) const
-    {
-        auto attrib_it = Primitive.attributes.find(Name);
-        return attrib_it != Primitive.attributes.end() ?
-            &attrib_it->second :
-            nullptr;
-    }
-
-    const tinygltf::Primitive& Get() const { return Primitive; }
-
-    int GetIndicesId() const { return Primitive.indices; }
-    int GetMaterialId() const { return Primitive.material; }
-};
-
-struct TinyGltfMeshWrapper
-{
-    const tinygltf::Mesh& Mesh;
-
-    const tinygltf::Mesh& Get() const { return Mesh; }
-    const std::string&    GetName() const { return Mesh.name; }
-
-    size_t                   GetPrimitiveCount() const { return Mesh.primitives.size(); }
-    TinyGltfPrimitiveWrapper GetPrimitive(size_t Idx) const { return TinyGltfPrimitiveWrapper{Mesh.primitives[Idx]}; };
-};
-
-struct TinyGltfBufferViewWrapper;
-struct TinyGltfAccessorWrapper
-{
-    const tinygltf::Accessor& Accessor;
-
-    size_t GetCount() const { return Accessor.count; }
-    float3 GetMinValues() const
-    {
-        return float3{
-            static_cast<float>(Accessor.minValues[0]),
-            static_cast<float>(Accessor.minValues[1]),
-            static_cast<float>(Accessor.minValues[2]),
-        };
-    }
-    float3 GetMaxValues() const
-    {
-        return float3{
-            static_cast<float>(Accessor.maxValues[0]),
-            static_cast<float>(Accessor.maxValues[1]),
-            static_cast<float>(Accessor.maxValues[2]),
-        };
-    }
-
-    // clang-format off
-    int        GetBufferViewId()  const { return Accessor.bufferView; }
-    size_t     GetByteOffset()    const { return Accessor.byteOffset; }
-    VALUE_TYPE GetComponentType() const { return TinyGltfComponentTypeToValueType(Accessor.componentType); }
-    int32_t    GetNumComponents() const { return tinygltf::GetNumComponentsInType(Accessor.type); }
-    bool       IsNormalized()     const { return Accessor.normalized; }
-    // clang-format on
-    int GetByteStride(const TinyGltfBufferViewWrapper& View) const;
-};
-
-struct TinyGltfPerspectiveCameraWrapper
-{
-    const tinygltf::PerspectiveCamera& Camera;
-
-    // clang-format off
-    double GetAspectRatio() const { return Camera.aspectRatio; }
-    double GetYFov()        const { return Camera.yfov; }
-    double GetZNear()       const { return Camera.znear; }
-    double GetZFar()        const { return Camera.zfar; }
-    // clang-format on
-};
-
-struct TinyGltfOrthoCameraWrapper
-{
-    const tinygltf::OrthographicCamera& Camera;
-
-    // clang-format off
-    double GetXMag()  const { return Camera.xmag; }
-    double GetYMag()  const { return Camera.ymag; }
-    double GetZNear() const { return Camera.znear; }
-    double GetZFar()  const { return Camera.zfar; }
-    // clang-format on
-};
-
-struct TinyGltfCameraWrapper
-{
-    const tinygltf::Camera& Camera;
-
-    const std::string&               GetName() const { return Camera.name; }
-    const std::string&               GetType() const { return Camera.type; }
-    TinyGltfPerspectiveCameraWrapper GetPerspective() const { return TinyGltfPerspectiveCameraWrapper{Camera.perspective}; }
-    TinyGltfOrthoCameraWrapper       GetOrthographic() const { return TinyGltfOrthoCameraWrapper{Camera.orthographic}; }
-};
-
-struct TinyGltfLightWrapper
-{
-    const tinygltf::Light& Light;
-
-    // clang-format off
-    const std::string&         GetName()  const { return Light.name; }
-    const std::string&         GetType()  const { return Light.type; }
-    const std::vector<double>& GetColor() const { return Light.color; }
-
-    const double& GetIntensity()      const { return Light.intensity; }
-    const double& GetRange()          const { return Light.range; }
-    const double& GetInnerConeAngle() const { return Light.spot.innerConeAngle; }
-    const double& GetOuterConeAngle() const { return Light.spot.outerConeAngle; }
-    // clang-format on
-};
-
-struct TinyGltfBufferViewWrapper
-{
-    const tinygltf::BufferView& View;
-
-    int    GetBufferId() const { return View.buffer; }
-    size_t GetByteOffset() const { return View.byteOffset; }
-};
-
-struct TinyGltfBufferWrapper
-{
-    const tinygltf::Buffer& Buffer;
-
-    const Uint8* GetData(size_t Offset) const { return &Buffer.data[Offset]; }
-};
-
-struct TinyGltfSkinWrapper
-{
-    const tinygltf::Skin& Skin;
-
-    const std::string&      GetName() const { return Skin.name; }
-    int                     GetSkeletonId() const { return Skin.skeleton; }
-    int                     GetInverseBindMatricesId() const { return Skin.inverseBindMatrices; }
-    const std::vector<int>& GetJointIds() const { return Skin.joints; }
-};
-
-struct TinyGltfAnimationSamplerWrapper
-{
-    const tinygltf::AnimationSampler& Sam;
-
-    AnimationSampler::INTERPOLATION_TYPE GetInterpolation() const
-    {
-        if (Sam.interpolation == "LINEAR")
-            return AnimationSampler::INTERPOLATION_TYPE::LINEAR;
-        else if (Sam.interpolation == "STEP")
-            return AnimationSampler::INTERPOLATION_TYPE::STEP;
-        else if (Sam.interpolation == "CUBICSPLINE")
-            return AnimationSampler::INTERPOLATION_TYPE::CUBICSPLINE;
-        else
-        {
-            UNEXPECTED("Unexpected animation interpolation type: ", Sam.interpolation);
-            return AnimationSampler::INTERPOLATION_TYPE::LINEAR;
-        }
-    }
-
-    int GetInputId() const { return Sam.input; }
-    int GetOutputId() const { return Sam.output; }
-};
-
-
-struct TinyGltfAnimationChannelWrapper
-{
-    const tinygltf::AnimationChannel& Channel;
-
-    AnimationChannel::PATH_TYPE GetPathType() const
-    {
-        if (Channel.target_path == "rotation")
-            return AnimationChannel::PATH_TYPE::ROTATION;
-        else if (Channel.target_path == "translation")
-            return AnimationChannel::PATH_TYPE::TRANSLATION;
-        else if (Channel.target_path == "scale")
-            return AnimationChannel::PATH_TYPE::SCALE;
-        else if (Channel.target_path == "weights")
-            return AnimationChannel::PATH_TYPE::WEIGHTS;
-        else
-        {
-            UNEXPECTED("Unsupported animation channel path ", Channel.target_path);
-            return AnimationChannel::PATH_TYPE::ROTATION;
-        }
-    }
-
-    int GetSamplerId() const { return Channel.sampler; }
-    int GetTargetNodeId() const { return Channel.target_node; }
-};
-
-struct TinyGltfAnimationWrapper
-{
-    const tinygltf::Animation& Anim;
-
-    const std::string& GetName() const { return Anim.name; }
-
-    size_t GetSamplerCount() const { return Anim.samplers.size(); }
-    size_t GetChannelCount() const { return Anim.channels.size(); }
-
-    TinyGltfAnimationSamplerWrapper GetSampler(size_t Id) const { return TinyGltfAnimationSamplerWrapper{Anim.samplers[Id]}; }
-    TinyGltfAnimationChannelWrapper GetChannel(size_t Id) const { return TinyGltfAnimationChannelWrapper{Anim.channels[Id]}; }
-};
-
-struct TinyGltfSceneWrapper
-{
-    const tinygltf::Scene& Scene;
-
-    const std::string& GetName() const { return Scene.name; }
-    size_t             GetNodeCount() const { return Scene.nodes.size(); }
-    int                GetNodeId(size_t Idx) const { return Scene.nodes[Idx]; }
-};
-
-struct TinyGltfModelWrapper
-{
-    const tinygltf::Model& Model;
-
-    const tinygltf::Model& Get() const { return Model; }
-
-    // clang-format off
-    TinyGltfNodeWrapper       GetNode      (int idx) const { return TinyGltfNodeWrapper      {Model.nodes      [idx]}; }
-    TinyGltfSceneWrapper      GetScene     (int idx) const { return TinyGltfSceneWrapper     {Model.scenes     [idx]}; }
-    TinyGltfMeshWrapper       GetMesh      (int idx) const { return TinyGltfMeshWrapper      {Model.meshes     [idx]}; }
-    TinyGltfAccessorWrapper   GetAccessor  (int idx) const { return TinyGltfAccessorWrapper  {Model.accessors  [idx]}; }
-    TinyGltfCameraWrapper     GetCamera    (int idx) const { return TinyGltfCameraWrapper    {Model.cameras    [idx]}; }
-    TinyGltfLightWrapper      GetLight     (int idx) const { return TinyGltfLightWrapper     {Model.lights     [idx]}; }
-    TinyGltfBufferViewWrapper GetBufferView(int idx) const { return TinyGltfBufferViewWrapper{Model.bufferViews[idx]}; }
-    TinyGltfBufferWrapper     GetBuffer    (int idx) const { return TinyGltfBufferWrapper    {Model.buffers    [idx]}; }
-
-    TinyGltfSkinWrapper      GetSkin      (size_t idx) const { return TinyGltfSkinWrapper      {Model.skins      [idx]}; }
-    TinyGltfAnimationWrapper GetAnimation (size_t idx) const { return TinyGltfAnimationWrapper {Model.animations [idx]}; }
-
-    size_t GetNodeCount()      const { return Model.nodes.size();      }
-    size_t GetSceneCount()     const { return Model.scenes.size();     }
-    size_t GetMeshCount()      const { return Model.meshes.size();     }
-    size_t GetSkinCount()      const { return Model.skins.size();      }
-    size_t GetAnimationCount() const { return Model.animations.size(); }
-
-    int GetDefaultSceneId() const { return Model.defaultScene; }
-    // clang-format on
-};
-
-int TinyGltfAccessorWrapper::GetByteStride(const TinyGltfBufferViewWrapper& View) const
-{
-    return Accessor.ByteStride(View.View);
-}
-
 
 struct TextureInitData : public ObjectBase<IObject>
 {
@@ -1605,7 +1320,7 @@ void Model::LoadMaterials(const tinygltf::Model& gltf_model, const ModelCreateIn
         MatBuilder.Finalize();
 
         if (MaterialLoadCallback != nullptr)
-            MaterialLoadCallback(&gltf_model, &gltf_mat, Mat);
+            MaterialLoadCallback(&gltf_mat, Mat);
 
         Materials.push_back(std::move(Mat));
     }
@@ -1922,9 +1637,6 @@ void Model::LoadFromFile(IRenderDevice*         pDevice,
                          IDeviceContext*        pContext,
                          const ModelCreateInfo& CI)
 {
-    if (CI.FileName == nullptr || *CI.FileName == 0)
-        LOG_ERROR_AND_THROW("File path must not be empty");
-
     TextureCacheType* const pTextureCache = CI.pTextureCache;
     ResourceManager* const  pResourceMgr  = CI.pResourceManager;
     if (CI.pTextureCache != nullptr && pResourceMgr != nullptr)
@@ -1981,7 +1693,8 @@ void Model::LoadFromFile(IRenderDevice*         pDevice,
     LoadTextures(pDevice, gltf_model, LoaderData.BaseDir, pTextureCache, pResourceMgr);
 
     ModelBuilder Builder{CI, *this};
-    Builder.Execute(TinyGltfModelWrapper{gltf_model}, CI.SceneId, pDevice);
+    Builder.m_gltf_model = std::make_unique<TinyGltfModelWrapper>(&gltf_model);
+    Builder.Execute(&gltf_model, CI.SceneId, pDevice);
 
     if (pContext != nullptr)
     {
@@ -2119,7 +1832,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
     }
 
     VERIFY_EXPR(SceneIndex < Scenes.size());
-    const Animation& animation = Animations[AnimationIndex];
+    const spw::Animation& animation = Animations[AnimationIndex];
 
     time = clamp(time, animation.Start, animation.End);
 
@@ -2139,9 +1852,9 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
         A.Scale       = pN->Scale;
     }
 
-    for (const AnimationChannel& channel : animation.Channels)
+    for (const auto& channel : animation.Channels)
     {
-        const AnimationSampler& sampler = animation.Samplers[channel.SamplerIndex];
+        const auto& sampler = animation.Samplers[channel.SamplerIndex];
         if (sampler.Inputs.size() > sampler.OutputsVec4.size())
         {
             continue;
@@ -2159,7 +1872,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
 
         // LINEAR: The animated values are linearly interpolated between keyframes.
         //         The number of output elements **MUST** equal the number of input elements.
-        if (sampler.Interpolation == AnimationSampler::INTERPOLATION_TYPE::LINEAR)
+        if (sampler.Interpolation == spw::AnimationSampler::INTERPOLATION_TYPE::LINEAR)
         {
             if (sampler.Inputs.size() < 2)
                 continue;
@@ -2178,7 +1891,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
         u = clamp(u, 0.f, 1.f);
         switch (channel.PathType)
         {
-            case AnimationChannel::PATH_TYPE::TRANSLATION:
+            case spw::AnimationChannel::PATH_TYPE::TRANSLATION:
             {
                 const float3 f3Start = sampler.OutputsVec4[Idx];
                 const float3 f3End   = sampler.OutputsVec4[Idx + 1];
@@ -2186,7 +1899,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
                 break;
             }
 
-            case AnimationChannel::PATH_TYPE::SCALE:
+            case spw::AnimationChannel::PATH_TYPE::SCALE:
             {
                 const float3 f3Start = sampler.OutputsVec4[Idx];
                 const float3 f3End   = sampler.OutputsVec4[Idx + 1];
@@ -2194,7 +1907,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
                 break;
             }
 
-            case AnimationChannel::PATH_TYPE::ROTATION:
+            case spw::AnimationChannel::PATH_TYPE::ROTATION:
             {
                 QuaternionF q1;
                 q1.q.x = sampler.OutputsVec4[Idx].x;
@@ -2212,7 +1925,7 @@ void Model::UpdateAnimation(Uint32 SceneIndex, Uint32 AnimationIndex, float time
                 break;
             }
 
-            case AnimationChannel::PATH_TYPE::WEIGHTS:
+            case spw::AnimationChannel::PATH_TYPE::WEIGHTS:
             {
                 UNEXPECTED("Weights are not currently supported");
                 break;
