@@ -48,7 +48,6 @@ endfunction()
 
 add_subdirectory(ThirdParty)
 add_subdirectory(TextureLoader)
-add_subdirectory(AssetLoader)
 add_subdirectory(Imgui)
 add_subdirectory(NativeApp)
 
