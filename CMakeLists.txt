@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.20)
 
 if(NOT DILIGENT_CORE_FOUND)
 	message(FATAL_ERROR "DiligentCore module is not found. Please add DiligentCore module to the project before DiligentTools module.")
