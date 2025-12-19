@@ -18,14 +18,14 @@
 #include "imGuIZMO.h"
 
 
-ImVector<Diligent::float3> imguiGizmo::sphereVtx;
+ImVector<Vector3f> imguiGizmo::sphereVtx;
 ImVector<int>              imguiGizmo::sphereTess;
-ImVector<Diligent::float3> imguiGizmo::arrowVtx[4];
-ImVector<Diligent::float3> imguiGizmo::arrowNorm[4];
-ImVector<Diligent::float3> imguiGizmo::cubeVtx;
-ImVector<Diligent::float3> imguiGizmo::cubeNorm;
-ImVector<Diligent::float3> imguiGizmo::planeVtx;
-ImVector<Diligent::float3> imguiGizmo::planeNorm;
+ImVector<Vector3f> imguiGizmo::arrowVtx[4];
+ImVector<Vector3f> imguiGizmo::arrowNorm[4];
+ImVector<Vector3f> imguiGizmo::cubeVtx;
+ImVector<Vector3f> imguiGizmo::cubeNorm;
+ImVector<Vector3f> imguiGizmo::planeVtx;
+ImVector<Vector3f> imguiGizmo::planeNorm;
 bool imguiGizmo::solidAreBuilded = false;
 bool imguiGizmo::dragActivate    = false;
 
@@ -34,21 +34,21 @@ using tbT = float;
 //
 //  Settings
 //
-//      axes/arrow are composed of cone (or pyramid) and cylinder 
+//      axes/arrow are composed of cone (or pyramid) and cylinder
 //      (or parallelepiped): this solid are builded at first instance
-//      and will have same slices/radius/length for all controls in your 
+//      and will have same slices/radius/length for all controls in your
 //      applications but can be resized proportionally with a reductin
 //      factor: solidResizeFactor and  axesResizeFactor.
 //      Same thing for the colors of sphere tessellation, while color
 //      of axes and cube are fixed
 //
 //      Solid/axes settings can be set one only one time before your widget
-//      while solidResizeFactor and  axesResizeFactor settings must 
+//      while solidResizeFactor and  axesResizeFactor settings must
 //      be call before and always of your widget, every redraw... and
 //      restored after use... like push/pop
 //      ... I avoided creating a push/pop mechanism
 ////////////////////////////////////////////////////////////////////////////
- 
+
 // arrow/axes components
 ///////////////////////////////////////
 int   imguiGizmo::coneSlices = 4;
@@ -76,8 +76,8 @@ float imguiGizmo::planeThickness = 0.015f;
 
 // Axes resize
 ///////////////////////////////////////
-Diligent::float3 imguiGizmo::axesResizeFactor(0.95f, 1.f , 1.f);
-Diligent::float3 imguiGizmo::savedAxesResizeFactor = imguiGizmo::axesResizeFactor;
+Vector3f imguiGizmo::axesResizeFactor(0.95f, 1.f , 1.f);
+Vector3f imguiGizmo::savedAxesResizeFactor = imguiGizmo::axesResizeFactor;
 
 // Solid resize
 ///////////////////////////////////////
@@ -94,10 +94,10 @@ ImVec4 imguiGizmo::savedDirectionColor = imguiGizmo::directionColor;
 ImVec4 imguiGizmo::planeColor(0.0f, 0.5f, 1.0, STARTING_ALPHA_PLANE);
 ImVec4 imguiGizmo::savedPlaneColor = imguiGizmo::planeColor;
 
-// Sphere Colors 
+// Sphere Colors
 ///////////////////////////////////////
 ImU32 imguiGizmo::sphereColors[2]       = { 0xff401010, 0xffc0a0a0 }; // Tessellation colors
-ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 }; 
+ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 };
 //ImU32 spherecolorA=0xff005cc0, spherecolorB=0xffc05c00;
 
 //
@@ -105,24 +105,24 @@ ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 };
 //
 //      input:
 //          size:   dimension of the control
-//          mode:   visualization mode: axis starting from origin, fullAxis 
+//          mode:   visualization mode: axis starting from origin, fullAxis
 //                  (whit or w/o solid at 0,0,0) or only one arrow for direction
 //
 //      other settings (to call before and always of your control):
-//          dimesion solid, axes, and arrow, slice of poligons end over: view 
-//          section "settings of class declaration", these these values are valid for 
-//          ALL controls in your application, because the lists of triangles/quads, 
-//          which compose the solids, are builded one time with the first 
+//          dimesion solid, axes, and arrow, slice of poligons end over: view
+//          section "settings of class declaration", these these values are valid for
+//          ALL controls in your application, because the lists of triangles/quads,
+//          which compose the solids, are builded one time with the first
 //          instance ... and NOT every redraw
 //
-//          solidResizeFactor - axesResizeFactor 
+//          solidResizeFactor - axesResizeFactor
 //              can resize axes or solid, respectively (helper func)
 ////////////////////////////////////////////////////////////////////////////
 
 namespace ImGui
 {
 //
-//  Quaternion control 
+//  Quaternion control
 //
 //      input/output: Diligent::Quaternion (quaternion) for full control
 ////////////////////////////////////////////////////////////////////////////
@@ -141,12 +141,12 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& quat, float size, const i
 
 
 //
-//  Angle/Axes control 
+//  Angle/Axes control
 //
-//      input/output: 
-//          Diligent::float4 - X Y Z vector/axes components - W angle of rotation
+//      input/output:
+//          float4 - X Y Z vector/axes components - W angle of rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::float4& axis_angle, float size, const int mode)
+bool gizmo3D(const char* label, Vector4f& axis_angle, float size, const int mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -155,25 +155,25 @@ bool gizmo3D(const char* label, Diligent::float4& axis_angle, float size, const 
 }
 
 //
-//  Direction control : 
-//      only in directional mode! ... for obvious reasons ;-) 
-//      
-//      input/output: Diligent::float3 - X Y Z vector/axes components
+//  Direction control :
+//      only in directional mode! ... for obvious reasons ;-)
+//
+//      input/output: Vector3f - X Y Z vector/axes components
 ////////////////////////////////////////////////////////////////////////////
 
-bool gizmo3D(const char* label, Diligent::float3& dir, float size, const int mode)
+bool gizmo3D(const char* label, Vector3f& dir, float size, const int mode)
 {
     imguiGizmo g;
-    g.modeSettings((mode & (imguiGizmo::modeDirection | imguiGizmo::modeDirPlane)) ? mode : imguiGizmo::modeDirection); 
+    g.modeSettings((mode & (imguiGizmo::modeDirection | imguiGizmo::modeDirPlane)) ? mode : imguiGizmo::modeDirection);
 
     return g.getTransforms(g.qtV, label, dir, size);
 
 }
 
 //
-//  2 Manipulators -> 2 Quaternions 
+//  2 Manipulators -> 2 Quaternions
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
+//      input/output: glm::axes (quaternion) for full control - LeftClick
 //                    glm::spot (quaternion) for full control - RightClick
 //
 //                    both pressed buttons... rotate together
@@ -184,10 +184,10 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::Quaternio
 {
     imguiGizmo g;
     g.setDualMode(mode);
-    
+
     g.qtV  = axes;
     g.qtV2 = spot;
-    
+
     bool ret = g.drawFunc(label, size);
     if(ret) { axes = g.qtV; spot = g.qtV2; }
 
@@ -197,12 +197,12 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::Quaternio
 //
 //  2 Manipulators -> Quaternions and Vec3
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
+//      input/output: glm::axes (quaternion) for full control - LeftClick
 //                    glm::spot (vec3)       for full control - RightClick
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::float3& spotDir, float size, const int mode)
+bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Vector3f& spotDir, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -217,12 +217,12 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::float3& s
 //
 //  2 Manipulators -> Quaternions and Vec4
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
+//      input/output: glm::axes (quaternion) for full control - LeftClick
 //                    glm::spot (vec4 -> xyz axes, q angle)   - RightClick
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::float4& axesAngle, float size, const int mode)
+bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Vector4f& axesAngle, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -239,7 +239,7 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::float4& a
 
 static inline int clamp(int v, int mn, int mx)
 {
-    return (v < mn) ? mn : (v > mx) ? mx : v; 
+    return (v < mn) ? mn : (v > mx) ? mx : v;
 }
 
 //
@@ -247,23 +247,23 @@ static inline int clamp(int v, int mn, int mx)
 //      faster but minus cute/precise.. ok for sphere
 ////////////////////////////////////////////////////////////////////////////
 inline ImU32 addLightEffect(ImU32 color, float light)
-{         
+{
     float l = ((light < 0.6f) ? 0.6f : light) * 0.8f;
-    float lc = light * 80.f;                    // ambient component 
+    float lc = light * 80.f;                    // ambient component
     return   clamp(ImU32((( color      & 0xff)*l + lc)),0,255)        |
             (clamp(ImU32((((color>>8)  & 0xff)*l + lc)),0,255) <<  8) |
             (clamp(ImU32((((color>>16) & 0xff)*l + lc)),0,255) << 16) |
-            (ImU32(ImGui::GetStyle().Alpha * (color>>24))  << 24);  
+            (ImU32(ImGui::GetStyle().Alpha * (color>>24))  << 24);
 }
 //
 //  LightEffect
 //      with distance attenuatin
 ////////////////////////////////////////////////////////////////////////////
-inline ImU32 addLightEffect(const Diligent::float4 &color, float light, float atten)
-{                          
-    Diligent::float3 l = Diligent::float3(1, 1, 1) * ((light < 0.5f)  ? 0.5f  : light); 
-    Diligent::float3 a = Diligent::float3(1, 1, 1) * ((atten > 0.25f) ? 0.25f : atten);
-    Diligent::float3 c(((Diligent::float3(color) + l * 0.5f) * l) * 0.75f +  a * Diligent::float3(color) * 0.45f + a * 0.25f);
+inline ImU32 addLightEffect(const Vector4f &color, float light, float atten)
+{
+    Vector3f l = Vector3f(1, 1, 1) * ((light < 0.5f)  ? 0.5f  : light);
+    Vector3f a = Vector3f(1, 1, 1) * ((atten > 0.25f) ? 0.25f : atten);
+    Vector3f c(((Vector3f(color) + l * 0.5f) * l) * 0.75f +  a * Vector3f(color) * 0.45f + a * 0.25f);
 
     const float alpha = color.a * ImGui::GetStyle().Alpha; //ImGui::GetCo(ImGuiCol_FrameBg).w;
     return ImGui::ColorConvertFloat4ToU32(ImVec4(c.x, c.y, c.z, alpha));
@@ -271,54 +271,54 @@ inline ImU32 addLightEffect(const Diligent::float4 &color, float light, float at
 
 
 inline ImU32 addLightEffect(ImU32 color, float light,  float atten)
-{                        
-    Diligent::float4 c(float(color & 0xff) / 255.f, float((color>>8) & 0xff)/255.f, float((color>>16) & 0xff)/255.f, 1.0);
+{
+    Vector4f c(float(color & 0xff) / 255.f, float((color>>8) & 0xff)/255.f, float((color>>16) & 0xff)/255.f, 1.0);
     return addLightEffect(c, light, atten);
 }
 
 //  inline helper drawing functions
 ////////////////////////////////////////////////////////////////////////////
-typedef Diligent::float3 & (*ptrFunc)(Diligent::float3 &);
+typedef Vector3f & (*ptrFunc)(Vector3f &);
 
 
-inline Diligent::float3 &adjustPlane(Diligent::float3 &coord)
+inline Vector3f &adjustPlane(Vector3f &coord)
 {
     coord.x = (coord.x > 0) ? ( 2.5f * coord.x - 1.6f) : coord.x ;
     coord.x = (coord.x) * 0.5f + 0.5f + (coord.x > 0.f ? -imguiGizmo::planeThickness : imguiGizmo::planeThickness) * imguiGizmo::solidResizeFactor;
-    coord *= Diligent::float3(1.f, 2.f, 2.f);
+    coord *= Vector3f(1.f, 2.f, 2.f);
     return coord;
 }
 
-inline Diligent::float3 &adjustDir(Diligent::float3 &coord)
+inline Vector3f &adjustDir(Vector3f &coord)
 {
     coord.x = (coord.x > 0) ? ( 2.5f * coord.x - 1.6f) : coord.x + 0.1f;
-    coord *= Diligent::float3(1.f, 3.f, 3.f);
+    coord *= Vector3f(1.f, 3.f, 3.f);
     return coord;
 }
 
-inline Diligent::float3 &adjustSpotCyl(Diligent::float3 &coord)
+inline Vector3f &adjustSpotCyl(Vector3f &coord)
 {
     const float halfCylMinusCone = 1.f - imguiGizmo::coneLength;
     coord.x = (coord.x * 0.075f - 2.f + (halfCylMinusCone - halfCylMinusCone * 0.075f)); //cyl begin where cone end
     return coord;
 
 }
-inline Diligent::float3 &adjustSpotCone(Diligent::float3 &coord)
+inline Vector3f &adjustSpotCone(Vector3f &coord)
 {
     coord.x-= 2.00f;
     return coord;
 }
 
-inline Diligent::float3 fastRotate (int axis, Diligent::float3 &v)
+inline Vector3f fastRotate (int axis, Vector3f &v)
 {
-    return ((axis == imguiGizmo::axisIsY) ? Diligent::float3(-v.y, v.x, v.z) : // rotation Z 90'
-           ((axis == imguiGizmo::axisIsZ) ? Diligent::float3(-v.z, v.y, v.x) : // rotation Y 90'                            
+    return ((axis == imguiGizmo::axisIsY) ? Vector3f(-v.y, v.x, v.z) : // rotation Z 90'
+           ((axis == imguiGizmo::axisIsZ) ? Vector3f(-v.z, v.y, v.x) : // rotation Y 90'
                                           v));
 }
 ////////////////////////////////////////////////////////////////////////////
 //
 //  Draw imguiGizmo
-//      
+//
 ////////////////////////////////////////////////////////////////////////////
 bool imguiGizmo::drawFunc(const char* label, float size)
 {
@@ -328,15 +328,15 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     const float arrowStartingPoint = (axesOriginType & imguiGizmo::sphereAtOrigin) ? sphereRadius * solidResizeFactor:
-                                    ((axesOriginType & imguiGizmo::cubeAtOrigin  ) ? cubeSize     * solidResizeFactor: 
+                                    ((axesOriginType & imguiGizmo::cubeAtOrigin  ) ? cubeSize     * solidResizeFactor:
                                                                                    cylRadius * .5f);
     // if modeDual... leave space for draw light arrow
-    Diligent::float3 resizeAxes( ((drawMode&modeDual) && (axesResizeFactor.x > 0.75f)) ? Diligent::float3(0.75f, axesResizeFactor.y, axesResizeFactor.z) : axesResizeFactor);
+    Vector3f resizeAxes( ((drawMode&modeDual) && (axesResizeFactor.x > 0.75f)) ? Vector3f(0.75f, axesResizeFactor.y, axesResizeFactor.z) : axesResizeFactor);
 
     //  build solids... once!
     ///////////////////////////////////////
     if (!solidAreBuilded)  {
-        const float arrowBgn = -1.0f, arrowEnd = 1.0f;     
+        const float arrowBgn = -1.0f, arrowEnd = 1.0f;
 
         buildCone    (arrowEnd - coneLength, arrowEnd, coneRadius, coneSlices);
         buildCylinder(arrowBgn, arrowEnd - coneLength, cylRadius , cylSlices );
@@ -370,27 +370,27 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         auto width  = size;
         auto height = size;
         auto minVal = width < height ? width * 0.5f : height * 0.5f;
-        auto offset = Diligent::float3(0.5f * width, 0.5f * height, 0.0);
+        auto offset = Vector3f(0.5f * width, 0.5f * height, 0.0);
 
         ImVec2 mouse = ImGui::GetMousePos() - controlPos;
 
-        Diligent::float2 delta = {io.MouseDelta.x, -io.MouseDelta.y};
-        Diligent::float2 pos   = {mouse.x, mouse.y};
-        Diligent::float3 rotationVector(1, 1, 1);
-        if(io.KeyShift)                   { rotationVector = Diligent::float3(1, 0, 0); }
-        else if(io.KeyCtrl)               { rotationVector = Diligent::float3(0, 1, 0); }
-        else if(io.KeyAlt || io.KeySuper) { rotationVector = Diligent::float3(0, 0, 1); }
+        Vector2f delta = {io.MouseDelta.x, -io.MouseDelta.y};
+        Vector2f pos   = {mouse.x, mouse.y};
+        Vector3f rotationVector(1, 1, 1);
+        if(io.KeyShift)                   { rotationVector = Vector3f(1, 0, 0); }
+        else if(io.KeyCtrl)               { rotationVector = Vector3f(0, 1, 0); }
+        else if(io.KeyAlt || io.KeySuper) { rotationVector = Vector3f(0, 0, 1); }
 
         Diligent::QuaternionF qtStep = {0, 0, 0, 1};
-        if(delta == Diligent::float2(0,0))
+        if(delta == Vector2f(0,0))
         {
             return;
         }
 
-        Diligent::float3 a(pos.x - delta.x, height - (pos.y+delta.y), 0);
-        Diligent::float3 b(pos.x,           height -  pos.y,          0);
+        Vector3f a(pos.x - delta.x, height - (pos.y+delta.y), 0);
+        Vector3f b(pos.x,           height -  pos.y,          0);
 
-        auto vecFromPos = [&] (Diligent::float3& v)
+        auto vecFromPos = [&] (Vector3f& v)
         {
             v -= offset;
             v /= minVal;
@@ -403,11 +403,11 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         vecFromPos(b);
 
         auto axis = cross(a, b);
-        if(axis == Diligent::float3(0,0,0))
+        if(axis == Vector3f(0,0,0))
             return;
         axis = normalize(axis);
 
-        auto AdotB = dot(a, b); 
+        auto AdotB = dot(a, b);
         auto angle = std::acos( AdotB > 1 ? 1 : AdotB < -1 ? -1 : AdotB); // clamp need!!! corss float is approximate to FLT_EPSILON
 
         const auto tbScale  = 1;  //base scale sensibility
@@ -422,7 +422,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //LeftClick
     if (ImGui::IsItemActive()) {
         highlighted = true;
-        if(ImGui::IsMouseDragging(0))                       getTrackball(qtV);        
+        if(ImGui::IsMouseDragging(0))                       getTrackball(qtV);
         if(drawMode==modeDual && ImGui::IsMouseDragging(1)) getTrackball(qtV2); // if dual mode... move together
         if(drawMode==modeDual && ImGui::IsMouseDragging(2)) { getTrackball(qtV);  getTrackball(qtV2); } // middle if dual mode... move together
 
@@ -441,10 +441,10 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     const ImVec2 wpUV = ImGui::GetFontTexUvWhitePixel(); //culling versus
     ImVec2 uv[4]; ImU32 col[4]; //buffers to storetransformed vtx & col for PrimVtx & PrimQuadUV
 
-    Diligent::QuaternionF quat(Diligent::normalize(qtV)); 
+    Diligent::QuaternionF quat(Diligent::normalize(qtV));
 
     ////////////////////////////////////////////////////////////////////////////
-    //  Just a "few" lambdas... 
+    //  Just a "few" lambdas...
 
     //////////////////////////////////////////////////////////////////
     auto normalizeToControlSize = [&] (float x, float y) {
@@ -453,9 +453,9 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     //////////////////////////////////////////////////////////////////
     auto addTriangle = [&] ()
-    {   // test cull dir        
-        if(Diligent::cross(Diligent::float3(uv[1].x - uv[0].x, uv[1].y - uv[0].y, 0), 
-                           Diligent::float3(uv[2].x - uv[0].x, uv[2].y - uv[0].y, 0)).z > 0.f)
+    {   // test cull dir
+        if(Diligent::cross(Vector3f(uv[1].x - uv[0].x, uv[1].y - uv[0].y, 0),
+                           Vector3f(uv[2].x - uv[0].x, uv[2].y - uv[0].y, 0)).z > 0.f)
             { uv[1] = uv[2] = uv[0]; }
 
         for(int i=0; i<3; i++) draw_list->PrimVtx(uv[i], wpUV, col[i]);
@@ -464,69 +464,69 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //////////////////////////////////////////////////////////////////
     auto addQuad = [&] (ImU32 colLight)
     {   // test cull dir
-        if(Diligent::cross(Diligent::float3(uv[1].x-uv[0].x, uv[1].y-uv[0].y, 0), 
-                           Diligent::float3(uv[3].x-uv[0].x, uv[3].y-uv[0].y, 0)).z > 0.f)
+        if(Diligent::cross(Vector3f(uv[1].x-uv[0].x, uv[1].y-uv[0].y, 0),
+                           Vector3f(uv[3].x-uv[0].x, uv[3].y-uv[0].y, 0)).z > 0.f)
             { uv[3] = uv[1] = uv[2] = uv[0]; }
 
-        draw_list->PrimQuadUV(uv[0],uv[1],uv[2],uv[3], wpUV, wpUV, wpUV, wpUV, colLight); 
+        draw_list->PrimQuadUV(uv[0],uv[1],uv[2],uv[3], wpUV, wpUV, wpUV, wpUV, colLight);
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawSphere = [&] () 
+    auto drawSphere = [&] ()
     {
-        draw_list->PrimReserve(sphereVtx.size(), sphereVtx.size()); // num vert/indices 
+        draw_list->PrimReserve(sphereVtx.size(), sphereVtx.size()); // num vert/indices
         auto itTess = sphereTess.begin();
         for(auto itVtx = sphereVtx.begin(); itVtx != sphereVtx.end(); )  {
             for(int h=0; h<3; h++, itTess++) {
-                Diligent::float3 coord = quat.RotateVector(*itVtx++ * solidResizeFactor);        //Rotate
+                Vector3f coord = quat.RotateVector(*itVtx++ * solidResizeFactor);        //Rotate
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 const float drawSize = sphereRadius * solidResizeFactor;
-                col[h] = addLightEffect(sphereColors[*itTess], (-drawSize*.5f + (coord.z*coord.z) / (drawSize*drawSize))); 
-                //col[h] = colorLightedY(sphereCol[i++], (-sizeSphereRadius.5f + (coord.z*coord.z) / (sizeSphereRadius*sizeSphereRadius)), coord.z); 
+                col[h] = addLightEffect(sphereColors[*itTess], (-drawSize*.5f + (coord.z*coord.z) / (drawSize*drawSize)));
+                //col[h] = colorLightedY(sphereCol[i++], (-sizeSphereRadius.5f + (coord.z*coord.z) / (sizeSphereRadius*sizeSphereRadius)), coord.z);
             }
             addTriangle();
         }
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawCube = [&] ()  
+    auto drawCube = [&] ()
     {
-        draw_list->PrimReserve(cubeNorm.size()*6, cubeNorm.size()*4); // num vert/indices 
+        draw_list->PrimReserve(cubeNorm.size()*6, cubeNorm.size()*4); // num vert/indices
         for(auto itNorm = cubeNorm.begin(), itVtx  = cubeVtx.begin() ; itNorm != cubeNorm.end();) {
-            Diligent::float3 coord;
-            Diligent::float3 norm = quat.RotateVector(*itNorm);
+            Vector3f coord;
+            Vector3f norm = quat.RotateVector(*itNorm);
             for (int i = 0; i<4; ) {
-                coord = quat.RotateVector(*itVtx++ * solidResizeFactor);                        
+                coord = quat.RotateVector(*itVtx++ * solidResizeFactor);
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
-            }                    
-            addQuad(addLightEffect(Diligent::float4(abs(*itNorm++), 1.0f), norm.z, coord.z));
+            }
+            addQuad(addLightEffect(Vector4f(abs(*itNorm++), 1.0f), norm.z, coord.z));
         }
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawPlane = [&] ()  
+    auto drawPlane = [&] ()
     {
-        draw_list->PrimReserve(planeNorm.size()*6, planeNorm.size()*4); // num vert/indices 
+        draw_list->PrimReserve(planeNorm.size()*6, planeNorm.size()*4); // num vert/indices
         for(auto itNorm = planeNorm.begin(), itVtx  = planeVtx.begin() ; itNorm != planeNorm.end();) {
-            Diligent::float3 coord;
-            Diligent::float3 norm = quat.RotateVector(*itNorm);
+            Vector3f coord;
+            Vector3f norm = quat.RotateVector(*itNorm);
             for (int i = 0; i<4; ) {
-                coord = quat.RotateVector(*itVtx++ * solidResizeFactor);                        
+                coord = quat.RotateVector(*itVtx++ * solidResizeFactor);
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
-            }                    
+            }
             itNorm++;
-            addQuad(addLightEffect(Diligent::float4(planeColor.x, planeColor.y, planeColor.z, planeColor.w), norm.z, coord.z));
+            addQuad(addLightEffect(Vector4f(planeColor.x, planeColor.y, planeColor.z, planeColor.w), norm.z, coord.z));
         }
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawAxes = [&] (int side) 
-    {   
+    auto drawAxes = [&] (int side)
+    {
         for(int n = 0; n < 4; n++) { //Arrow: 2 Cone -> (Surface + cap) + 2 Cyl -> (Surface + cap)
             for(int arrowAxis = 0; arrowAxis < 3; arrowAxis++) { // draw 3 axes
-                Diligent::float3 arrowCoord(0, 0, 0); arrowCoord[arrowAxis] = 1.0f; // rotate on 3 axis (arrow -> X, Y, Z ) in base to current arrowAxis
-                const float arrowCoordZ = Diligent::float3(quat.RotateVector(arrowCoord)).z; //.Rotate
+                Vector3f arrowCoord(0, 0, 0); arrowCoord[arrowAxis] = 1.0f; // rotate on 3 axis (arrow -> X, Y, Z ) in base to current arrowAxis
+                const float arrowCoordZ = Vector3f(quat.RotateVector(arrowCoord)).z; //.Rotate
 
                 const int i = (arrowCoordZ > 0) ? 3 - n : n; //painter algorithm: before farthest
 
@@ -543,23 +543,23 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
                 for (auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+i)->begin(); itVtx != ptrVtx->end(); ) { //for all Vtx
 #if !defined(imguiGizmo_INTERPOLATE_NORMALS)
-                    Diligent::float3 norm( quat * fastRotate(arrowAxis, *itNorm++));
-#endif                    
+                    Vector3f norm( quat * fastRotate(arrowAxis, *itNorm++));
+#endif
                     for(int h=0; h<3; h++) {
-                        Diligent::float3 coord(*itVtx++ * resizeAxes); //  reduction
+                        Vector3f coord(*itVtx++ * resizeAxes); //  reduction
 
                     // reposition starting point...
-                        if (!skipCone && coord.x >  0)                         coord.x = -arrowStartingPoint; 
-                        if ((skipCone && coord.x <= 0) || 
+                        if (!skipCone && coord.x >  0)                         coord.x = -arrowStartingPoint;
+                        if ((skipCone && coord.x <= 0) ||
                            (!showFullAxes && (coord.x < arrowStartingPoint)) ) coord.x =  arrowStartingPoint;
                         //transform
-                        coord = quat.RotateVector(fastRotate(arrowAxis, coord)); 
+                        coord = quat.RotateVector(fastRotate(arrowAxis, coord));
                         uv[h] = normalizeToControlSize(coord.x,coord.y);
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                        Diligent::float3 norm( quat.RotateVector(fastRotate(arrowAxis, *itNorm++)));
-#endif                  
+                        Vector3f norm( quat.RotateVector(fastRotate(arrowAxis, *itNorm++)));
+#endif
                         //col[h] = addLightEffect(ImU32(0xFF) << arrowAxis*8, float(0xa0)*norm.z+.5f);
-                        col[h] = addLightEffect(Diligent::float4(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
+                        col[h] = addLightEffect(Vector4f(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
                     }
                     addTriangle();
                 }
@@ -572,20 +572,20 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     {
         auto *ptrVtx = arrowVtx+idx;
         draw_list->PrimReserve(ptrVtx->size(), ptrVtx->size()); // reserve vtx
-        for (auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+idx)->begin(); itVtx != ptrVtx->end(); ) { 
+        for (auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+idx)->begin(); itVtx != ptrVtx->end(); ) {
 #if !defined(imguiGizmo_INTERPOLATE_NORMALS)
-            Diligent::float3 norm = (quat * *itNorm++);
+            Vector3f norm = (quat * *itNorm++);
 #endif
             for(int h=0; h<3; h++) {
-                Diligent::float3 coord = *itVtx++;
+                Vector3f coord = *itVtx++;
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                Diligent::float3 norm = (q.RotateVector(*itNorm++));
+                Vector3f norm = (q.RotateVector(*itNorm++));
 #endif
                 coord = q.RotateVector(func(coord) * resizeAxes); // remodelling Directional Arrow (func) and transforms;
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 //col[h] = addLightEffect(color, float(0xa0)*norm.z+.5f);
-                col[h] = addLightEffect(Diligent::float4(directionColor.x, directionColor.y, directionColor.z, 1.0f), norm.z, coord.z > 0 ? coord.z : coord.z * .5f);
+                col[h] = addLightEffect(Vector4f(directionColor.x, directionColor.y, directionColor.z, 1.0f), norm.z, coord.z > 0 ? coord.z : coord.z * .5f);
             }
             addTriangle();
         }
@@ -593,28 +593,28 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto dirArrow = [&] (const Diligent::QuaternionF &q, int mode) 
+    auto dirArrow = [&] (const Diligent::QuaternionF &q, int mode)
     {
-        Diligent::float3 arrowCoord(quat.RotateVector(Diligent::float3(1.0f, 0.0f, 0.0f)));
+        Vector3f arrowCoord(quat.RotateVector(Vector3f(1.0f, 0.0f, 0.0f)));
 
         ptrFunc func = (mode == modeDirPlane) ? adjustPlane : adjustDir;
 
         if(arrowCoord.z <= 0) { for(int i = 0; i <  4; i++) drawComponent(i, q, func); if(mode == modeDirPlane) drawPlane(); }
         else                  { if(mode == modeDirPlane) drawPlane(); for(int i = 3; i >= 0; i--) drawComponent(i, q, func); }
-            
+
     };
-    
+
     //////////////////////////////////////////////////////////////////
-    auto spotArrow = [&] (const Diligent::QuaternionF &q, const float arrowCoordZ) 
+    auto spotArrow = [&] (const Diligent::QuaternionF &q, const float arrowCoordZ)
     {
-        if(arrowCoordZ > 0) { 
+        if(arrowCoordZ > 0) {
             drawComponent(CONE_SURF, q, adjustSpotCone); drawComponent(CONE_CAP , q, adjustSpotCone);
             drawComponent(CYL_SURF , q, adjustSpotCyl ); drawComponent(CYL_CAP  , q, adjustSpotCyl );
         } else {
             drawComponent(CYL_CAP  , q, adjustSpotCyl ); drawComponent(CYL_SURF , q, adjustSpotCyl );
             drawComponent(CONE_CAP , q, adjustSpotCone); drawComponent(CONE_SURF, q, adjustSpotCone);
         }
-            
+
     };
 
     //////////////////////////////////////////////////////////////////
@@ -623,7 +623,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         drawAxes(backSide);
         if     (axesOriginType & sphereAtOrigin) drawSphere();
         else if(axesOriginType & cubeAtOrigin)   drawCube();
-        drawAxes(frontSide);  
+        drawAxes(frontSide);
     };
 
     //  ... and now..  draw the widget!!!
@@ -631,7 +631,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     if(drawMode & (modeDirection | modeDirPlane)) dirArrow(quat, drawMode);
     else { // draw arrows & sphere
         if(drawMode == modeDual) {
-            Diligent::float3 spot(qtV2.RotateVector(Diligent::float3(-1, 0, 0))); // versus opposite
+            Vector3f spot(qtV2.RotateVector(Vector3f(-1, 0, 0))); // versus opposite
             if(spot.z>0) { draw3DSystem(); spotArrow(Diligent::normalize(qtV2),spot.z); }
             else         { spotArrow(Diligent::normalize(qtV2),spot.z); draw3DSystem(); }
         } else draw3DSystem();
@@ -647,14 +647,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 //  Polygon
 //
 ////////////////////////////////////////////////////////////////////////////
-void imguiGizmo::buildPolygon(const Diligent::float3 &size, ImVector<Diligent::float3> &vtx, ImVector<Diligent::float3> &norm)
+void imguiGizmo::buildPolygon(const Vector3f &size, ImVector<Vector3f> &vtx, ImVector<Vector3f> &norm)
 {
 
     vtx .clear();
     norm.clear(); 
 
-#define V(a,b,c) vtx.push_back(Diligent::float3(a size.x, b size.y, c size.z))
-#define N(x,y,z) norm.push_back(Diligent::float3(x, y, z))
+#define V(a,b,c) vtx.push_back(Vector3f(a size.x, b size.y, c size.z))
+#define N(x,y,z) norm.push_back(Vector3f(x, y, z))
 
     N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
     N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
@@ -679,7 +679,7 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     sphereVtx .clear();
     sphereTess.clear();
 
-#   define V(x,y,z) sphereVtx.push_back(Diligent::float3(x, y, z))
+#   define V(x,y,z) sphereVtx.push_back(Vector3f(x, y, z))
 #   define T(t)     sphereTess.push_back(t)
  
     const float incAngle = 2.f * Diligent::PI_F / (float)( meridians );
@@ -779,8 +779,8 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
     arrowVtx[CONE_CAP ].clear(); arrowNorm[CONE_CAP ].clear();
     arrowVtx[CONE_SURF].clear(); arrowNorm[CONE_SURF].clear();
 
-#   define V(i,x,y,z) arrowVtx [i].push_back(Diligent::float3(x, y, z))
-#   define N(i,x,y,z) arrowNorm[i].push_back(Diligent::float3(x, y, z)) 
+#   define V(i,x,y,z) arrowVtx [i].push_back(Vector3f(x, y, z))
+#   define N(i,x,y,z) arrowNorm[i].push_back(Vector3f(x, y, z))
 
     for (int j=0; j<slices; j++, angle+=incAngle)
     {   
@@ -830,8 +830,8 @@ void imguiGizmo::buildCylinder(const float x0, const float x1, const float radiu
     arrowVtx[CYL_CAP ].clear(); arrowNorm[CYL_CAP ].clear();
     arrowVtx[CYL_SURF].clear(); arrowNorm[CYL_SURF].clear();
 
-#   define V(i,x,y,z) arrowVtx [i].push_back(Diligent::float3(x, y, z))
-#   define N(i,x,y,z) arrowNorm[i].push_back(Diligent::float3(x, y, z)) 
+#   define V(i,x,y,z) arrowVtx [i].push_back(Vector3f(x, y, z))
+#   define N(i,x,y,z) arrowNorm[i].push_back(Vector3f(x, y, z))
 
     for (int j=0; j<slices; j++, angle+=incAngle) {
         const float y0  = y1;   y1  = cosf(angle);

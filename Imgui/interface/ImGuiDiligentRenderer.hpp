@@ -66,7 +66,7 @@ public:
     void CreateDeviceObjects();
 
 private:
-    inline float4 TransformClipRect(const ImVec2& DisplaySize, const float4& rect) const;
+    inline Vector4f TransformClipRect(const ImVec2& DisplaySize, const Vector4f& rect) const;
     void          UpdateTexture(IDeviceContext* pCtx, ImTextureData* tex);
     void          DestroyTexture(ImTextureData* tex);
 

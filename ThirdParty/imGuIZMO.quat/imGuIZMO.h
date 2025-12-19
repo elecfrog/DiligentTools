@@ -115,26 +115,26 @@ struct imguiGizmo
         frontSide
     }; // or viceversa... 
 
-    static ImVector<Diligent::float3> sphereVtx;
+    static ImVector<Vector3f> sphereVtx;
     static ImVector<int>              sphereTess;
-    static ImVector<Diligent::float3> cubeVtx;
-    static ImVector<Diligent::float3> cubeNorm;
-    static ImVector<Diligent::float3> planeVtx;
-    static ImVector<Diligent::float3> planeNorm;
-    static ImVector<Diligent::float3> arrowVtx[4];
-    static ImVector<Diligent::float3> arrowNorm[4];
+    static ImVector<Vector3f> cubeVtx;
+    static ImVector<Vector3f> cubeNorm;
+    static ImVector<Vector3f> planeVtx;
+    static ImVector<Vector3f> planeNorm;
+    static ImVector<Vector3f> arrowVtx[4];
+    static ImVector<Vector3f> arrowNorm[4];
 
     static void buildPlane(const float size, const float thickness = planeThickness)
     {
-        buildPolygon(Diligent::float3(thickness, size, size), planeVtx, planeNorm);
+        buildPolygon(Vector3f(thickness, size, size), planeVtx, planeNorm);
     }
 
     static void buildCube(const float size)
     {
-        buildPolygon(Diligent::float3(size, size, size), cubeVtx, cubeNorm);
+        buildPolygon(Vector3f(size, size, size), cubeVtx, cubeNorm);
     }
 
-    static void buildPolygon (const Diligent::float3& size, ImVector<Diligent::float3>& vtx, ImVector<Diligent::float3>& norm);
+    static void buildPolygon (const Vector3f& size, ImVector<Vector3f>& vtx, ImVector<Vector3f>& norm);
     static void buildSphere  (const float radius, const int tessFactor);
     static void buildCone    (const float x0, const float x1, const float radius, const int slices);
     static void buildCylinder(const float x0, const float x1, const float radius, const int slices);
@@ -142,7 +142,7 @@ struct imguiGizmo
     
     // helper functions
     ///////////////////////////////////////
-    static void resizeAxesOf(const Diligent::float3& newSize)
+    static void resizeAxesOf(const Vector3f& newSize)
     {
         savedAxesResizeFactor = axesResizeFactor;
         axesResizeFactor = newSize;
@@ -239,25 +239,25 @@ struct imguiGizmo
 
     // vec3 -> quat -> trackbalTransforms -> quat -> vec3
     ////////////////////////////////////////////////////////////////////////////
-    bool getTransforms(Diligent::QuaternionF& q, const char* label, Diligent::float3& dir, float size)
+    bool getTransforms(Diligent::QuaternionF& q, const char* label, Vector3f& dir, float size)
     {
         const float len = Diligent::length(dir);
-        q = Diligent::QuaternionF::RotationFromAxisAngle(Diligent::normalize(Diligent::float3(0, -dir.z, dir.y)), acosf(dir.x/len));
+        q = Diligent::QuaternionF::RotationFromAxisAngle(Diligent::normalize(Vector3f(0, -dir.z, dir.y)), acosf(dir.x/len));
 
         bool ret = drawFunc(label, size);
-        if (ret) dir = q.RotateVector(Diligent::float3(1, 0, 0)) * len; //return vector with original length
+        if (ret) dir = q.RotateVector(Vector3f(1, 0, 0)) * len; //return vector with original length
 
         return ret;
     }
     // Vec4 (xyz axis, w angle) -> quat -> trackbalTransforms -> quat -> vec4
     ////////////////////////////////////////////////////////////////////////////
-    bool getTransforms(Diligent::QuaternionF& q, const char* label, Diligent::float4& axis_angle, float size)
+    bool getTransforms(Diligent::QuaternionF& q, const char* label, Vector4f& axis_angle, float size)
     {
-        q = Diligent::QuaternionF::RotationFromAxisAngle(Diligent::float3(axis_angle), axis_angle.w); //g.ConvertFromAxisAngle();
+        q = Diligent::QuaternionF::RotationFromAxisAngle(Vector3f(axis_angle), axis_angle.w); //g.ConvertFromAxisAngle();
    
         bool ret = drawFunc(label, size);
         
-        if (ret)q.GetAxisAngle((Diligent::float3&)axis_angle, axis_angle.w);
+        if (ret)q.GetAxisAngle((Vector3f&)axis_angle, axis_angle.w);
 
         return ret; 
     }
@@ -279,7 +279,7 @@ struct imguiGizmo
     //      with respective restoreAxesSize and restoreSolidSize.
     //      for example:
     //          // reDim axes ... same lenght, 
-    //          imguiGizmo::resizeAxesOf(Diligent::float3(imguiGizmo::axesResizeFactor.x, 2.0, 2.0)); 
+    //          imguiGizmo::resizeAxesOf(float3(imguiGizmo::axesResizeFactor.x, 2.0, 2.0)); 
     //          imguiGizmo::resizeSolidOf(1.25); // sphere bigger
     //          ImGui::gizmo3D("##RotB", b,sz);   
     //          imguiGizmo::restoreSolidSize(); // restore at default
@@ -323,8 +323,8 @@ struct imguiGizmo
 
     // Axes reduction
     ///////////////////////////////////////
-    static Diligent::float3 axesResizeFactor;
-    static Diligent::float3 savedAxesResizeFactor;
+    static Vector3f axesResizeFactor;
+    static Vector3f savedAxesResizeFactor;
 
     // solid reduction
     ///////////////////////////////////////
@@ -354,12 +354,12 @@ namespace ImGui
 {
 
 IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, Diligent::float4&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, Diligent::float3&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char*, Vector4f&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, Vector3f&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
 
 IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, Diligent::QuaternionF&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, Diligent::float4&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, Diligent::float3&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, Vector4f&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, Diligent::QuaternionF&, Vector3f&,      float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
 };
 

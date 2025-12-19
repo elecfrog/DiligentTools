@@ -717,7 +717,7 @@ void ImGuiDiligentRenderer::CreateDeviceObjects()
 
     {
         BufferDesc BuffDesc;
-        BuffDesc.Size           = sizeof(float4x4);
+        BuffDesc.Size           = sizeof(Matrix4x4f);
         BuffDesc.Usage          = USAGE_DYNAMIC;
         BuffDesc.BindFlags      = BIND_UNIFORM_BUFFER;
         BuffDesc.CPUAccessFlags = CPU_ACCESS_WRITE;
@@ -731,7 +731,7 @@ void ImGuiDiligentRenderer::CreateDeviceObjects()
     VERIFY_EXPR(m_pTextureVar != nullptr);
 }
 
-float4 ImGuiDiligentRenderer::TransformClipRect(const ImVec2& DisplaySize, const float4& rect) const
+Vector4f ImGuiDiligentRenderer::TransformClipRect(const ImVec2& DisplaySize, const Vector4f& rect) const
 {
     switch (m_SurfacePreTransform)
     {
@@ -757,9 +757,9 @@ float4 ImGuiDiligentRenderer::TransformClipRect(const ImVec2& DisplaySize, const
             //              |-----> Y'                                    |                |
             //         New Origin                                         |________________|
             //
-            float2 a{rect.x, rect.y};
-            float2 c{rect.z, rect.w};
-            return float4 //
+            Vector2f a{rect.x, rect.y};
+            Vector2f c{rect.z, rect.w};
+            return Vector4f //
                 {
                     DisplaySize.y - c.y, // min_x = c'.x
                     a.x,                 // min_y = a'.y
@@ -785,9 +785,9 @@ float4 ImGuiDiligentRenderer::TransformClipRect(const ImVec2& DisplaySize, const
             //                                         A                                               A
             //                                         |                                               |
             //                                     New Origin                                      Old Origin
-            float2 a{rect.x, rect.y};
-            float2 c{rect.z, rect.w};
-            return float4 //
+            Vector2f a{rect.x, rect.y};
+            Vector2f c{rect.z, rect.w};
+            return Vector4f //
                 {
                     DisplaySize.x - c.x, // min_x = c'.x
                     DisplaySize.y - c.y, // min_y = c'.y
@@ -816,9 +816,9 @@ float4 ImGuiDiligentRenderer::TransformClipRect(const ImVec2& DisplaySize, const
             //                                                              A
             //                                                              |
             //                                                            Old origin
-            float2 a{rect.x, rect.y};
-            float2 c{rect.z, rect.w};
-            return float4 //
+            Vector2f a{rect.x, rect.y};
+            Vector2f c{rect.z, rect.w};
+            return Vector4f //
                 {
                     a.y,                 // min_x = a'.x
                     DisplaySize.x - c.x, // min_y = c'.y
@@ -1004,7 +1004,7 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
         float B = pDrawData->DisplayPos.y + pDrawData->DisplaySize.y;
 
         // clang-format off
-        float4x4 Projection
+        Matrix4x4f Projection
         {
             2.0f / (R - L),                  0.0f,   0.0f,   0.0f,
             0.0f,                  2.0f / (T - B),   0.0f,   0.0f,
@@ -1022,17 +1022,17 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
 
             case SURFACE_TRANSFORM_ROTATE_90:
                 // The image content is rotated 90 degrees clockwise.
-                Projection *= float4x4::RotationZ(-PI_F * 0.5f);
+                Projection *= Matrix4x4f::RotationZ(-PI_F * 0.5f);
                 break;
 
             case SURFACE_TRANSFORM_ROTATE_180:
                 // The image content is rotated 180 degrees clockwise.
-                Projection *= float4x4::RotationZ(-PI_F * 1.0f);
+                Projection *= Matrix4x4f::RotationZ(-PI_F * 1.0f);
                 break;
 
             case SURFACE_TRANSFORM_ROTATE_270:
                 // The image content is rotated 270 degrees clockwise.
-                Projection *= float4x4::RotationZ(-PI_F * 1.5f);
+                Projection *= Matrix4x4f::RotationZ(-PI_F * 1.5f);
                 break;
 
             case SURFACE_TRANSFORM_OPTIMAL:
@@ -1050,7 +1050,7 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
                 UNEXPECTED("Unknown transform");
         }
 
-        MapHelper<float4x4> CBData{pCtx, m_pVertexConstantBuffer, MAP_WRITE, MAP_FLAG_DISCARD};
+        MapHelper<Matrix4x4f> CBData{pCtx, m_pVertexConstantBuffer, MAP_WRITE, MAP_FLAG_DISCARD};
         if (!CBData)
             return;
 
@@ -1106,7 +1106,7 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
                     continue;
 
                 // Apply scissor/clipping rectangle
-                float4 ClipRect //
+                Vector4f ClipRect //
                     {
                         (pCmd->ClipRect.x - pDrawData->DisplayPos.x) * pDrawData->FramebufferScale.x,
                         (pCmd->ClipRect.y - pDrawData->DisplayPos.y) * pDrawData->FramebufferScale.y,
