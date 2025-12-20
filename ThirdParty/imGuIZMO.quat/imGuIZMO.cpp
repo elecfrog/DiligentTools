@@ -126,7 +126,7 @@ namespace ImGui
 //
 //      input/output: Diligent::Quaternion (quaternion) for full control
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& quat, float size, const int mode)
+bool gizmo3D(const char* label, QuaternionF& quat, float size, const int mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -180,7 +180,7 @@ bool gizmo3D(const char* label, Vector3f& dir, float size, const int mode)
 //                    ctrl-Shift-Alt mods, for X-Y-Z rotations (respectivally)
 //                    are abilitated on both ... also together!
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::QuaternionF& spot, float size, const int mode)
+bool gizmo3D(const char* label, QuaternionF& axes, QuaternionF& spot, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -202,7 +202,7 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Diligent::Quaternio
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Vector3f& spotDir, float size, const int mode)
+bool gizmo3D(const char* label, QuaternionF& axes, Vector3f& spotDir, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -222,7 +222,7 @@ bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Vector3f& spotDir, 
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, Diligent::QuaternionF& axes, Vector4f& axesAngle, float size, const int mode)
+bool gizmo3D(const char* label, QuaternionF& axes, Vector4f& axesAngle, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -366,7 +366,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //      in : q -> quaternion to which applay rotations
     //      out: q -> quaternion with rotations
     ////////////////////////////////////////////////////////////////////////////
-    auto getTrackball = [&] (Diligent::QuaternionF &q) {
+    auto getTrackball = [&] (QuaternionF &q) {
         auto width  = size;
         auto height = size;
         auto minVal = width < height ? width * 0.5f : height * 0.5f;
@@ -381,7 +381,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         else if(io.KeyCtrl)               { rotationVector = Vector3f(0, 1, 0); }
         else if(io.KeyAlt || io.KeySuper) { rotationVector = Vector3f(0, 0, 1); }
 
-        Diligent::QuaternionF qtStep = {0, 0, 0, 1};
+        QuaternionF qtStep = {0, 0, 0, 1};
         if(delta == Vector2f(0,0))
         {
             return;
@@ -413,7 +413,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         const auto tbScale  = 1;  //base scale sensibility
         const auto fpsRatio = 1;  //auto adjust by FPS (call idle with current FPS)
 
-        qtStep = normalize(Diligent::QuaternionF::RotationFromAxisAngle(axis * rotationVector, angle * tbScale * fpsRatio));
+        qtStep = normalize(QuaternionF::RotationFromAxisAngle(axis * rotationVector, angle * tbScale * fpsRatio));
         q = qtStep * q;
 
         value_changed = true;
@@ -441,7 +441,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     const ImVec2 wpUV = ImGui::GetFontTexUvWhitePixel(); //culling versus
     ImVec2 uv[4]; ImU32 col[4]; //buffers to storetransformed vtx & col for PrimVtx & PrimQuadUV
 
-    Diligent::QuaternionF quat(Diligent::normalize(qtV));
+    QuaternionF quat(Diligent::normalize(qtV));
 
     ////////////////////////////////////////////////////////////////////////////
     //  Just a "few" lambdas...
@@ -568,7 +568,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawComponent = [&] (const int idx, const Diligent::QuaternionF& q, ptrFunc func)
+    auto drawComponent = [&] (const int idx, const QuaternionF& q, ptrFunc func)
     {
         auto *ptrVtx = arrowVtx+idx;
         draw_list->PrimReserve(ptrVtx->size(), ptrVtx->size()); // reserve vtx
@@ -593,7 +593,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto dirArrow = [&] (const Diligent::QuaternionF &q, int mode)
+    auto dirArrow = [&] (const QuaternionF &q, int mode)
     {
         Vector3f arrowCoord(quat.RotateVector(Vector3f(1.0f, 0.0f, 0.0f)));
 
@@ -605,7 +605,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto spotArrow = [&] (const Diligent::QuaternionF &q, const float arrowCoordZ)
+    auto spotArrow = [&] (const QuaternionF &q, const float arrowCoordZ)
     {
         if(arrowCoordZ > 0) {
             drawComponent(CONE_SURF, q, adjustSpotCone); drawComponent(CONE_CAP , q, adjustSpotCone);
