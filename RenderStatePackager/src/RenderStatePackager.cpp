@@ -30,7 +30,7 @@
 #include <sstream>
 
 #include "GraphicsAccessories.hpp"
-#include "BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "DefaultRawMemoryAllocator.hpp"
 #include "DynamicLinearAllocator.hpp"
 #include "SerializedPipelineState.h"

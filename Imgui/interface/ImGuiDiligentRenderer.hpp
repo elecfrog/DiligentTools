@@ -27,9 +27,7 @@
 
 #pragma once
 
-#include <memory>
-#include "CommonDefinitions.h"
-#include "../../../DiligentCore/Common/interface/BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "../../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
 #include "../../../DiligentCore/Graphics/GraphicsEngine/interface/GraphicsTypes.h"
 #include "imgui.h"

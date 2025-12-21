@@ -241,8 +241,8 @@ struct imguiGizmo
     ////////////////////////////////////////////////////////////////////////////
     bool getTransforms(QuaternionF& q, const char* label, Vector3f& dir, float size)
     {
-        const float len = Diligent::length(dir);
-        q = QuaternionF::RotationFromAxisAngle(Diligent::normalize(Vector3f(0, -dir.z, dir.y)), acosf(dir.x/len));
+        const float len = length(dir);
+        q = QuaternionF::RotationFromAxisAngle(normalize(Vector3f(0, -dir.z, dir.y)), acosf(dir.x/len));
 
         bool ret = drawFunc(label, size);
         if (ret) dir = q.RotateVector(Vector3f(1, 0, 0)) * len; //return vector with original length

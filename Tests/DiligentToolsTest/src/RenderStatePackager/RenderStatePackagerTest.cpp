@@ -33,7 +33,7 @@
 #include "ParsingEnvironment.hpp"
 #include "TestingEnvironment.hpp"
 #include "FileSystem.hpp"
-#include "BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "GraphicsAccessories.hpp"
 
 using namespace Diligent;

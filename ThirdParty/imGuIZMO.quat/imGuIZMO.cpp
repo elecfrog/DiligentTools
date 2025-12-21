@@ -14,7 +14,7 @@
 // Modified by Egor Yusov, Diligent Graphics LLC
 
 
-#include "BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "imGuIZMO.h"
 
 
@@ -124,7 +124,7 @@ namespace ImGui
 //
 //  Quaternion control
 //
-//      input/output: Diligent::Quaternion (quaternion) for full control
+//      input/output: Quaternion (quaternion) for full control
 ////////////////////////////////////////////////////////////////////////////
 bool gizmo3D(const char* label, QuaternionF& quat, float size, const int mode)
 {
@@ -394,7 +394,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         {
             v -= offset;
             v /= minVal;
-            const auto len = Diligent::length(v);
+            const auto len = length(v);
             v.z = len > 0 ? std::pow(2.f, -0.5f * len) : 1;
             v = normalize(v);
         };
@@ -441,7 +441,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     const ImVec2 wpUV = ImGui::GetFontTexUvWhitePixel(); //culling versus
     ImVec2 uv[4]; ImU32 col[4]; //buffers to storetransformed vtx & col for PrimVtx & PrimQuadUV
 
-    QuaternionF quat(Diligent::normalize(qtV));
+    QuaternionF quat(normalize(qtV));
 
     ////////////////////////////////////////////////////////////////////////////
     //  Just a "few" lambdas...
@@ -454,7 +454,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //////////////////////////////////////////////////////////////////
     auto addTriangle = [&] ()
     {   // test cull dir
-        if(Diligent::cross(Vector3f(uv[1].x - uv[0].x, uv[1].y - uv[0].y, 0),
+        if(cross(Vector3f(uv[1].x - uv[0].x, uv[1].y - uv[0].y, 0),
                            Vector3f(uv[2].x - uv[0].x, uv[2].y - uv[0].y, 0)).z > 0.f)
             { uv[1] = uv[2] = uv[0]; }
 
@@ -464,7 +464,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //////////////////////////////////////////////////////////////////
     auto addQuad = [&] (ImU32 colLight)
     {   // test cull dir
-        if(Diligent::cross(Vector3f(uv[1].x-uv[0].x, uv[1].y-uv[0].y, 0),
+        if(cross(Vector3f(uv[1].x-uv[0].x, uv[1].y-uv[0].y, 0),
                            Vector3f(uv[3].x-uv[0].x, uv[3].y-uv[0].y, 0)).z > 0.f)
             { uv[3] = uv[1] = uv[2] = uv[0]; }
 
@@ -632,8 +632,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     else { // draw arrows & sphere
         if(drawMode == modeDual) {
             Vector3f spot(qtV2.RotateVector(Vector3f(-1, 0, 0))); // versus opposite
-            if(spot.z>0) { draw3DSystem(); spotArrow(Diligent::normalize(qtV2),spot.z); }
-            else         { spotArrow(Diligent::normalize(qtV2),spot.z); draw3DSystem(); }
+            if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
+            else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
         } else draw3DSystem();
     }
 
@@ -682,7 +682,7 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
 #   define V(x,y,z) sphereVtx.push_back(Vector3f(x, y, z))
 #   define T(t)     sphereTess.push_back(t)
  
-    const float incAngle = 2.f * Diligent::PI_F / (float)( meridians );
+    const float incAngle = 2.f * PI_F / (float)( meridians );
     float angle = incAngle;
 
     // Adjust z and radius as stacks are drawn. 
@@ -695,8 +695,8 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
 
     for (int j=0; j<meridians; j++, angle+=incAngle)
     {
-        const float x0 = x1; x1 = cosf(Diligent::PI_F - angle);
-        const float y0 = y1; y1 = sinf(Diligent::PI_F - angle);
+        const float x0 = x1; x1 = cosf(PI_F - angle);
+        const float y0 = y1; y1 = sinf(PI_F - angle);
 
         const int tType = ((j>>div)&1);
         
@@ -740,8 +740,8 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     angle = incAngle;
     for (int j=0; j<meridians; j++,angle+=incAngle)
     {
-        const float x0 = x1; x1 = cosf(angle + Diligent::PI_F);
-        const float y0 = y1; y1 = sinf(angle + Diligent::PI_F);
+        const float x0 = x1; x1 = cosf(angle + PI_F);
+        const float y0 = y1; y1 = sinf(angle + PI_F);
 
         const int tType = ((parallels-1)>>div)&1 ? ((j>>div)&1) : !((j>>div)&1); 
         //color = 0xff0000ff;
@@ -768,7 +768,7 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
     const float sinn =  radius / sq;
 
 
-    const float incAngle = 2 * Diligent::PI_F / (float)( slices );
+    const float incAngle = 2 * PI_F / (float)( slices );
     float angle = incAngle;
 
     float yt1 = sinn,  y1 = radius;// cos(0) * sinn ... cos(0) * radius 
@@ -824,7 +824,7 @@ void imguiGizmo::buildCylinder(const float x0, const float x1, const float radiu
     float z1 = 0.0f, zr1 = 0.0f; // * radius
 
     
-    const float incAngle = 2 * Diligent::PI_F / (float)( slices );
+    const float incAngle = 2 * PI_F / (float)( slices );
     float angle = incAngle;
 
     arrowVtx[CYL_CAP ].clear(); arrowNorm[CYL_CAP ].clear();

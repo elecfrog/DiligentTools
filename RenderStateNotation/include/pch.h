@@ -28,7 +28,7 @@
 
 #include "json.hpp"
 
-#include "BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "RenderDevice.h"
 #include "DynamicLinearAllocator.hpp"
 #include "StringTools.hpp"

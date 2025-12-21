@@ -27,7 +27,7 @@
 #include <type_traits>
 
 #include "json.hpp"
-#include "BasicMath.hpp"
+#include <math/basic_math.hpp>
 #include "DynamicLinearAllocator.hpp"
 #include "FileWrapper.hpp"
 #include "DataBlobImpl.hpp"
