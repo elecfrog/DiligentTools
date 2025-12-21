@@ -122,7 +122,7 @@ struct BytecodeDumper
                     WorkingDirectoryScope PipelineDirectory{RootDirectory, pPipeline->GetDesc().Name};
 
                     auto pSerializedPSO = pPipeline.Cast<ISerializedPipelineState>(IID_SerializedPipelineState);
-                    for (Uint32 ShaderID = 0; ShaderID < pSerializedPSO->GetPatchedShaderCount(DeviceFlag); ++ShaderID)
+                    for (UInt32 ShaderID = 0; ShaderID < pSerializedPSO->GetPatchedShaderCount(DeviceFlag); ++ShaderID)
                     {
                         const ShaderCreateInfo ShaderCI    = pSerializedPSO->GetPatchedShaderCreateInfo(DeviceFlag, ShaderID);
                         const bool             UseBytecode = (ShaderCI.ByteCode != nullptr);
@@ -165,7 +165,7 @@ const char* RenderStatePackager::GetShaderFileExtension(ARCHIVE_DEVICE_DATA_FLAG
             case ARCHIVE_DEVICE_DATA_FLAG_METAL_MACOS:
                 return ".air";
             default:
-                UNEXPECTED("Unexpected device data flag (", static_cast<Uint32>(DeviceFlag), ")");
+                UNEXPECTED("Unexpected device data flag (", static_cast<UInt32>(DeviceFlag), ")");
                 return "";
         }
     }
@@ -184,7 +184,7 @@ const char* RenderStatePackager::GetShaderFileExtension(ARCHIVE_DEVICE_DATA_FLAG
             case SHADER_SOURCE_LANGUAGE_MTLB:
                 return ".metallib";
             default:
-                UNEXPECTED("Unexpected source language (", static_cast<Uint32>(Language), ")");
+                UNEXPECTED("Unexpected source language (", static_cast<UInt32>(Language), ")");
                 return "";
         }
     }
@@ -234,10 +234,10 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
 
         std::atomic<bool> Result{true};
 
-        for (Uint32 ShaderID = 0; ShaderID < ParserInfo.ShaderCount; ++ShaderID)
+        for (UInt32 ShaderID = 0; ShaderID < ParserInfo.ShaderCount; ++ShaderID)
         {
             EnqueueAsyncWork(m_pThreadPool,
-                             [ShaderID, this, &Result, &Shaders](Uint32 ThreadId) {
+                             [ShaderID, this, &Result, &Shaders](UInt32 ThreadId) {
                                  ShaderCreateInfo ShaderCI           = *m_pRSNParser->GetShaderByIndex(ShaderID);
                                  ShaderCI.pShaderSourceStreamFactory = m_pShaderStreamFactory;
 
@@ -253,10 +253,10 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
                              });
         }
 
-        for (Uint32 RenderPassID = 0; RenderPassID < ParserInfo.RenderPassCount; ++RenderPassID)
+        for (UInt32 RenderPassID = 0; RenderPassID < ParserInfo.RenderPassCount; ++RenderPassID)
         {
             EnqueueAsyncWork(m_pThreadPool,
-                             [RenderPassID, this, &Result, &RenderPasses](Uint32 ThreadId) {
+                             [RenderPassID, this, &Result, &RenderPasses](UInt32 ThreadId) {
                                  RenderPassDesc              RPDesc      = *m_pRSNParser->GetRenderPassByIndex(RenderPassID);
                                  RefCntAutoPtr<IRenderPass>& pRenderPass = RenderPasses[RenderPassID];
                                  m_pDevice->CreateRenderPass(RPDesc, &pRenderPass);
@@ -270,10 +270,10 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
                              });
         }
 
-        for (Uint32 SignatureID = 0; SignatureID < ParserInfo.ResourceSignatureCount; ++SignatureID)
+        for (UInt32 SignatureID = 0; SignatureID < ParserInfo.ResourceSignatureCount; ++SignatureID)
         {
             EnqueueAsyncWork(m_pThreadPool,
-                             [&, SignatureID](Uint32 ThreadId) {
+                             [&, SignatureID](UInt32 ThreadId) {
                                  PipelineResourceSignatureDesc              SignDesc   = *m_pRSNParser->GetResourceSignatureByIndex(SignatureID);
                                  RefCntAutoPtr<IPipelineResourceSignature>& pSignature = ResourceSignatures[SignatureID];
                                  m_pDevice->CreatePipelineResourceSignature(SignDesc, {m_DeviceFlags}, &pSignature);
@@ -346,14 +346,14 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
             PipelineCI.Flags                   = DescRSN.Flags;
             PipelineCI.ResourceSignaturesCount = DescRSN.ResourceSignaturesNameCount;
             PipelineCI.ppResourceSignatures    = Allocator.ConstructArray<IPipelineResourceSignature*>(DescRSN.ResourceSignaturesNameCount);
-            for (Uint32 SignatureID = 0; SignatureID < PipelineCI.ResourceSignaturesCount; ++SignatureID)
+            for (UInt32 SignatureID = 0; SignatureID < PipelineCI.ResourceSignaturesCount; ++SignatureID)
                 PipelineCI.ppResourceSignatures[SignatureID] = FindResourceSignature(DescRSN.ppResourceSignatureNames[SignatureID]);
         };
 
-        for (Uint32 PipelineID = 0; PipelineID < ParserInfo.PipelineStateCount; ++PipelineID)
+        for (UInt32 PipelineID = 0; PipelineID < ParserInfo.PipelineStateCount; ++PipelineID)
         {
             EnqueueAsyncWork(m_pThreadPool,
-                             [&, PipelineID](Uint32 ThreadId) {
+                             [&, PipelineID](UInt32 ThreadId) {
                                  try
                                  {
                                      DynamicLinearAllocator Allocator{DefaultRawMemoryAllocator::GetAllocator()};
@@ -425,7 +425,7 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
                                              {
                                                  RayTracingGeneralShaderGroup* pData = Allocator.ConstructArray<RayTracingGeneralShaderGroup>(pPipelineDescRSN->GeneralShaderCount);
 
-                                                 for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->GeneralShaderCount; ShaderID++)
+                                                 for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->GeneralShaderCount; ShaderID++)
                                                  {
                                                      pData[ShaderID].Name    = pPipelineDescRSN->pGeneralShaders[ShaderID].Name;
                                                      pData[ShaderID].pShader = FindShader(pPipelineDescRSN->pGeneralShaders[ShaderID].pShaderName);
@@ -438,7 +438,7 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
                                              {
                                                  RayTracingTriangleHitShaderGroup* pData = Allocator.ConstructArray<RayTracingTriangleHitShaderGroup>(pPipelineDescRSN->TriangleHitShaderCount);
 
-                                                 for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->TriangleHitShaderCount; ++ShaderID)
+                                                 for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->TriangleHitShaderCount; ++ShaderID)
                                                  {
                                                      pData[ShaderID].Name              = pPipelineDescRSN->pTriangleHitShaders[ShaderID].Name;
                                                      pData[ShaderID].pAnyHitShader     = FindShader(pPipelineDescRSN->pTriangleHitShaders[ShaderID].pAnyHitShaderName);
@@ -452,7 +452,7 @@ bool RenderStatePackager::Execute(IArchiver* pArchiver, const char* DumpPath)
                                              {
                                                  RayTracingProceduralHitShaderGroup* pData = Allocator.ConstructArray<RayTracingProceduralHitShaderGroup>(pPipelineDescRSN->ProceduralHitShaderCount);
 
-                                                 for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->ProceduralHitShaderCount; ++ShaderID)
+                                                 for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->ProceduralHitShaderCount; ++ShaderID)
                                                  {
                                                      pData[ShaderID].Name                = pPipelineDescRSN->pProceduralHitShaders[ShaderID].Name;
                                                      pData[ShaderID].pAnyHitShader       = FindShader(pPipelineDescRSN->pProceduralHitShaders[ShaderID].pAnyHitShaderName);

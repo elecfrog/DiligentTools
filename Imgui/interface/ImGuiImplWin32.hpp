@@ -50,7 +50,7 @@ public:
     ImGuiImplWin32& operator = (      ImGuiImplWin32&&) = delete;
     // clang-format on
 
-    virtual void NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform) override final;
+    virtual void NewFrame(UInt32 RenderSurfaceWidth, UInt32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform) override final;
 };
 
 } // namespace Diligent

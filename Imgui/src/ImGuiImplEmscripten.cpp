@@ -177,8 +177,8 @@ ImGuiImplEmscripten::~ImGuiImplEmscripten()
 {
 }
 
-void ImGuiImplEmscripten::NewFrame(Uint32            RenderSurfaceWidth,
-                                   Uint32            RenderSurfaceHeight,
+void ImGuiImplEmscripten::NewFrame(UInt32            RenderSurfaceWidth,
+                                   UInt32            RenderSurfaceHeight,
                                    SURFACE_TRANSFORM SurfacePreTransform)
 {
     auto now        = std::chrono::high_resolution_clock::now();

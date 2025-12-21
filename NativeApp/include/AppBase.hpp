@@ -27,14 +27,14 @@
 
 #pragma once
 
-#include "BasicTypes.h"
+#include "CommonDefinitions.h"
 #include "FlagEnum.h"
 
 namespace Diligent
 {
 
 /// Hot key handling flags.
-enum HOT_KEY_FLAGS : Uint32
+enum HOT_KEY_FLAGS : UInt32
 {
     /// Disable all hot keys.
     HOT_KEY_FLAG_NONE = 0,

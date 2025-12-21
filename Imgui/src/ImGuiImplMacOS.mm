@@ -50,8 +50,8 @@ ImGuiImplMacOS::~ImGuiImplMacOS()
     ImGui_ImplOSX_Shutdown();
 }
 
-void ImGuiImplMacOS::NewFrame(Uint32            RenderSurfaceWidth,
-                              Uint32            RenderSurfaceHeight,
+void ImGuiImplMacOS::NewFrame(UInt32            RenderSurfaceWidth,
+                              UInt32            RenderSurfaceHeight,
                               SURFACE_TRANSFORM SurfacePreTransform)
 {
     std::lock_guard<std::mutex> Lock(m_Mtx);

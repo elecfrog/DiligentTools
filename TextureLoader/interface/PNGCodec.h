@@ -31,14 +31,10 @@
 /// PNG loading and encoding functions.
 
 #include "Image.h"
-
-DILIGENT_BEGIN_NAMESPACE(Diligent)
-
-// clang-format off
+#include <types/base_types.hpp>
 
 /// PNG decoding result.
-DILIGENT_TYPED_ENUM(DECODE_PNG_RESULT, Uint32)
-{
+DILIGENT_TYPED_ENUM(DECODE_PNG_RESULT, UInt){
     /// Decoding was successful.
     DECODE_PNG_RESULT_OK = 0,
 
@@ -55,12 +51,10 @@ DILIGENT_TYPED_ENUM(DECODE_PNG_RESULT, Uint32)
     DECODE_PNG_RESULT_INVALID_BIT_DEPTH,
 
     /// An unexpected error occurred while decoding the file.
-    DECODE_PNG_RESULT_DECODING_ERROR
-};
+    DECODE_PNG_RESULT_DECODING_ERROR};
 
 /// PNG encoding result
-DILIGENT_TYPED_ENUM(ENCODE_PNG_RESULT, Uint32)
-{
+DILIGENT_TYPED_ENUM(ENCODE_PNG_RESULT, UInt){
     /// Encoding finished successfully.
     ENCODE_PNG_RESULT_OK = 0,
 
@@ -68,8 +62,7 @@ DILIGENT_TYPED_ENUM(ENCODE_PNG_RESULT, Uint32)
     ENCODE_PNG_RESULT_INVALID_ARGUMENTS,
 
     /// Failed to initialize the encoder.
-    ENCODE_PNG_RESULT_INITIALIZATION_FAILED
-};
+    ENCODE_PNG_RESULT_INITIALIZATION_FAILED};
 // clang-format on
 
 
@@ -83,10 +76,10 @@ DILIGENT_TYPED_ENUM(ENCODE_PNG_RESULT, Uint32)
 /// \return                    Decoding result, see Diligent::DECODE_PNG_RESULT.
 ///
 /// \remarks    If `pDstPixels` is null, the function will only decode the image description.
-DECODE_PNG_RESULT DILIGENT_GLOBAL_FUNCTION(DecodePng)(const void* pSrcPngBits,
-                                                      size_t      PngDataSize,
-                                                      IDataBlob*  pDstPixels,
-                                                      ImageDesc*  pDstImgDesc);
+DECODE_PNG_RESULT DecodePng(const void*          pSrcPngBits,
+                            size_t               PngDataSize,
+                            Diligent::IDataBlob* pDstPixels,
+                            Diligent::ImageDesc* pDstImgDesc);
 
 /// Encodes an image into PNG format.
 
@@ -101,11 +94,9 @@ DECODE_PNG_RESULT DILIGENT_GLOBAL_FUNCTION(DecodePng)(const void* pSrcPngBits,
 ///                             tightly packed.
 /// \param [out] pDstPngBits  - Encoded PNG image bits.
 /// \return                     Encoding result, see Diligent::ENCODE_PNG_RESULT.
-ENCODE_PNG_RESULT DILIGENT_GLOBAL_FUNCTION(EncodePng)(const Uint8* pSrcPixels,
-                                                      Uint32       Width,
-                                                      Uint32       Height,
-                                                      Uint32       StrideInBytes,
-                                                      int          PngColorType,
-                                                      IDataBlob*   pDstPngBits);
-
-DILIGENT_END_NAMESPACE // namespace Diligent
+ENCODE_PNG_RESULT EncodePng(const UInt8*         pSrcPixels,
+                            UInt                 Width,
+                            UInt                 Height,
+                            UInt                 StrideInBytes,
+                            int                  PngColorType,
+                            Diligent::IDataBlob* pDstPngBits);

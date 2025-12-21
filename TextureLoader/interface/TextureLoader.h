@@ -47,7 +47,7 @@ struct IMemoryAllocator;
 // clang-format off
 
 /// Coarse mip filter type
-DILIGENT_TYPED_ENUM(TEXTURE_LOAD_MIP_FILTER, Uint8)
+DILIGENT_TYPED_ENUM(TEXTURE_LOAD_MIP_FILTER, UInt8)
 {
     /// Default filter type: BOX_AVERAGE for UNORM/SNORM and FP formats, and
     /// MOST_FREQUENT for UINT/SINT formats.
@@ -63,7 +63,7 @@ DILIGENT_TYPED_ENUM(TEXTURE_LOAD_MIP_FILTER, Uint8)
 };
 
 /// Texture compression mode
-DILIGENT_TYPED_ENUM(TEXTURE_LOAD_COMPRESS_MODE, Uint8)
+DILIGENT_TYPED_ENUM(TEXTURE_LOAD_COMPRESS_MODE, UInt8)
 {
     /// Do not compress the texture.
     TEXTURE_LOAD_COMPRESS_MODE_NONE = 0,
@@ -99,7 +99,7 @@ struct TextureLoadInfo
     BIND_FLAGS BindFlags                DEFAULT_INITIALIZER(BIND_SHADER_RESOURCE);
 
     /// Number of mip levels
-    Uint32 MipLevels                    DEFAULT_INITIALIZER(0);
+    UInt32 MipLevels                    DEFAULT_INITIALIZER(0);
 
     /// CPU access flags
     CPU_ACCESS_FLAGS CPUAccessFlags     DEFAULT_INITIALIZER(CPU_ACCESS_NONE);
@@ -149,7 +149,7 @@ struct TextureLoadInfo
     /// When this parameter is non-zero, the loader will check if all pixels
     /// in the image have the same value. If this is the case, the image will
     /// be clipped to the specified dimension.
-    Uint32 UniformImageClipDim DEFAULT_INITIALIZER(0);
+    UInt32 UniformImageClipDim DEFAULT_INITIALIZER(0);
 
     /// An optional memory allocator to allocate memory for the texture.
     struct IMemoryAllocator* pAllocator DEFAULT_INITIALIZER(nullptr);
@@ -158,7 +158,7 @@ struct TextureLoadInfo
     explicit TextureLoadInfo(const Char*         _Name,
                              USAGE               _Usage             = TextureLoadInfo{}.Usage,
                              BIND_FLAGS          _BindFlags         = TextureLoadInfo{}.BindFlags,
-                             Uint32              _MipLevels         = TextureLoadInfo{}.MipLevels,
+                             UInt32              _MipLevels         = TextureLoadInfo{}.MipLevels,
                              CPU_ACCESS_FLAGS    _CPUAccessFlags    = TextureLoadInfo{}.CPUAccessFlags,
                              Bool                _IsSRGB            = TextureLoadInfo{}.IsSRGB,
                              Bool                _GenerateMips      = TextureLoadInfo{}.GenerateMips,
@@ -206,8 +206,8 @@ DILIGENT_BEGIN_INTERFACE(ITextureLoader, IObject)
 
     /// Returns the subresource data for the given subresource.
     VIRTUAL const TextureSubResData REF METHOD(GetSubresourceData)(THIS_
-                                                                   Uint32 MipLevel,
-                                                                   Uint32 ArraySlice DEFAULT_VALUE(0)) CONST PURE;
+                                                                   UInt32 MipLevel,
+                                                                   UInt32 ArraySlice DEFAULT_VALUE(0)) CONST PURE;
 
     /// Returns the texture initialization data.
     VIRTUAL TextureData METHOD(GetTextureData)(THIS) PURE;

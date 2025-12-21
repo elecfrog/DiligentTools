@@ -43,11 +43,11 @@ void VerifyCopyPixelsData(const CopyPixelsAttribs& CopyAttribs, const DataType& 
     const auto NumComponents = CopyAttribs.DstCompCount;
     VERIFY_EXPR(CopyAttribs.DstStride % (CopyAttribs.DstComponentSize * CopyAttribs.DstCompCount) == 0);
     const auto StrideInPixels = CopyAttribs.DstStride / (CopyAttribs.DstComponentSize * CopyAttribs.DstCompCount);
-    for (Uint32 y = 0; y < CopyAttribs.Height; ++y)
+    for (UInt32 y = 0; y < CopyAttribs.Height; ++y)
     {
-        for (Uint32 x = 0; x < CopyAttribs.Width; ++x)
+        for (UInt32 x = 0; x < CopyAttribs.Width; ++x)
         {
-            for (Uint32 c = 0; c < NumComponents; ++c)
+            for (UInt32 c = 0; c < NumComponents; ++c)
             {
                 const auto src_y   = CopyAttribs.FlipVertically ? CopyAttribs.Height - y - 1 : y;
                 const auto TestVal = TestData[(y * StrideInPixels + x) * NumComponents + c];
@@ -316,12 +316,12 @@ void TestCopyPixels()
     }
 
     // Swizzle
-    for (Uint32 Comp = 0; Comp < 4; ++Comp)
+    for (UInt32 Comp = 0; Comp < 4; ++Comp)
     {
-        for (Uint32 Swizzle = 0; Swizzle < TEXTURE_COMPONENT_SWIZZLE_COUNT; ++Swizzle)
+        for (UInt32 Swizzle = 0; Swizzle < TEXTURE_COMPONENT_SWIZZLE_COUNT; ++Swizzle)
         {
             std::vector<DataType> RefData = SrcData;
-            for (Uint32 row = 0; row < 4; ++row)
+            for (UInt32 row = 0; row < 4; ++row)
             {
                 DataType& Val = RefData[row * 4 + Comp];
                 switch (Swizzle)
@@ -360,24 +360,24 @@ void TestCopyPixels()
         }
     }
 
-    TestComponentSizeChange<DataType, Uint8>();
-    TestComponentSizeChange<DataType, Uint16>();
-    TestComponentSizeChange<DataType, Uint32>();
+    TestComponentSizeChange<DataType, UInt8>();
+    TestComponentSizeChange<DataType, UInt16>();
+    TestComponentSizeChange<DataType, UInt32>();
 }
 
 TEST(Tools_TextureUtilities, CopyPixels8)
 {
-    TestCopyPixels<Uint8>();
+    TestCopyPixels<UInt8>();
 }
 
 TEST(Tools_TextureUtilities, CopyPixels16)
 {
-    TestCopyPixels<Uint16>();
+    TestCopyPixels<UInt16>();
 }
 
 TEST(Tools_TextureUtilities, CopyPixels32)
 {
-    TestCopyPixels<Uint32>();
+    TestCopyPixels<UInt32>();
 }
 
 
@@ -388,11 +388,11 @@ void VerifyExpandPixelsData(const ExpandPixelsAttribs& Attribs, const DataType& 
     const auto NumComponents = Attribs.ComponentCount;
     VERIFY_EXPR(Attribs.DstStride % (Attribs.ComponentSize * Attribs.ComponentCount) == 0);
     const auto StrideInPixels = Attribs.DstStride / (Attribs.ComponentSize * Attribs.ComponentCount);
-    for (Uint32 y = 0; y < Attribs.DstHeight; ++y)
+    for (UInt32 y = 0; y < Attribs.DstHeight; ++y)
     {
-        for (Uint32 x = 0; x < Attribs.DstWidth; ++x)
+        for (UInt32 x = 0; x < Attribs.DstWidth; ++x)
         {
-            for (Uint32 c = 0; c < NumComponents; ++c)
+            for (UInt32 c = 0; c < NumComponents; ++c)
             {
                 const auto TestVal = TestData[(y * StrideInPixels + x) * NumComponents + c];
                 const auto RefVal  = RefData[(y * StrideInPixels + x) * NumComponents + c];
@@ -535,17 +535,17 @@ void TestExpandPixels()
 
 TEST(Tools_TextureUtilities, ExpandPixels8)
 {
-    TestExpandPixels<Uint8>();
+    TestExpandPixels<UInt8>();
 }
 
 TEST(Tools_TextureUtilities, ExpandPixels16)
 {
-    TestExpandPixels<Uint16>();
+    TestExpandPixels<UInt16>();
 }
 
 TEST(Tools_TextureUtilities, ExpandPixels32)
 {
-    TestExpandPixels<Uint32>();
+    TestExpandPixels<UInt32>();
 }
 
 
@@ -556,11 +556,11 @@ void VerifyPremultiplyAlphaData(const PremultiplyAlphaAttribs& Attribs, const Da
     const auto NumComponents = Attribs.ComponentCount;
     VERIFY_EXPR(Attribs.Stride % (ComponentSize * Attribs.ComponentCount) == 0);
     const auto StrideInPixels = Attribs.Stride / (ComponentSize * Attribs.ComponentCount);
-    for (Uint32 y = 0; y < Attribs.Height; ++y)
+    for (UInt32 y = 0; y < Attribs.Height; ++y)
     {
-        for (Uint32 x = 0; x < Attribs.Width; ++x)
+        for (UInt32 x = 0; x < Attribs.Width; ++x)
         {
-            for (Uint32 c = 0; c < NumComponents; ++c)
+            for (UInt32 c = 0; c < NumComponents; ++c)
             {
                 const auto TestVal = TestData[(y * StrideInPixels + x) * NumComponents + c];
                 const auto RefVal  = RefData[(y * StrideInPixels + x) * NumComponents + c];
@@ -657,17 +657,17 @@ void TestPremultiplyAlpha<float>(VALUE_TYPE ComponentType)
 
 TEST(Tools_TextureUtilities, PremultiplyAlpha8)
 {
-    TestPremultiplyAlpha<Uint8>(VT_UINT8);
+    TestPremultiplyAlpha<UInt8>(VT_UINT8);
 }
 
 TEST(Tools_TextureUtilities, PremultiplyAlpha16)
 {
-    TestPremultiplyAlpha<Uint16>(VT_UINT16);
+    TestPremultiplyAlpha<UInt16>(VT_UINT16);
 }
 
 TEST(Tools_TextureUtilities, PremultiplyAlpha32)
 {
-    TestPremultiplyAlpha<Uint32>(VT_UINT32);
+    TestPremultiplyAlpha<UInt32>(VT_UINT32);
 }
 
 TEST(Tools_TextureUtilities, PremultiplyAlphaFloat)

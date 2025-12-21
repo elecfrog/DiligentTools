@@ -44,34 +44,34 @@ DILIGENT_BEGIN_NAMESPACE(Diligent)
 struct CopyPixelsAttribs
 {
     /// Texture width.
-    Uint32 Width DEFAULT_INITIALIZER(0);
+    UInt32 Width DEFAULT_INITIALIZER(0);
 
     /// Texture height.
-    Uint32 Height DEFAULT_INITIALIZER(0);
+    UInt32 Height DEFAULT_INITIALIZER(0);
 
     /// Source component size in bytes.
-    Uint32 SrcComponentSize DEFAULT_INITIALIZER(0);
+    UInt32 SrcComponentSize DEFAULT_INITIALIZER(0);
 
     /// A pointer to source pixels.
     const void* pSrcPixels DEFAULT_INITIALIZER(nullptr);
 
     /// Source stride in bytes.
-    Uint32 SrcStride DEFAULT_INITIALIZER(0);
+    UInt32 SrcStride DEFAULT_INITIALIZER(0);
 
     /// Source component count.
-    Uint32 SrcCompCount DEFAULT_INITIALIZER(0);
+    UInt32 SrcCompCount DEFAULT_INITIALIZER(0);
 
     /// A pointer to destination pixels.
     void* pDstPixels DEFAULT_INITIALIZER(nullptr);
 
     /// Destination component size in bytes.
-    Uint32 DstComponentSize DEFAULT_INITIALIZER(0);
+    UInt32 DstComponentSize DEFAULT_INITIALIZER(0);
 
     /// Destination stride in bytes.
-    Uint32 DstStride DEFAULT_INITIALIZER(0);
+    UInt32 DstStride DEFAULT_INITIALIZER(0);
 
     /// Destination component count.
-    Uint32 DstCompCount DEFAULT_INITIALIZER(0);
+    UInt32 DstCompCount DEFAULT_INITIALIZER(0);
 
     /// If true, flip the image vertically.
     bool FlipVertically DEFAULT_INITIALIZER(false);
@@ -89,34 +89,34 @@ void DILIGENT_GLOBAL_FUNCTION(CopyPixels)(const CopyPixelsAttribs REF Attribs);
 struct ExpandPixelsAttribs
 {
     /// Source texture width.
-    Uint32 SrcWidth DEFAULT_INITIALIZER(0);
+    UInt32 SrcWidth DEFAULT_INITIALIZER(0);
 
     /// Source texture height.
-    Uint32 SrcHeight DEFAULT_INITIALIZER(0);
+    UInt32 SrcHeight DEFAULT_INITIALIZER(0);
 
     /// Texture component size in bytes.
-    Uint32 ComponentSize DEFAULT_INITIALIZER(0);
+    UInt32 ComponentSize DEFAULT_INITIALIZER(0);
 
     /// Component count.
-    Uint32 ComponentCount DEFAULT_INITIALIZER(0);
+    UInt32 ComponentCount DEFAULT_INITIALIZER(0);
 
     /// A pointer to source pixels.
     const void* pSrcPixels DEFAULT_INITIALIZER(nullptr);
 
     /// Source stride in bytes.
-    Uint32 SrcStride DEFAULT_INITIALIZER(0);
+    UInt32 SrcStride DEFAULT_INITIALIZER(0);
 
     /// Destination texture width.
-    Uint32 DstWidth DEFAULT_INITIALIZER(0);
+    UInt32 DstWidth DEFAULT_INITIALIZER(0);
 
     /// Destination texture height.
-    Uint32 DstHeight DEFAULT_INITIALIZER(0);
+    UInt32 DstHeight DEFAULT_INITIALIZER(0);
 
     /// A pointer to destination pixels.
     void* pDstPixels DEFAULT_INITIALIZER(nullptr);
 
     /// Destination stride in bytes.
-    Uint32 DstStride DEFAULT_INITIALIZER(0);
+    UInt32 DstStride DEFAULT_INITIALIZER(0);
 };
 typedef struct ExpandPixelsAttribs ExpandPixelsAttribs;
 
@@ -128,19 +128,19 @@ void DILIGENT_GLOBAL_FUNCTION(ExpandPixels)(const ExpandPixelsAttribs REF Attrib
 struct PremultiplyAlphaAttribs
 {
     /// Texture width.
-    Uint32 Width DEFAULT_INITIALIZER(0);
+    UInt32 Width DEFAULT_INITIALIZER(0);
 
     /// Texture height.
-    Uint32 Height DEFAULT_INITIALIZER(0);
+    UInt32 Height DEFAULT_INITIALIZER(0);
 
     /// A pointer to pixels.
     void* pPixels DEFAULT_INITIALIZER(nullptr);
 
     /// Stride in bytes.
-    Uint32 Stride DEFAULT_INITIALIZER(0);
+    UInt32 Stride DEFAULT_INITIALIZER(0);
 
     /// Component count.
-    Uint32 ComponentCount DEFAULT_INITIALIZER(0);
+    UInt32 ComponentCount DEFAULT_INITIALIZER(0);
 
     /// Component type.
     VALUE_TYPE ComponentType DEFAULT_INITIALIZER(VT_UINT8);

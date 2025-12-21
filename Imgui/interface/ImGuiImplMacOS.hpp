@@ -51,8 +51,8 @@ public:
     ImGuiImplMacOS& operator = (      ImGuiImplMacOS&&) = delete;
     // clang-format on
 
-    virtual void NewFrame(Uint32            RenderSurfaceWidth,
-                          Uint32            RenderSurfaceHeight,
+    virtual void NewFrame(UInt32            RenderSurfaceWidth,
+                          UInt32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform) override final;
     virtual void Render(IDeviceContext* _Nonnull pCtx) override final;
     bool         HandleOSXEvent(NSEvent* _Nonnull event, NSView* _Nonnull view);

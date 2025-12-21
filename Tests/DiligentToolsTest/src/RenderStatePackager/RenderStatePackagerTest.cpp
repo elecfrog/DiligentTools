@@ -42,7 +42,7 @@ using namespace Diligent::Testing;
 namespace
 {
 
-static constexpr Uint32 ContentVersion = 135;
+static constexpr UInt32 ContentVersion = 135;
 
 static constexpr ARCHIVE_DEVICE_DATA_FLAGS GetDeviceFlags()
 {

@@ -556,12 +556,12 @@ TEST(Tools_RenderStateNotationParser, RenderStateNotationParserTest)
     EXPECT_EQ(ParserInfo.ResourceSignatureCount, 2u);
     EXPECT_EQ(ParserInfo.PipelineStateCount, 4u);
 
-    auto Iterate = [](Uint32 ResourceCount, std::function<void(Uint32)> const& Callback) {
-        for (Uint32 ResourceID = 0; ResourceID < ResourceCount; ResourceID++)
+    auto Iterate = [](UInt32 ResourceCount, std::function<void(UInt32)> const& Callback) {
+        for (UInt32 ResourceID = 0; ResourceID < ResourceCount; ResourceID++)
             Callback(ResourceID);
     };
 
-    Iterate(ParserInfo.ShaderCount, [&](Uint32 Index) {
+    Iterate(ParserInfo.ShaderCount, [&](UInt32 Index) {
         auto pResourceSrc = pParser->GetShaderByIndex(Index);
         ASSERT_NE(pResourceSrc, nullptr);
 
@@ -569,7 +569,7 @@ TEST(Tools_RenderStateNotationParser, RenderStateNotationParserTest)
         EXPECT_EQ(pResourceSrc, pResourceDst);
     });
 
-    Iterate(ParserInfo.ResourceSignatureCount, [&](Uint32 Index) {
+    Iterate(ParserInfo.ResourceSignatureCount, [&](UInt32 Index) {
         auto pResourceSrc = pParser->GetResourceSignatureByIndex(Index);
         ASSERT_NE(pResourceSrc, nullptr);
 
@@ -577,7 +577,7 @@ TEST(Tools_RenderStateNotationParser, RenderStateNotationParserTest)
         EXPECT_EQ(pResourceSrc, pResourceDst);
     });
 
-    Iterate(ParserInfo.RenderPassCount, [&](Uint32 Index) {
+    Iterate(ParserInfo.RenderPassCount, [&](UInt32 Index) {
         auto pResourceSrc = pParser->GetRenderPassByIndex(Index);
         ASSERT_NE(pResourceSrc, nullptr);
 
@@ -585,7 +585,7 @@ TEST(Tools_RenderStateNotationParser, RenderStateNotationParserTest)
         EXPECT_EQ(pResourceSrc, pResourceDst);
     });
 
-    Iterate(ParserInfo.PipelineStateCount, [&](Uint32 Index) {
+    Iterate(ParserInfo.PipelineStateCount, [&](UInt32 Index) {
         auto pResourceSrc = pParser->GetPipelineStateByIndex(Index);
         ASSERT_NE(pResourceSrc, nullptr);
 

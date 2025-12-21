@@ -73,8 +73,8 @@ ImGuiImplSDL2::ImGuiImplSDL2(const ImGuiDiligentCreateInfo& CI,
 
 ImGuiImplSDL2::~ImGuiImplSDL2() { ImGui_ImplSDL2_Shutdown(); }
 
-void ImGuiImplSDL2::NewFrame(Uint32            RenderSurfaceWidth,
-                             Uint32            RenderSurfaceHeight,
+void ImGuiImplSDL2::NewFrame(UInt32            RenderSurfaceWidth,
+                             UInt32            RenderSurfaceHeight,
                              SURFACE_TRANSFORM SurfacePreTransform)
 {
     ImGui_ImplSDL2_NewFrame();

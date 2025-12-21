@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "BasicTypes.h"
+#include "CommonDefinitions.h"
 #include "RenderDevice.h"
 #include "DeviceContext.h"
 #include "Errors.hpp"

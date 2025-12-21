@@ -128,8 +128,8 @@ enum D3D11_RESOURCE_MISC_FLAG
 //--------------------------------------------------------------------------------------
 #ifndef MAKEFOURCC
     #define MAKEFOURCC(ch0, ch1, ch2, ch3)                                      \
-                ((Uint32)(Uint8)(ch0)        | ((Uint32)(Uint8)(ch1) << 8) |    \
-                ((Uint32)(Uint8)(ch2) << 16) | ((Uint32)(Uint8)(ch3) << 24))
+                ((UInt32)(UInt8)(ch0)        | ((UInt32)(UInt8)(ch1) << 8) |    \
+                ((UInt32)(UInt8)(ch2) << 16) | ((UInt32)(UInt8)(ch3) << 24))
 #endif /* defined(MAKEFOURCC) */
 
 //--------------------------------------------------------------------------------------
@@ -143,14 +143,14 @@ enum D3D11_RESOURCE_MISC_FLAG
 
 struct DDS_PIXELFORMAT
 {
-    Uint32  size;
-    Uint32  flags;
-    Uint32  fourCC;
-    Uint32  RGBBitCount;
-    Uint32  RBitMask;
-    Uint32  GBitMask;
-    Uint32  BBitMask;
-    Uint32  ABitMask;
+    UInt32  size;
+    UInt32  flags;
+    UInt32  fourCC;
+    UInt32  RGBBitCount;
+    UInt32  RBitMask;
+    UInt32  GBitMask;
+    UInt32  BBitMask;
+    UInt32  ABitMask;
 };
 
 #define DDS_FOURCC      0x00000004  // DDPF_FOURCC
@@ -205,30 +205,30 @@ enum DDS_ALPHA_MODE
 
 typedef struct
 {
-    Uint32          size;
-    Uint32          flags;
-    Uint32          height;
-    Uint32          width;
-    Uint32          pitchOrLinearSize;
-    Uint32          depth; // only if DDS_HEADER_FLAGS_VOLUME is set in flags
-    Uint32          mipMapCount;
-    Uint32          reserved1[11];
+    UInt32          size;
+    UInt32          flags;
+    UInt32          height;
+    UInt32          width;
+    UInt32          pitchOrLinearSize;
+    UInt32          depth; // only if DDS_HEADER_FLAGS_VOLUME is set in flags
+    UInt32          mipMapCount;
+    UInt32          reserved1[11];
     DDS_PIXELFORMAT ddspf;
-    Uint32          caps;
-    Uint32          caps2;
-    Uint32          caps3;
-    Uint32          caps4;
-    Uint32          reserved2;
+    UInt32          caps;
+    UInt32          caps2;
+    UInt32          caps3;
+    UInt32          caps4;
+    UInt32          reserved2;
 } DDS_HEADER;
 
 
 typedef struct
 {
     DXGI_FORMAT dxgiFormat;
-    Uint32      resourceDimension;
-    Uint32      miscFlag; // see D3D11_RESOURCE_MISC_FLAG
-    Uint32      arraySize;
-    Uint32      miscFlags2;
+    UInt32      resourceDimension;
+    UInt32      miscFlag; // see D3D11_RESOURCE_MISC_FLAG
+    UInt32      arraySize;
+    UInt32      miscFlags2;
 } DDS_HEADER_DXT10;
 
 #pragma pack(pop)
@@ -831,30 +831,30 @@ static DXGI_FORMAT GetDXGIFormat(const DDS_PIXELFORMAT& ddpf)
 
 //--------------------------------------------------------------------------------------
 static void FillInitData(
-    _In_ Uint32      width,
-    _In_ Uint32      height,
-    _In_ Uint32      depth,
-    _In_ Uint32      srcMipCount,
-    _In_ Uint32      dstMipCount,
-    _In_ Uint32      arraySize,
+    _In_ UInt32      width,
+    _In_ UInt32      height,
+    _In_ UInt32      depth,
+    _In_ UInt32      srcMipCount,
+    _In_ UInt32      dstMipCount,
+    _In_ UInt32      arraySize,
     _In_ DXGI_FORMAT format,
     _In_ size_t      bitSize,
-    _In_ const Uint8* bitData,
+    _In_ const UInt8* bitData,
     _Out_ TextureSubResData* initData)
 {
     VERIFY_EXPR(bitData != nullptr && initData != nullptr);
 
-    const Uint8* pSrcBits = bitData;
-    const Uint8* pEndBits = bitData + bitSize;
+    const UInt8* pSrcBits = bitData;
+    const UInt8* pEndBits = bitData + bitSize;
 
     size_t index = 0;
     for (size_t slice = 0; slice < arraySize; slice++)
     {
         for (size_t mip = 0; mip < srcMipCount; mip++)
         {
-            const Uint32 w = std::max(width >> mip, 1u);
-            const Uint32 h = std::max(height >> mip, 1u);
-            const Uint32 d = std::max(depth >> mip, 1u);
+            const UInt32 w = std::max(width >> mip, 1u);
+            const UInt32 h = std::max(height >> mip, 1u);
+            const UInt32 d = std::max(depth >> mip, 1u);
 
             size_t NumBytes = 0;
             size_t RowBytes = 0;
@@ -865,8 +865,8 @@ static void FillInitData(
             {
                 VERIFY_EXPR(index < size_t{dstMipCount} * size_t{arraySize});
                 initData[index].pData       = reinterpret_cast<const void*>(pSrcBits);
-                initData[index].Stride      = static_cast<Uint32>(RowBytes);
-                initData[index].DepthStride = static_cast<Uint32>(NumBytes);
+                initData[index].Stride      = static_cast<UInt32>(RowBytes);
+                initData[index].DepthStride = static_cast<UInt32>(NumBytes);
                 ++index;
             }
 
@@ -926,21 +926,21 @@ static D2D1_ALPHA_MODE GetAlphaMode(_In_ const DDS_HEADER* header)
 namespace Diligent
 {
 
-void TextureLoaderImpl::LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const Uint8* pData, size_t DataSize)
+void TextureLoaderImpl::LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const UInt8* pData, size_t DataSize)
 {
     // Validate DDS file in memory
-    if (DataSize < (sizeof(Uint32) + sizeof(DDS_HEADER)))
+    if (DataSize < (sizeof(UInt32) + sizeof(DDS_HEADER)))
     {
         LOG_ERROR_AND_THROW("DDS data size (", DataSize, ") is too small");
     }
 
-    Uint32 dwMagicNumber = *(const Uint32*)(pData);
+    UInt32 dwMagicNumber = *(const UInt32*)(pData);
     if (dwMagicNumber != DDS_MAGIC)
     {
         LOG_ERROR_AND_THROW("Invalid dds magic number (", dwMagicNumber, "). ", DDS_MAGIC, " is expected.");
     }
 
-    const DDS_HEADER* header = reinterpret_cast<const DDS_HEADER*>(pData + sizeof(Uint32));
+    const DDS_HEADER* header = reinterpret_cast<const DDS_HEADER*>(pData + sizeof(UInt32));
 
     // Verify header to validate DDS file
     if (header->size != sizeof(DDS_HEADER) ||
@@ -955,7 +955,7 @@ void TextureLoaderImpl::LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const Ui
         (MAKEFOURCC('D', 'X', '1', '0') == header->ddspf.fourCC))
     {
         // Must be long enough for both headers and magic value
-        if (DataSize < (sizeof(DDS_HEADER) + sizeof(Uint32) + sizeof(DDS_HEADER_DXT10)))
+        if (DataSize < (sizeof(DDS_HEADER) + sizeof(UInt32) + sizeof(DDS_HEADER_DXT10)))
         {
             LOG_ERROR_AND_THROW("Invalid DX10 extension");
         }
@@ -965,16 +965,16 @@ void TextureLoaderImpl::LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const Ui
 
     m_TexDesc.Width  = header->width;
     m_TexDesc.Height = header->height;
-    Uint32 Depth     = header->depth;
-    Uint32 ArraySize = 1;
+    UInt32 Depth     = header->depth;
+    UInt32 ArraySize = 1;
 
-    ptrdiff_t SubResDataOffset = sizeof(Uint32) + sizeof(DDS_HEADER) + (bDXT10Header ? sizeof(DDS_HEADER_DXT10) : 0);
+    ptrdiff_t SubResDataOffset = sizeof(UInt32) + sizeof(DDS_HEADER) + (bDXT10Header ? sizeof(DDS_HEADER_DXT10) : 0);
 
     bool        IsCubeMap   = false;
-    Uint32      d3d11ResDim = D3D11_RESOURCE_DIMENSION_UNKNOWN;
+    UInt32      d3d11ResDim = D3D11_RESOURCE_DIMENSION_UNKNOWN;
     DXGI_FORMAT dxgiFormat  = DXGI_FORMAT_UNKNOWN;
 
-    const Uint32 SrcMipCount = std::max(header->mipMapCount, 1u);
+    const UInt32 SrcMipCount = std::max(header->mipMapCount, 1u);
     m_TexDesc.MipLevels      = SrcMipCount;
     if (TexLoadInfo.MipLevels > 0)
         m_TexDesc.MipLevels = std::min(m_TexDesc.MipLevels, TexLoadInfo.MipLevels);
@@ -1142,11 +1142,11 @@ bool WriteDDSToStream(IFileStream*       pFileStream,
         return false;
     }
 
-    const Uint32 ArraySize = Desc.GetArraySize();
+    const UInt32 ArraySize = Desc.GetArraySize();
     VERIFY(TexData.NumSubresources == Desc.MipLevels * ArraySize, "Incorrect number of subresources");
     VERIFY_EXPR(TexData.pSubResources != nullptr);
 
-    Uint32 Magic = MAKEFOURCC('D', 'D', 'S', ' ');
+    UInt32 Magic = MAKEFOURCC('D', 'D', 'S', ' ');
 
     DDS_HEADER Header{};
     Header.size         = sizeof(Header);
@@ -1194,17 +1194,17 @@ bool WriteDDSToStream(IFileStream*       pFileStream,
         return false;
 
     const TextureFormatAttribs& FmtAttribs = GetTextureFormatAttribs(Desc.Format);
-    for (Uint32 Slice = 0; Slice < ArraySize; ++Slice)
+    for (UInt32 Slice = 0; Slice < ArraySize; ++Slice)
     {
-        for (Uint32 Mip = 0; Mip < Desc.MipLevels; ++Mip)
+        for (UInt32 Mip = 0; Mip < Desc.MipLevels; ++Mip)
         {
             const MipLevelProperties MipProps = GetMipLevelProperties(Desc, Mip);
             const TextureSubResData& SubRes   = TexData.pSubResources[Slice * Desc.MipLevels + Mip];
             VERIFY_EXPR(SubRes.pData != nullptr);
-            const Uint8* pData  = static_cast<const Uint8*>(SubRes.pData);
-            const Uint64 Stride = SubRes.Stride;
+            const UInt8* pData  = static_cast<const UInt8*>(SubRes.pData);
+            const UInt64 Stride = SubRes.Stride;
             VERIFY(Stride >= MipProps.RowSize, "Row stride is too small");
-            for (Uint32 row = 0; row < MipProps.StorageHeight / FmtAttribs.BlockHeight; ++row)
+            for (UInt32 row = 0; row < MipProps.StorageHeight / FmtAttribs.BlockHeight; ++row)
             {
                 const void* pRowData = pData + Stride * row;
                 if (!pFileStream->Write(pRowData, StaticCast<size_t>(MipProps.RowSize)))

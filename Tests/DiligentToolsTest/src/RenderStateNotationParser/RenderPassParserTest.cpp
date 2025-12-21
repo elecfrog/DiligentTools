@@ -125,7 +125,7 @@ TEST(Tools_RenderStateNotationParser, ParseSubpassDesc)
     constexpr ShadingRateAttachment ShadingRateAttachment[] = {
         {{3, RESOURCE_STATE_SHADING_RATE}, 4, 8}};
 
-    constexpr Uint32 PreserveAttachments[] = {2, 4};
+    constexpr UInt32 PreserveAttachments[] = {2, 4};
 
     SubpassDesc DescReference{};
     DescReference.InputAttachmentCount        = _countof(InputAttachments);

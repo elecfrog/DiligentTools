@@ -33,7 +33,7 @@
 namespace Diligent
 {
 
-void ParseRSNDeviceCreateInfo(const Char* Data, Uint32 Size, SerializationDeviceCreateInfo& Type, DynamicLinearAllocator& Allocator);
+void ParseRSNDeviceCreateInfo(const Char* Data, UInt32 Size, SerializationDeviceCreateInfo& Type, DynamicLinearAllocator& Allocator);
 
 IArchiverFactory* ParsingEnvironment::GetArchiverFactory()
 {
@@ -89,7 +89,7 @@ bool ParsingEnvironment::Initialize()
             RefCntAutoPtr<DataBlobImpl> pFileData = DataBlobImpl::Create();
             File->Read(pFileData);
 
-            ParseRSNDeviceCreateInfo(pFileData->GetConstDataPtr<char>(), StaticCast<Uint32>(pFileData->GetSize()), DeviceCI, Allocator);
+            ParseRSNDeviceCreateInfo(pFileData->GetConstDataPtr<char>(), StaticCast<UInt32>(pFileData->GetSize()), DeviceCI, Allocator);
         }
 
         auto ConstructString = [](std::vector<std::string> const& Paths) {
@@ -117,7 +117,7 @@ bool ParsingEnvironment::Initialize()
         if (!m_pRenderStateStreamFactory)
             LOG_ERROR_AND_THROW("Failed to create DefaultShaderSourceStreamFactory from paths: '", RenderStatePaths, "'.");
 
-        Uint32 ThreadCount = m_CreateInfo.ThreadCount > 0 ? m_CreateInfo.ThreadCount : std::thread::hardware_concurrency();
+        UInt32 ThreadCount = m_CreateInfo.ThreadCount > 0 ? m_CreateInfo.ThreadCount : std::thread::hardware_concurrency();
 
         ThreadPoolCreateInfo ThreadPoolCI{ThreadCount};
         m_pThreadPool = CreateThreadPool(ThreadPoolCI);

@@ -84,7 +84,7 @@ void ParseRSN(const nlohmann::json& Json, PipelineStateNotation& Type, DynamicLi
             Callbacks.ResourceSignatureCallback(Signatures[i], &pData[i], Allocator);
 
         Type.ppResourceSignatureNames    = pData;
-        Type.ResourceSignaturesNameCount = StaticCast<Uint32>(Signatures.size());
+        Type.ResourceSignaturesNameCount = StaticCast<UInt32>(Signatures.size());
     }
 }
 
@@ -104,7 +104,7 @@ void ParseRSN(const nlohmann::json& Json, GraphicsPipelineNotation& Type, Dynami
 
         if (!GraphicsPipeline.contains("NumRenderTargets"))
         {
-            for (Uint8 i = 0; i < _countof(Type.Desc.RTVFormats); i++)
+            for (UInt8 i = 0; i < _countof(Type.Desc.RTVFormats); i++)
                 if (Type.Desc.RTVFormats[i] != TEX_FORMAT_UNKNOWN)
                     Type.Desc.NumRenderTargets = i + 1;
         }
@@ -247,7 +247,7 @@ PIPELINE_TYPE GetPipelineType(const nlohmann::json& Json)
 
 } // namespace
 
-void ParseRSNDeviceCreateInfo(const Char* Data, Uint32 Size, SerializationDeviceCreateInfo& Type, DynamicLinearAllocator& Allocator)
+void ParseRSNDeviceCreateInfo(const Char* Data, UInt32 Size, SerializationDeviceCreateInfo& Type, DynamicLinearAllocator& Allocator)
 {
     nlohmann::json Json = nlohmann::json::parse(Data, Data + Size);
     ParseRSN(Json, Type, Allocator);
@@ -302,7 +302,7 @@ Bool RenderStateNotationParserImpl::ParseFileInternal(const Char*               
             RefCntAutoPtr<DataBlobImpl> pFileData = DataBlobImpl::Create();
             pFileStream->ReadBlob(pFileData);
 
-            if (!ParseStringInternal(pFileData->GetConstDataPtr<char>(), StaticCast<Uint32>(pFileData->GetSize()), pStreamFactory))
+            if (!ParseStringInternal(pFileData->GetConstDataPtr<char>(), StaticCast<UInt32>(pFileData->GetSize()), pStreamFactory))
                 LOG_ERROR_AND_THROW("Failed to parse file: '", FilePath, "'.");
         }
 
@@ -315,7 +315,7 @@ Bool RenderStateNotationParserImpl::ParseFileInternal(const Char*               
 }
 
 Bool RenderStateNotationParserImpl::ParseString(const Char*                      Source,
-                                                Uint32                           Length,
+                                                UInt32                           Length,
                                                 IShaderSourceInputStreamFactory* pStreamFactory,
                                                 IShaderSourceInputStreamFactory* pReloadFactory)
 {
@@ -337,12 +337,12 @@ Bool RenderStateNotationParserImpl::ParseString(const Char*                     
 }
 
 Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*                      Source,
-                                                        Uint32                           Length,
+                                                        UInt32                           Length,
                                                         IShaderSourceInputStreamFactory* pStreamFactory)
 {
     VERIFY_EXPR(Source != nullptr);
 
-    auto ParseJSON = [this](const Char* Source, Uint32 Length, IShaderSourceInputStreamFactory* pStreamFactory) -> bool //
+    auto ParseJSON = [this](const Char* Source, UInt32 Length, IShaderSourceInputStreamFactory* pStreamFactory) -> bool //
     {
         try
         {
@@ -400,7 +400,7 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
                     if (ShaderType != SHADER_TYPE_UNKNOWN)
                         ResourceDesc.Desc.ShaderType = ShaderType;
 
-                    auto const Iter = m_ShaderNames.emplace(HashMapStringKey{ResourceDesc.Desc.Name, false}, StaticCast<Uint32>(m_Shaders.size()));
+                    auto const Iter = m_ShaderNames.emplace(HashMapStringKey{ResourceDesc.Desc.Name, false}, StaticCast<UInt32>(m_Shaders.size()));
                     if (Iter.second)
                     {
                         m_Shaders.push_back(ResourceDesc);
@@ -447,7 +447,7 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
                     ParseRSN(Json, ResourceDesc, Allocator);
                     VERIFY_EXPR(ResourceDesc.Name != nullptr);
 
-                    auto const Iter = m_RenderPassNames.emplace(HashMapStringKey{ResourceDesc.Name, false}, StaticCast<Uint32>(m_RenderPasses.size()));
+                    auto const Iter = m_RenderPassNames.emplace(HashMapStringKey{ResourceDesc.Name, false}, StaticCast<UInt32>(m_RenderPasses.size()));
                     if (Iter.second)
                         m_RenderPasses.push_back(ResourceDesc);
                     else if (!(m_RenderPasses[Iter.first->second] == ResourceDesc))
@@ -475,7 +475,7 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
                     ParseRSN(Json, ResourceDesc, Allocator);
                     VERIFY_EXPR(ResourceDesc.Name != nullptr);
 
-                    auto const Iter = m_ResourceSignatureNames.emplace(HashMapStringKey{ResourceDesc.Name, false}, StaticCast<Uint32>(m_ResourceSignatures.size()));
+                    auto const Iter = m_ResourceSignatureNames.emplace(HashMapStringKey{ResourceDesc.Name, false}, StaticCast<UInt32>(m_ResourceSignatures.size()));
                     if (Iter.second)
                         m_ResourceSignatures.push_back(ResourceDesc);
                     else if (!(m_ResourceSignatures[Iter.first->second] == ResourceDesc))
@@ -527,7 +527,7 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
                     ParseRSN(Pipeline, PSONotation, *m_pAllocator, Callbacks);
                     VERIFY_EXPR(PSONotation.PSODesc.Name != nullptr);
 
-                    if (m_PipelineStateNames.emplace(std::make_pair(HashMapStringKey{PSONotation.PSODesc.Name, false}, PipelineType), StaticCast<Uint32>(m_PipelineStates.size())).second)
+                    if (m_PipelineStateNames.emplace(std::make_pair(HashMapStringKey{PSONotation.PSODesc.Name, false}, PipelineType), StaticCast<UInt32>(m_PipelineStates.size())).second)
                         m_PipelineStates.emplace_back(PSONotation);
                     else
                         LOG_ERROR_AND_THROW("Redefinition of pipeline '", PSONotation.PSODesc.Name, "'.");
@@ -572,10 +572,10 @@ Bool RenderStateNotationParserImpl::ParseStringInternal(const Char*             
     if (!ParseJSON(Source, Length, pStreamFactory))
         return false;
 
-    m_ParseInfo.ResourceSignatureCount = StaticCast<Uint32>(m_ResourceSignatures.size());
-    m_ParseInfo.ShaderCount            = StaticCast<Uint32>(m_Shaders.size());
-    m_ParseInfo.RenderPassCount        = StaticCast<Uint32>(m_RenderPasses.size());
-    m_ParseInfo.PipelineStateCount     = StaticCast<Uint32>(m_PipelineStates.size());
+    m_ParseInfo.ResourceSignatureCount = StaticCast<UInt32>(m_ResourceSignatures.size());
+    m_ParseInfo.ShaderCount            = StaticCast<UInt32>(m_Shaders.size());
+    m_ParseInfo.RenderPassCount        = StaticCast<UInt32>(m_RenderPasses.size());
+    m_ParseInfo.PipelineStateCount     = StaticCast<UInt32>(m_PipelineStates.size());
 
     return true;
 }
@@ -630,22 +630,22 @@ const RenderPassDesc* RenderStateNotationParserImpl::GetRenderPassByName(const C
     return Iter != m_RenderPassNames.end() ? &m_RenderPasses[Iter->second] : nullptr;
 }
 
-const PipelineStateNotation* RenderStateNotationParserImpl::GetPipelineStateByIndex(Uint32 Index) const
+const PipelineStateNotation* RenderStateNotationParserImpl::GetPipelineStateByIndex(UInt32 Index) const
 {
     return Index < m_PipelineStates.size() ? &m_PipelineStates[Index].get() : nullptr;
 }
 
-const PipelineResourceSignatureDesc* RenderStateNotationParserImpl::GetResourceSignatureByIndex(Uint32 Index) const
+const PipelineResourceSignatureDesc* RenderStateNotationParserImpl::GetResourceSignatureByIndex(UInt32 Index) const
 {
     return Index < m_ResourceSignatures.size() ? &m_ResourceSignatures[Index] : nullptr;
 }
 
-const ShaderCreateInfo* RenderStateNotationParserImpl::GetShaderByIndex(Uint32 Index) const
+const ShaderCreateInfo* RenderStateNotationParserImpl::GetShaderByIndex(UInt32 Index) const
 {
     return Index < m_Shaders.size() ? &m_Shaders[Index] : nullptr;
 }
 
-const RenderPassDesc* RenderStateNotationParserImpl::GetRenderPassByIndex(Uint32 Index) const
+const RenderPassDesc* RenderStateNotationParserImpl::GetRenderPassByIndex(UInt32 Index) const
 {
     return Index < m_RenderPasses.size() ? &m_RenderPasses[Index] : nullptr;
 }
@@ -702,7 +702,7 @@ bool RenderStateNotationParserImpl::Reload()
         }
         else if (!Reload.Source.empty())
         {
-            if (!ParseStringInternal(Reload.Source.c_str(), static_cast<Uint32>(Reload.Source.length()), Reload.pFactory))
+            if (!ParseStringInternal(Reload.Source.c_str(), static_cast<UInt32>(Reload.Source.length()), Reload.pFactory))
                 res = false;
         }
         else

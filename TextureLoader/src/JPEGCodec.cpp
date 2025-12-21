@@ -58,10 +58,7 @@ my_error_exit(j_common_ptr cinfo)
     longjmp(myerr->setjmp_buffer, 1);
 }
 
-DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
-                                       size_t      JpegDataSize,
-                                       IDataBlob*  pDstPixels,
-                                       ImageDesc*  pDstImgDesc)
+DECODE_JPEG_RESULT DecodeJpeg(const void* pSrcJpegBits, size_t JpegDataSize, Diligent::IDataBlob* pDstPixels, Diligent::ImageDesc* pDstImgDesc)
 {
     if (!pSrcJpegBits || !pDstImgDesc)
         return DECODE_JPEG_RESULT_INVALID_ARGUMENTS;
@@ -95,7 +92,7 @@ DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
     jpeg_create_decompress(&cinfo);
 
     // Step 2: specify data source
-    const unsigned char* pSrcPtr = pSrcJpegBits;
+    const unsigned char* pSrcPtr = (const unsigned char*)pSrcJpegBits;
     unsigned long        SrcSize = (unsigned long)JpegDataSize;
     jpeg_mem_src(&cinfo, pSrcPtr, SrcSize);
 
@@ -127,12 +124,12 @@ DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
 
         pDstImgDesc->Width         = cinfo.output_width;
         pDstImgDesc->Height        = cinfo.output_height;
-        pDstImgDesc->ComponentType = VT_UINT8;
+        pDstImgDesc->ComponentType = Diligent::VT_UINT8;
         pDstImgDesc->NumComponents = cinfo.output_components;
         pDstImgDesc->RowStride     = pDstImgDesc->Width * pDstImgDesc->NumComponents;
         pDstImgDesc->RowStride     = (pDstImgDesc->RowStride + 3u) & ~3u;
 
-        IDataBlob_Resize(pDstPixels, (size_t)pDstImgDesc->RowStride * pDstImgDesc->Height);
+        pDstPixels->Resize((size_t)pDstImgDesc->RowStride * pDstImgDesc->Height);
         // Step 6: while (scan lines remain to be read)
         //           jpeg_read_scanlines(...);
 
@@ -144,8 +141,9 @@ DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
             // Here the array is only one element long, but you could ask for
             // more than one scanline at a time if that's more convenient.
 
-            Uint8*   pScanline0   = IDataBlob_GetDataPtr(pDstPixels, 0);
-            Uint8*   pDstScanline = pScanline0 + cinfo.output_scanline * (size_t)pDstImgDesc->RowStride;
+
+            UInt8*   pScanline0   = (UInt8*)pDstPixels->GetDataPtr(0);
+            UInt8*   pDstScanline = pScanline0 + cinfo.output_scanline * (size_t)pDstImgDesc->RowStride;
             JSAMPROW RowPtrs[1];
             RowPtrs[0] = (JSAMPROW)pDstScanline;
             jpeg_read_scanlines(&cinfo, RowPtrs, 1);
@@ -161,7 +159,7 @@ DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
     {
         pDstImgDesc->Width         = cinfo.image_width;
         pDstImgDesc->Height        = cinfo.image_height;
-        pDstImgDesc->ComponentType = VT_UINT8;
+        pDstImgDesc->ComponentType = Diligent::VT_UINT8;
         pDstImgDesc->NumComponents = cinfo.num_components;
     }
 
@@ -178,11 +176,7 @@ DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void* pSrcJpegBits,
 
 
 
-ENCODE_JPEG_RESULT Diligent_EncodeJpeg(Uint8*     pSrcRGBPixels,
-                                       Uint32     Width,
-                                       Uint32     Height,
-                                       int        quality,
-                                       IDataBlob* pDstJpegBits)
+ENCODE_JPEG_RESULT EncodeJpeg(UInt8* pSrcRGBPixels, UInt Width, UInt Height, int quality, Diligent::IDataBlob* pDstJpegBits)
 {
     if (!pSrcRGBPixels || !pDstJpegBits || quality < 0 || Width == 0 || Height == 0)
         return ENCODE_JPEG_RESULT_INVALID_ARGUMENTS;
@@ -256,7 +250,7 @@ ENCODE_JPEG_RESULT Diligent_EncodeJpeg(Uint8*     pSrcRGBPixels,
      * To keep things simple, we pass one scanline per call; you can pass
      * more if you wish, though.
      */
-    Uint32 row_stride = Width * 3; /* JSAMPLEs per row in image_buffer */
+    UInt row_stride = Width * 3; /* JSAMPLEs per row in image_buffer */
 
     while (cinfo.next_scanline < cinfo.image_height)
     {
@@ -272,9 +266,10 @@ ENCODE_JPEG_RESULT Diligent_EncodeJpeg(Uint8*     pSrcRGBPixels,
     /* Step 6: Finish compression */
     jpeg_finish_compress(&cinfo);
 
-    size_t dst_offset = IDataBlob_GetSize(pDstJpegBits);
-    IDataBlob_Resize(pDstJpegBits, dst_offset + mem_size);
-    void* pDstPtr = IDataBlob_GetDataPtr(pDstJpegBits, dst_offset);
+
+    size_t dst_offset = pDstJpegBits->GetSize();
+    pDstJpegBits->Resize(dst_offset + mem_size);
+    void* pDstPtr = pDstJpegBits->GetDataPtr(dst_offset);
     memcpy(pDstPtr, mem, mem_size);
 
     /* After finish_compress, we can free memory buffer. */

@@ -50,8 +50,8 @@ public:
     ImGuiImplAndroid& operator = (      ImGuiImplAndroid&&) = delete;
     // clang-format on
 
-    virtual void NewFrame(Uint32            RenderSurfaceWidth,
-                          Uint32            RenderSurfaceHeight,
+    virtual void NewFrame(UInt32            RenderSurfaceWidth,
+                          UInt32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform) override final;
 
     bool BeginDrag(float x, float y);

@@ -46,36 +46,36 @@ DstChannelType ConvertChannel(SrcChannelType Val)
 }
 
 template <>
-Uint16 ConvertChannel<Uint8, Uint16>(Uint8 Val)
+UInt16 ConvertChannel<UInt8, UInt16>(UInt8 Val)
 {
-    return static_cast<Uint16>(Val) << 8u;
+    return static_cast<UInt16>(Val) << 8u;
 }
 template <>
-Uint32 ConvertChannel<Uint8, Uint32>(Uint8 Val)
+UInt32 ConvertChannel<UInt8, UInt32>(UInt8 Val)
 {
-    return static_cast<Uint32>(Val) << 24u;
-}
-
-template <>
-Uint8 ConvertChannel<Uint16, Uint8>(Uint16 Val)
-{
-    return static_cast<Uint8>(Val >> 8u);
-}
-template <>
-Uint32 ConvertChannel<Uint16, Uint32>(Uint16 Val)
-{
-    return static_cast<Uint32>(Val) << 16u;
+    return static_cast<UInt32>(Val) << 24u;
 }
 
 template <>
-Uint8 ConvertChannel<Uint32, Uint8>(Uint32 Val)
+UInt8 ConvertChannel<UInt16, UInt8>(UInt16 Val)
 {
-    return static_cast<Uint8>(Val >> 24u);
+    return static_cast<UInt8>(Val >> 8u);
 }
 template <>
-Uint16 ConvertChannel<Uint32, Uint16>(Uint32 Val)
+UInt32 ConvertChannel<UInt16, UInt32>(UInt16 Val)
 {
-    return static_cast<Uint16>(Val >> 16u);
+    return static_cast<UInt32>(Val) << 16u;
+}
+
+template <>
+UInt8 ConvertChannel<UInt32, UInt8>(UInt32 Val)
+{
+    return static_cast<UInt8>(Val >> 24u);
+}
+template <>
+UInt16 ConvertChannel<UInt32, UInt16>(UInt32 Val)
+{
+    return static_cast<UInt16>(Val >> 16u);
 }
 
 template <typename SrcChannelType, typename DstChannelType>
@@ -89,8 +89,8 @@ void CopyPixelsImpl(const CopyPixelsAttribs& Attribs)
         {
             size_t src_row = Attribs.FlipVertically ? size_t{Attribs.Height} - row - 1 : row;
             // clang-format off
-            const SrcChannelType* pSrcRow = reinterpret_cast<const SrcChannelType*>((static_cast<const Uint8*>(Attribs.pSrcPixels) + size_t{Attribs.SrcStride} * src_row));
-            DstChannelType*       pDstRow = reinterpret_cast<      DstChannelType*>((static_cast<      Uint8*>(Attribs.pDstPixels) + size_t{Attribs.DstStride} * row));
+            const SrcChannelType* pSrcRow = reinterpret_cast<const SrcChannelType*>((static_cast<const UInt8*>(Attribs.pSrcPixels) + size_t{Attribs.SrcStride} * src_row));
+            DstChannelType*       pDstRow = reinterpret_cast<      DstChannelType*>((static_cast<      UInt8*>(Attribs.pDstPixels) + size_t{Attribs.DstStride} * row));
             // clang-format on
             Handler(pSrcRow, pDstRow);
         }
@@ -102,8 +102,8 @@ void CopyPixelsImpl(const CopyPixelsAttribs& Attribs)
         (Attribs.DstCompCount >= 3 && Attribs.Swizzle.B != TEXTURE_COMPONENT_SWIZZLE_IDENTITY && Attribs.Swizzle.B != TEXTURE_COMPONENT_SWIZZLE_B) ||
         (Attribs.DstCompCount >= 4 && Attribs.Swizzle.A != TEXTURE_COMPONENT_SWIZZLE_IDENTITY && Attribs.Swizzle.A != TEXTURE_COMPONENT_SWIZZLE_A);
 
-    const Uint32 SrcRowSize = Attribs.Width * Attribs.SrcComponentSize * Attribs.SrcCompCount;
-    const Uint32 DstRowSize = Attribs.Width * Attribs.DstComponentSize * Attribs.DstCompCount;
+    const UInt32 SrcRowSize = Attribs.Width * Attribs.SrcComponentSize * Attribs.SrcCompCount;
+    const UInt32 DstRowSize = Attribs.Width * Attribs.DstComponentSize * Attribs.DstCompCount;
     if (SrcRowSize == DstRowSize && !SwizzleRequired)
     {
         if (SrcRowSize == Attribs.SrcStride &&
@@ -140,7 +140,7 @@ void CopyPixelsImpl(const CopyPixelsAttribs& Attribs)
             int SrcCompOffset = SrcCompOffset_ZERO;
             switch (Swizzle)
             {
-                // clang-format off
+                    // clang-format off
                 case TEXTURE_COMPONENT_SWIZZLE_IDENTITY: SrcCompOffset = IdentityOffset;     break;
                 case TEXTURE_COMPONENT_SWIZZLE_ZERO:     SrcCompOffset = SrcCompOffset_ZERO; break;
                 case TEXTURE_COMPONENT_SWIZZLE_ONE:      SrcCompOffset = SrcCompOffset_ONE;  break;
@@ -204,16 +204,24 @@ void CopyPixels(const CopyPixelsAttribs& Attribs)
     case sizeof(SRC_TYPE):                                                                              \
         switch (Attribs.DstComponentSize)                                                               \
         {                                                                                               \
-            case 1: CopyPixelsImpl<SRC_TYPE, Uint8>(Attribs); break;                                    \
-            case 2: CopyPixelsImpl<SRC_TYPE, Uint16>(Attribs); break;                                   \
-            case 4: CopyPixelsImpl<SRC_TYPE, Uint32>(Attribs); break;                                   \
+            case 1: CopyPixelsImpl<SRC_TYPE, UInt8>(Attribs); break;                                    \
+            case 2: CopyPixelsImpl<SRC_TYPE, UInt16>(Attribs); break;                                   \
+            case 4: CopyPixelsImpl<SRC_TYPE, UInt32>(Attribs); break;                                   \
             default: UNSUPPORTED("Unsupported destination component size: ", Attribs.DstComponentSize); \
         }                                                                                               \
         break
 
-        CASE_SRC_COMPONENT_SIZE(Uint8);
-        CASE_SRC_COMPONENT_SIZE(Uint16);
-        CASE_SRC_COMPONENT_SIZE(Uint32);
+        case sizeof(UInt8):
+            switch (Attribs.DstComponentSize)
+            {
+                case 1: CopyPixelsImpl<UInt8, UInt8>(Attribs); break;
+                case 2: CopyPixelsImpl<UInt8, UInt16>(Attribs); break;
+                case 4: CopyPixelsImpl<UInt8, UInt32>(Attribs); break;
+                default: UNSUPPORTED("Unsupported destination component size: ", Attribs.DstComponentSize);
+            }
+            break;
+            CASE_SRC_COMPONENT_SIZE(UInt16);
+            CASE_SRC_COMPONENT_SIZE(UInt32);
 #undef CASE_SRC_COMPONENT_SIZE
 
         default:
@@ -237,15 +245,15 @@ void ExpandPixels(const ExpandPixelsAttribs& Attribs)
     DEV_CHECK_ERR(Attribs.SrcStride >= Attribs.SrcWidth * Attribs.ComponentSize * Attribs.ComponentCount || Attribs.SrcHeight == 1, "Source stride is too small");
     DEV_CHECK_ERR(Attribs.DstStride >= Attribs.DstWidth * Attribs.ComponentSize * Attribs.ComponentCount || Attribs.DstHeight == 1, "Destination stride is too small");
 
-    const Uint32 NumRowsToCopy = std::min(Attribs.SrcHeight, Attribs.DstHeight);
-    const Uint32 NumColsToCopy = std::min(Attribs.SrcWidth, Attribs.DstWidth);
+    const UInt32 NumRowsToCopy = std::min(Attribs.SrcHeight, Attribs.DstHeight);
+    const UInt32 NumColsToCopy = std::min(Attribs.SrcWidth, Attribs.DstWidth);
 
-    auto ExpandRow = [&Attribs, NumColsToCopy](size_t row, Uint8* pDstRow) {
-        const Uint8* pSrcRow = reinterpret_cast<const Uint8*>(Attribs.pSrcPixels) + row * size_t{Attribs.SrcStride};
+    auto ExpandRow = [&Attribs, NumColsToCopy](size_t row, UInt8* pDstRow) {
+        const UInt8* pSrcRow = reinterpret_cast<const UInt8*>(Attribs.pSrcPixels) + row * size_t{Attribs.SrcStride};
         memcpy(pDstRow, pSrcRow, size_t{NumColsToCopy} * size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount});
 
         // Expand the row by repeating the last pixel
-        const Uint8* pLastPixel = pSrcRow + size_t{NumColsToCopy - 1u} * size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount};
+        const UInt8* pLastPixel = pSrcRow + size_t{NumColsToCopy - 1u} * size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount};
         for (size_t col = NumColsToCopy; col < Attribs.DstWidth; ++col)
         {
             memcpy(pDstRow + col * Attribs.ComponentSize * Attribs.ComponentCount, pLastPixel, size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount});
@@ -254,17 +262,17 @@ void ExpandPixels(const ExpandPixelsAttribs& Attribs)
 
     for (size_t row = 0; row < NumRowsToCopy; ++row)
     {
-        Uint8* pDstRow = reinterpret_cast<Uint8*>(Attribs.pDstPixels) + row * Attribs.DstStride;
+        UInt8* pDstRow = reinterpret_cast<UInt8*>(Attribs.pDstPixels) + row * Attribs.DstStride;
         ExpandRow(row, pDstRow);
     }
 
     if (NumRowsToCopy < Attribs.DstHeight)
     {
-        std::vector<Uint8> LastRow(size_t{Attribs.DstWidth} * size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount});
+        std::vector<UInt8> LastRow(size_t{Attribs.DstWidth} * size_t{Attribs.ComponentSize} * size_t{Attribs.ComponentCount});
         ExpandRow(NumRowsToCopy - 1, LastRow.data());
         for (size_t row = NumRowsToCopy - 1; row < Attribs.DstHeight; ++row)
         {
-            Uint8* pDstRow = reinterpret_cast<Uint8*>(Attribs.pDstPixels) + row * Attribs.DstStride;
+            UInt8* pDstRow = reinterpret_cast<UInt8*>(Attribs.pDstPixels) + row * Attribs.DstStride;
             memcpy(pDstRow, LastRow.data(), LastRow.size());
         }
     }
@@ -274,9 +282,9 @@ template <typename Type>
 struct PremultiplyAlphaImplHelper;
 
 template <>
-struct PremultiplyAlphaImplHelper<Uint8>
+struct PremultiplyAlphaImplHelper<UInt8>
 {
-    using IntermediateType = Uint32;
+    using IntermediateType = UInt32;
 };
 
 template <>
@@ -286,9 +294,9 @@ struct PremultiplyAlphaImplHelper<Int8>
 };
 
 template <>
-struct PremultiplyAlphaImplHelper<Uint16>
+struct PremultiplyAlphaImplHelper<UInt16>
 {
-    using IntermediateType = Uint32;
+    using IntermediateType = UInt32;
 };
 
 template <>
@@ -298,9 +306,9 @@ struct PremultiplyAlphaImplHelper<Int16>
 };
 
 template <>
-struct PremultiplyAlphaImplHelper<Uint32>
+struct PremultiplyAlphaImplHelper<UInt32>
 {
-    using IntermediateType = Uint64;
+    using IntermediateType = UInt64;
 };
 
 template <>
@@ -312,14 +320,14 @@ struct PremultiplyAlphaImplHelper<Int32>
 template <typename Type, typename PremultiplyComponentType>
 void PremultiplyComponents(const PremultiplyAlphaAttribs& Attribs, PremultiplyComponentType&& PremultiplyComponent)
 {
-    for (Uint32 row = 0; row < Attribs.Height; ++row)
+    for (UInt32 row = 0; row < Attribs.Height; ++row)
     {
-        Type* pRow = reinterpret_cast<Type*>(reinterpret_cast<Uint8*>(Attribs.pPixels) + row * Attribs.Stride);
-        for (Uint32 col = 0; col < Attribs.Width; ++col)
+        Type* pRow = reinterpret_cast<Type*>(reinterpret_cast<UInt8*>(Attribs.pPixels) + row * Attribs.Stride);
+        for (UInt32 col = 0; col < Attribs.Width; ++col)
         {
             Type* pPixel = pRow + col * Attribs.ComponentCount;
             Type  A      = pPixel[Attribs.ComponentCount - 1];
-            for (Uint32 c = 0; c < Attribs.ComponentCount - 1; ++c)
+            for (UInt32 c = 0; c < Attribs.ComponentCount - 1; ++c)
                 PremultiplyComponent(pPixel[c], A);
         }
     }
@@ -382,7 +390,7 @@ void PremultiplyAlphaImpl<float>(const PremultiplyAlphaAttribs& Attribs)
 
 void PremultiplyAlpha(const PremultiplyAlphaAttribs& Attribs)
 {
-    const Uint32 ValueSize = GetValueSize(Attribs.ComponentType);
+    const UInt32 ValueSize = GetValueSize(Attribs.ComponentType);
 
     DEV_CHECK_ERR(Attribs.Width > 0, "Eidth must not be zero");
     DEV_CHECK_ERR(Attribs.Height > 0, "Height must not be zero");
@@ -393,9 +401,9 @@ void PremultiplyAlpha(const PremultiplyAlphaAttribs& Attribs)
 
     switch (Attribs.ComponentType)
     {
-        case VT_UINT8: PremultiplyAlphaImpl<Uint8>(Attribs); break;
-        case VT_UINT16: PremultiplyAlphaImpl<Uint16>(Attribs); break;
-        case VT_UINT32: PremultiplyAlphaImpl<Uint32>(Attribs); break;
+        case VT_UINT8: PremultiplyAlphaImpl<UInt8>(Attribs); break;
+        case VT_UINT16: PremultiplyAlphaImpl<UInt16>(Attribs); break;
+        case VT_UINT32: PremultiplyAlphaImpl<UInt32>(Attribs); break;
 
         case VT_INT8: PremultiplyAlphaImpl<Int8>(Attribs); break;
         case VT_INT16: PremultiplyAlphaImpl<Int16>(Attribs); break;
@@ -425,7 +433,7 @@ void CreateTextureFromFile(const Char*            FilePath,
 
 extern "C"
 {
-    void Diligent_CreateTextureFromFile(const Diligent::Char*            FilePath,
+    void Diligent_CreateTextureFromFile(const Char*            FilePath,
                                         const Diligent::TextureLoadInfo& TexLoadInfo,
                                         Diligent::IRenderDevice*         pDevice,
                                         Diligent::ITexture**             ppTexture)

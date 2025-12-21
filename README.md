@@ -34,7 +34,7 @@ To build the module, see [build instructions](https://github.com/DiligentGraphic
 # License
 
 See [Apache 2.0 license](License.txt).
-
+[READNE](ThirdParty/imgui/READNE)
 This project has some third-party dependencies, each of which may have independent licensing:
 
 * [args](https://github.com/Taywee/args): A simple header-only C++ argument parser library. ([MIT License](https://github.com/DiligentGraphics/args/blob/master/LICENSE)).

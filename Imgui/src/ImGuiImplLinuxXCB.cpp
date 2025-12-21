@@ -39,16 +39,16 @@ namespace Diligent
 
 std::unique_ptr<ImGuiImplLinuxXCB> ImGuiImplLinuxXCB::Create(const ImGuiDiligentCreateInfo& CI,
                                                              xcb_connection_t*              connection,
-                                                             Uint32                         DisplayWidth,
-                                                             Uint32                         DisplayHeight)
+                                                             UInt32                         DisplayWidth,
+                                                             UInt32                         DisplayHeight)
 {
     return std::make_unique<ImGuiImplLinuxXCB>(CI, connection, DisplayWidth, DisplayHeight);
 }
 
 ImGuiImplLinuxXCB::ImGuiImplLinuxXCB(const ImGuiDiligentCreateInfo& CI,
                                      xcb_connection_t*              connection,
-                                     Uint32                         DisplayWidth,
-                                     Uint32                         DisplayHeight) :
+                                     UInt32                         DisplayWidth,
+                                     UInt32                         DisplayHeight) :
     ImGuiImplDiligent{CI}
 {
     m_syms = xcb_key_symbols_alloc((xcb_connection_t*)connection);
@@ -69,8 +69,8 @@ ImGuiImplLinuxXCB::~ImGuiImplLinuxXCB()
     }
 }
 
-void ImGuiImplLinuxXCB::NewFrame(Uint32            RenderSurfaceWidth,
-                                 Uint32            RenderSurfaceHeight,
+void ImGuiImplLinuxXCB::NewFrame(UInt32            RenderSurfaceWidth,
+                                 UInt32            RenderSurfaceHeight,
                                  SURFACE_TRANSFORM SurfacePreTransform)
 {
     auto now        = std::chrono::high_resolution_clock::now();

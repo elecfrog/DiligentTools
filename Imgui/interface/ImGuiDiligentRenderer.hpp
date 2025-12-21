@@ -28,7 +28,7 @@
 #pragma once
 
 #include <memory>
-#include "../../../DiligentCore/Primitives/interface/BasicTypes.h"
+#include "CommonDefinitions.h"
 #include "../../../DiligentCore/Common/interface/BasicMath.hpp"
 #include "../../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
 #include "../../../DiligentCore/Graphics/GraphicsEngine/interface/GraphicsTypes.h"
@@ -47,9 +47,9 @@ struct ITextureView;
 struct IShaderResourceBinding;
 struct IShaderResourceVariable;
 struct ImGuiDiligentCreateInfo;
-enum TEXTURE_FORMAT : Uint16;
-enum SURFACE_TRANSFORM : Uint32;
-enum IMGUI_COLOR_CONVERSION_MODE : Uint8;
+enum TEXTURE_FORMAT : UInt16;
+enum SURFACE_TRANSFORM : UInt32;
+enum IMGUI_COLOR_CONVERSION_MODE : UInt8;
 
 class ImGuiDiligentRenderer
 {
@@ -57,8 +57,8 @@ public:
     ImGuiDiligentRenderer(const ImGuiDiligentCreateInfo& CI);
     ~ImGuiDiligentRenderer();
 
-    void NewFrame(Uint32            RenderSurfaceWidth,
-                  Uint32            RenderSurfaceHeight,
+    void NewFrame(UInt32            RenderSurfaceWidth,
+                  UInt32            RenderSurfaceHeight,
                   SURFACE_TRANSFORM SurfacePreTransform);
     void EndFrame();
     void RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDrawData);
@@ -81,10 +81,10 @@ private:
 
     const TEXTURE_FORMAT              m_BackBufferFmt;
     const TEXTURE_FORMAT              m_DepthBufferFmt;
-    Uint32                            m_VertexBufferSize    = 0;
-    Uint32                            m_IndexBufferSize     = 0;
-    Uint32                            m_RenderSurfaceWidth  = 0;
-    Uint32                            m_RenderSurfaceHeight = 0;
+    UInt32                            m_VertexBufferSize    = 0;
+    UInt32                            m_IndexBufferSize     = 0;
+    UInt32                            m_RenderSurfaceWidth  = 0;
+    UInt32                            m_RenderSurfaceHeight = 0;
     SURFACE_TRANSFORM                 m_SurfacePreTransform = SURFACE_TRANSFORM_IDENTITY;
     const IMGUI_COLOR_CONVERSION_MODE m_ColorConversionMode;
     bool                              m_BaseVertexSupported = false;

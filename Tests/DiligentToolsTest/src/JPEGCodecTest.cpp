@@ -40,14 +40,14 @@ namespace
 
 TEST(Tools_TextureLoader, JPEGCodec)
 {
-    constexpr Uint32 TestImgWidth  = 256;
-    constexpr Uint32 TestImgHeight = 128;
-    constexpr Uint32 NumComponents = 3;
+    constexpr UInt32 TestImgWidth  = 256;
+    constexpr UInt32 TestImgHeight = 128;
+    constexpr UInt32 NumComponents = 3;
 
-    std::vector<Uint8> RefPixels(TestImgWidth * TestImgHeight * NumComponents);
-    for (Uint32 y = 0; y < TestImgHeight; ++y)
+    std::vector<UInt8> RefPixels(TestImgWidth * TestImgHeight * NumComponents);
+    for (UInt32 y = 0; y < TestImgHeight; ++y)
     {
-        for (Uint32 x = 0; x < TestImgWidth; ++x)
+        for (UInt32 x = 0; x < TestImgWidth; ++x)
         {
             auto idx = x + y * TestImgWidth;
 
@@ -83,15 +83,15 @@ TEST(Tools_TextureLoader, JPEGCodec)
         ASSERT_EQ(DecodedImgDesc.NumComponents, NumComponents);
         ASSERT_EQ(DecodedImgDesc.ComponentType, VT_UINT8);
 
-        const Uint8* pTestPixels = pDecodedPixelsBlob->GetConstDataPtr<Uint8>();
-        for (Uint32 y = 0; y < TestImgHeight; ++y)
+        const UInt8* pTestPixels = pDecodedPixelsBlob->GetConstDataPtr<UInt8>();
+        for (UInt32 y = 0; y < TestImgHeight; ++y)
         {
-            for (Uint32 x = 0; x < TestImgWidth; ++x)
+            for (UInt32 x = 0; x < TestImgWidth; ++x)
             {
-                for (Uint32 c = 0; c < NumComponents; ++c)
+                for (UInt32 c = 0; c < NumComponents; ++c)
                 {
-                    Uint8 RefVal  = RefPixels[(x + y * TestImgWidth) * NumComponents + c];
-                    Uint8 TestVal = pTestPixels[x * DecodedImgDesc.NumComponents + c + y * DecodedImgDesc.RowStride];
+                    UInt8 RefVal  = RefPixels[(x + y * TestImgWidth) * NumComponents + c];
+                    UInt8 TestVal = pTestPixels[x * DecodedImgDesc.NumComponents + c + y * DecodedImgDesc.RowStride];
                     int   Diff    = std::abs(static_cast<int>(RefVal) - static_cast<int>(TestVal));
                     EXPECT_LE(Diff, 1) << "[" << x << "," << y << "][" << c << "]: " << static_cast<int>(RefVal) << " vs " << static_cast<int>(TestVal);
                 }

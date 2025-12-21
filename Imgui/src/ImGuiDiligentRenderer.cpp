@@ -517,8 +517,8 @@ ImGuiDiligentRenderer::~ImGuiDiligentRenderer()
 {
 }
 
-void ImGuiDiligentRenderer::NewFrame(Uint32            RenderSurfaceWidth,
-                                     Uint32            RenderSurfaceHeight,
+void ImGuiDiligentRenderer::NewFrame(UInt32            RenderSurfaceWidth,
+                                     UInt32            RenderSurfaceHeight,
                                      SURFACE_TRANSFORM SurfacePreTransform)
 {
     if (!m_pPSO)
@@ -868,15 +868,15 @@ void ImGuiDiligentRenderer::UpdateTexture(IDeviceContext* pCtx, ImTextureData* p
         TextureDesc Desc;
         Desc.Name      = "ImGuiTexture";
         Desc.Type      = RESOURCE_DIM_TEX_2D;
-        Desc.Width     = static_cast<Uint32>(pTexData->Width);
-        Desc.Height    = static_cast<Uint32>(pTexData->Height);
+        Desc.Width     = static_cast<UInt32>(pTexData->Width);
+        Desc.Height    = static_cast<UInt32>(pTexData->Height);
         Desc.Format    = ImTextureFormatToDiligentFormat(pTexData->Format);
         Desc.Usage     = USAGE_DEFAULT; // allow future UpdateTexture()
         Desc.BindFlags = BIND_SHADER_RESOURCE;
 
         TextureSubResData mip0{
             pTexData->GetPixels(),
-            static_cast<Uint64>(pTexData->GetPitch()),
+            static_cast<UInt64>(pTexData->GetPitch()),
         };
         TextureData init{&mip0, 1};
 
@@ -893,10 +893,10 @@ void ImGuiDiligentRenderer::UpdateTexture(IDeviceContext* pCtx, ImTextureData* p
     else if (pTexData->Status == ImTextureStatus_WantUpdates && pTexture != nullptr)
     {
         Box dstBox{
-            static_cast<Uint32>(pTexData->UpdateRect.x),
-            static_cast<Uint32>(pTexData->UpdateRect.x + pTexData->UpdateRect.w),
-            static_cast<Uint32>(pTexData->UpdateRect.y),
-            static_cast<Uint32>(pTexData->UpdateRect.y + pTexData->UpdateRect.h),
+            static_cast<UInt32>(pTexData->UpdateRect.x),
+            static_cast<UInt32>(pTexData->UpdateRect.x + pTexData->UpdateRect.w),
+            static_cast<UInt32>(pTexData->UpdateRect.y),
+            static_cast<UInt32>(pTexData->UpdateRect.y + pTexData->UpdateRect.h),
         };
 
         TextureSubResData SubresData;
@@ -1082,8 +1082,8 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
 
     // Render command lists
     // (Because we merged all buffers into a single one, we maintain our own offset into them)
-    Uint32 GlobalIdxOffset = 0;
-    Uint32 GlobalVtxOffset = 0;
+    UInt32 GlobalIdxOffset = 0;
+    UInt32 GlobalVtxOffset = 0;
 
     ITextureView* pLastTextureView = nullptr;
     for (const ImDrawList* pCmdList : pDrawData->CmdLists)
@@ -1141,7 +1141,7 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
                     pCtx->CommitShaderResources(m_pSRB, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
                 }
 
-                DrawIndexedAttribs DrawAttrs{pCmd->ElemCount, sizeof(ImDrawIdx) == sizeof(Uint16) ? VT_UINT16 : VT_UINT32, DRAW_FLAG_VERIFY_STATES};
+                DrawIndexedAttribs DrawAttrs{pCmd->ElemCount, sizeof(ImDrawIdx) == sizeof(UInt16) ? VT_UINT16 : VT_UINT32, DRAW_FLAG_VERIFY_STATES};
                 DrawAttrs.FirstIndexLocation = pCmd->IdxOffset + GlobalIdxOffset;
                 if (m_BaseVertexSupported)
                 {
@@ -1150,7 +1150,7 @@ void ImGuiDiligentRenderer::RenderDrawData(IDeviceContext* pCtx, ImDrawData* pDr
                 else
                 {
                     IBuffer* pVBs[]       = {m_pVB};
-                    Uint64   VtxOffsets[] = {sizeof(ImDrawVert) * (size_t{pCmd->VtxOffset} + size_t{GlobalVtxOffset})};
+                    UInt64   VtxOffsets[] = {sizeof(ImDrawVert) * (size_t{pCmd->VtxOffset} + size_t{GlobalVtxOffset})};
                     pCtx->SetVertexBuffers(0, 1, pVBs, VtxOffsets, RESOURCE_STATE_TRANSITION_MODE_TRANSITION, SET_VERTEX_BUFFERS_FLAG_NONE);
                 }
                 pCtx->DrawIndexed(DrawAttrs);

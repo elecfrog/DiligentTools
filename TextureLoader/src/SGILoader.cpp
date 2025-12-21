@@ -39,18 +39,18 @@ namespace
 {
 struct SGIHeader
 {
-    Uint16  Magic;               // SGI magic number
+    UInt16  Magic;               // SGI magic number
     uint8_t Compression;         // Whether to use RLE compression or not
     uint8_t BytePerPixelChannel; // 1 for 8-bit channels, or 2 for 16-bit channels
-    Uint16  DimensionBE;         // Image dimension, equals 3 for RGBA image
-    Uint16  WidthBE;             // Image width
-    Uint16  HeightBE;            // Image height
-    Uint16  ChannelsBE;          // Number of channels, equals 4 for RGBA image
-    Uint32  MinPixelValueBE;     // Smallest pixel value in the image
-    Uint32  MaxPixelValueBE;     // Largest pixel value in the image
-    Uint32  Reserved1BE;         // Unused
+    UInt16  DimensionBE;         // Image dimension, equals 3 for RGBA image
+    UInt16  WidthBE;             // Image width
+    UInt16  HeightBE;            // Image height
+    UInt16  ChannelsBE;          // Number of channels, equals 4 for RGBA image
+    UInt32  MinPixelValueBE;     // Smallest pixel value in the image
+    UInt32  MaxPixelValueBE;     // Largest pixel value in the image
+    UInt32  Reserved1BE;         // Unused
     char    Name[80];            // C string null-terminated name
-    Uint32  ColorMapIDBE;        // Only for color map image
+    UInt32  ColorMapIDBE;        // Only for color map image
     char    Reserved2[404];      // To make header 512 bytes long. Ignore
 };
 
@@ -64,9 +64,9 @@ bool LoadSGI(const void* pSGIData,
              ImageDesc*  pDstImgDesc)
 {
     VERIFY_EXPR(pSGIData != nullptr && pDstImgDesc != nullptr);
-    const Uint8* pDataStart = static_cast<const Uint8*>(pSGIData);
-    const Uint8* pDataEnd   = pDataStart + DataSize;
-    const Uint8* pSrcPtr    = pDataStart;
+    const UInt8* pDataStart = static_cast<const UInt8*>(pSGIData);
+    const UInt8* pDataEnd   = pDataStart + DataSize;
+    const UInt8* pSrcPtr    = pDataStart;
 
     if (DataSize < sizeof(SGIHeader))
     {
@@ -77,17 +77,17 @@ bool LoadSGI(const void* pSGIData,
     const SGIHeader& Header = reinterpret_cast<const SGIHeader&>(*pSrcPtr);
     pSrcPtr += sizeof(SGIHeader);
 
-    constexpr Uint16 SGIMagic = 0xda01u;
+    constexpr UInt16 SGIMagic = 0xda01u;
     if (Header.Magic != 0xda01)
     {
         LOG_ERROR_MESSAGE("0x", std::hex, Header.Magic, " is not a valid SGI magic number; 0x", std::hex, SGIMagic, " is expected.");
         return false;
     }
 
-    const Uint32 Width           = PlatformMisc::SwapBytes(Header.WidthBE);
-    const Uint32 Height          = PlatformMisc::SwapBytes(Header.HeightBE);
-    const Uint32 NumChannels     = PlatformMisc::SwapBytes(Header.ChannelsBE);
-    const Uint32 BytesPerChannel = Header.BytePerPixelChannel;
+    const UInt32 Width           = PlatformMisc::SwapBytes(Header.WidthBE);
+    const UInt32 Height          = PlatformMisc::SwapBytes(Header.HeightBE);
+    const UInt32 NumChannels     = PlatformMisc::SwapBytes(Header.ChannelsBE);
+    const UInt32 BytesPerChannel = Header.BytePerPixelChannel;
     pDstImgDesc->Width           = Width;
     pDstImgDesc->Height          = Height;
     pDstImgDesc->NumComponents   = NumChannels;
@@ -116,7 +116,7 @@ bool LoadSGI(const void* pSGIData,
 
     pDstImgDesc->RowStride = Width * NumChannels * BytesPerChannel;
     pDstPixels->Resize(size_t{Height} * pDstImgDesc->RowStride);
-    Uint8* pDstPtr = pDstPixels->GetDataPtr<Uint8>();
+    UInt8* pDstPtr = pDstPixels->GetDataPtr<UInt8>();
 
     if (Header.Compression == 0)
     {
@@ -137,7 +137,7 @@ bool LoadSGI(const void* pSGIData,
                 // Copy each channel from the respective plane
                 for (size_t c = 0; c < NumChannels; ++c)
                 {
-                    const Uint8* pSrcPlane = pSrcPtr + PlaneSize * c;
+                    const UInt8* pSrcPlane = pSrcPtr + PlaneSize * c;
                     const size_t PixelIdx  = y * Width + x;
 
                     // Copy channel
@@ -154,14 +154,14 @@ bool LoadSGI(const void* pSGIData,
         // RLE-compressed SGI image
 
         // Offsets table starts at byte 512 and is Height * NumChannels * 4 bytes long.
-        const size_t  TableSize     = sizeof(Uint32) * Height * NumChannels;
-        const Uint32* OffsetTableBE = reinterpret_cast<const Uint32*>(pSrcPtr);
+        const size_t  TableSize     = sizeof(UInt32) * Height * NumChannels;
+        const UInt32* OffsetTableBE = reinterpret_cast<const UInt32*>(pSrcPtr);
         pSrcPtr += TableSize;
         if (pSrcPtr > pDataEnd)
             return false;
 
         // Length table follows the offsets table and is the same size.
-        const Uint32* LengthTableBE = reinterpret_cast<const Uint32*>(pSrcPtr);
+        const UInt32* LengthTableBE = reinterpret_cast<const UInt32*>(pSrcPtr);
         pSrcPtr += TableSize;
         if (pSrcPtr > pDataEnd)
             return false;
@@ -177,7 +177,7 @@ bool LoadSGI(const void* pSGIData,
 
             const auto* pSrc = pLineDataStart;
 
-            Uint32 x = 0;
+            UInt32 x = 0;
             while (x < Width && pSrc < pLineDataEnd)
             {
                 // The lowest 7 bits is the counter
@@ -204,17 +204,17 @@ bool LoadSGI(const void* pSGIData,
             return x == Width;
         };
 
-        for (Uint32 c = 0; c < NumChannels; ++c)
+        for (UInt32 c = 0; c < NumChannels; ++c)
         {
-            for (Uint32 y = 0; y < Height; ++y)
+            for (UInt32 y = 0; y < Height; ++y)
             {
                 // Each unsigned int in the offset table is the offset (from the file start) to the
                 // start of the compressed data of each scanline for each channel.
-                const Uint32 RleOff = PlatformMisc::SwapBytes(OffsetTableBE[y + c * Height]);
+                const UInt32 RleOff = PlatformMisc::SwapBytes(OffsetTableBE[y + c * Height]);
                 // The size table tells the size of the compressed data (unsigned int) of each scanline.
-                const Uint32 RleLen = PlatformMisc::SwapBytes(LengthTableBE[y + c * Height]);
+                const UInt32 RleLen = PlatformMisc::SwapBytes(LengthTableBE[y + c * Height]);
 
-                Uint8* DstLine = pDstPtr + y * size_t{pDstImgDesc->RowStride} + c;
+                UInt8* DstLine = pDstPtr + y * size_t{pDstImgDesc->RowStride} + c;
                 if (!ReadLine(DstLine, pDataStart + RleOff, pSrcPtr + RleOff + RleLen))
                     return false;
             }

@@ -46,76 +46,13 @@
 
 #define STB_DXT_STATIC
 #define STB_DXT_IMPLEMENTATION
-#include "../../ThirdParty/stb/stb_dxt.h"
+#include <stb_dxt.h>
+#include "PNGCodec.h"
+#include "JPEGCodec.h"
 
-extern "C"
-{
-    Diligent::DECODE_PNG_RESULT Diligent_DecodePng(const void*          pSrcPngBits,
-                                                   size_t               PngDataSize,
-                                                   Diligent::IDataBlob* pDstPixels,
-                                                   Diligent::ImageDesc* pDstImgDesc);
-
-    Diligent::ENCODE_PNG_RESULT Diligent_EncodePng(const Diligent::Uint8* pSrcPixels,
-                                                   Diligent::Uint32       Width,
-                                                   Diligent::Uint32       Height,
-                                                   Diligent::Uint32       StrideInBytes,
-                                                   int                    PngColorType,
-                                                   Diligent::IDataBlob*   pDstPngBits);
-
-    Diligent::DECODE_JPEG_RESULT Diligent_DecodeJpeg(const void*          pSrcJpegBits,
-                                                     size_t               JpegDataSize,
-                                                     Diligent::IDataBlob* pDstPixels,
-                                                     Diligent::ImageDesc* pDstImgDesc);
-
-    Diligent::ENCODE_JPEG_RESULT Diligent_EncodeJpeg(Diligent::Uint8*     pSrcRGBData,
-                                                     Diligent::Uint32     Width,
-                                                     Diligent::Uint32     Height,
-                                                     int                  quality,
-                                                     Diligent::IDataBlob* pDstJpegBits);
-
-    Diligent::DECODE_JPEG_RESULT Diligent_LoadSGI(const Diligent::IDataBlob* pSrcJpegBits,
-                                                  Diligent::IDataBlob*       pDstPixels,
-                                                  Diligent::ImageDesc*       pDstImgDesc);
-}
 
 namespace Diligent
 {
-
-DECODE_PNG_RESULT DecodePng(const void* pSrcPngBits,
-                            size_t      PngDataSize,
-                            IDataBlob*  pDstPixels,
-                            ImageDesc*  pDstImgDesc)
-{
-    return Diligent_DecodePng(pSrcPngBits, PngDataSize, pDstPixels, pDstImgDesc);
-}
-
-ENCODE_PNG_RESULT EncodePng(const Uint8* pSrcPixels,
-                            Uint32       Width,
-                            Uint32       Height,
-                            Uint32       StrideInBytes,
-                            int          PngColorType,
-                            IDataBlob*   pDstPngBits)
-{
-    return Diligent_EncodePng(pSrcPixels, Width, Height, StrideInBytes, PngColorType, pDstPngBits);
-}
-
-
-DECODE_JPEG_RESULT DecodeJpeg(const void* pSrcJpegBits,
-                              size_t      JpegDataSize,
-                              IDataBlob*  pDstPixels,
-                              ImageDesc*  pDstImgDesc)
-{
-    return Diligent_DecodeJpeg(pSrcJpegBits, JpegDataSize, pDstPixels, pDstImgDesc);
-}
-
-ENCODE_JPEG_RESULT EncodeJpeg(Uint8*     pSrcRGBPixels,
-                              Uint32     Width,
-                              Uint32     Height,
-                              int        quality,
-                              IDataBlob* pDstJpegBits)
-{
-    return Diligent_EncodeJpeg(pSrcRGBPixels, Width, Height, quality, pDstJpegBits);
-}
 
 static TextureDesc TexDescFromTexLoadInfo(const TextureLoadInfo& TexLoadInfo, const std::string& Name)
 {
@@ -130,7 +67,7 @@ static TextureDesc TexDescFromTexLoadInfo(const TextureLoadInfo& TexLoadInfo, co
 
 TextureLoaderImpl::TextureLoaderImpl(IReferenceCounters*      pRefCounters,
                                      const TextureLoadInfo&   TexLoadInfo,
-                                     const Uint8*             pData,
+                                     const UInt8*             pData,
                                      size_t                   DataSize,
                                      RefCntAutoPtr<IDataBlob> pDataBlob) :
     TBase{pRefCounters},
@@ -200,7 +137,7 @@ static void TexDescFromImageDesc(const ImageDesc& ImgDesc, const TextureLoadInfo
     {
         const COMPONENT_TYPE CompType = ValueTypeToComponentType(ImgDesc.ComponentType, /*IsNormalized = */ true, TexLoadInfo.IsSRGB);
 
-        Uint32 NumComponents = ImgDesc.NumComponents;
+        UInt32 NumComponents = ImgDesc.NumComponents;
         if (NumComponents == 3 || CompType == COMPONENT_TYPE_UNORM_SRGB)
         {
             // Note that there is RGB32_FLOAT format, but it can't be filtered, so always extend RGB to RGBA.
@@ -208,7 +145,7 @@ static void TexDescFromImageDesc(const ImageDesc& ImgDesc, const TextureLoadInfo
         }
         DEV_CHECK_ERR(CompType != COMPONENT_TYPE_UNDEFINED, "Failed to deduce component type from image component type ", GetValueTypeString(ImgDesc.ComponentType), " and sRGB flag ", TexLoadInfo.IsSRGB);
 
-        const Uint32 CompSize = GetValueSize(ImgDesc.ComponentType);
+        const UInt32 CompSize = GetValueSize(ImgDesc.ComponentType);
 
         TexDesc.Format = TextureComponentAttribsToTextureFormat(CompType, CompSize, NumComponents);
         if (TexDesc.Format == TEX_FORMAT_UNKNOWN)
@@ -218,7 +155,7 @@ static void TexDescFromImageDesc(const ImageDesc& ImgDesc, const TextureLoadInfo
     }
 }
 
-inline bool GetSwizzleRequired(Uint32 NumComponents, const TextureComponentMapping& Swizzle)
+inline bool GetSwizzleRequired(UInt32 NumComponents, const TextureComponentMapping& Swizzle)
 {
     return ((NumComponents >= 1 && Swizzle.R != TEXTURE_COMPONENT_SWIZZLE_IDENTITY && Swizzle.R != TEXTURE_COMPONENT_SWIZZLE_R) ||
             (NumComponents >= 2 && Swizzle.G != TEXTURE_COMPONENT_SWIZZLE_IDENTITY && Swizzle.G != TEXTURE_COMPONENT_SWIZZLE_G) ||
@@ -241,8 +178,8 @@ void TextureLoaderImpl::LoadFromImage(RefCntAutoPtr<Image> pImage, const Texture
     TexDescFromImageDesc(ImgDesc, TexLoadInfo, m_TexDesc);
 
     const TextureFormatAttribs& TexFmtDesc      = GetTextureFormatAttribs(m_TexDesc.Format);
-    const Uint32                NumComponents   = TexFmtDesc.NumComponents;
-    const Uint32                SrcCompSize     = GetValueSize(ImgDesc.ComponentType);
+    const UInt32                NumComponents   = TexFmtDesc.NumComponents;
+    const UInt32                SrcCompSize     = GetValueSize(ImgDesc.ComponentType);
     const bool                  SwizzleRequired = GetSwizzleRequired(NumComponents, TexLoadInfo.Swizzle);
 
     m_SubResources.resize(m_TexDesc.MipLevels);
@@ -252,8 +189,8 @@ void TextureLoaderImpl::LoadFromImage(RefCntAutoPtr<Image> pImage, const Texture
         TexLoadInfo.FlipVertically ||
         SwizzleRequired)
     {
-        Uint32 DstStride         = ImgDesc.Width * NumComponents * TexFmtDesc.ComponentSize;
-        DstStride                = AlignUp(DstStride, Uint32{4});
+        UInt32 DstStride         = ImgDesc.Width * NumComponents * TexFmtDesc.ComponentSize;
+        DstStride                = AlignUp(DstStride, UInt32{4});
         m_Mips[0]                = DataBlobImpl::Create(TexLoadInfo.pAllocator, size_t{DstStride} * size_t{ImgDesc.Height});
         m_SubResources[0].pData  = m_Mips[0]->GetDataPtr();
         m_SubResources[0].Stride = DstStride;
@@ -314,15 +251,15 @@ void TextureLoaderImpl::LoadFromImage(RefCntAutoPtr<Image> pImage, const Texture
         m_SubResources[0].Stride = ImgDesc.RowStride;
     }
 
-    for (Uint32 m = 1; m < m_TexDesc.MipLevels; ++m)
+    for (UInt32 m = 1; m < m_TexDesc.MipLevels; ++m)
     {
         const MipLevelProperties MipLevelProps = GetMipLevelProperties(m_TexDesc, m);
 
-        Uint64 MipSize = MipLevelProps.MipSize;
-        Uint64 RowSize = MipLevelProps.RowSize;
+        UInt64 MipSize = MipLevelProps.MipSize;
+        UInt64 RowSize = MipLevelProps.RowSize;
         if ((RowSize % 4) != 0)
         {
-            RowSize = AlignUp(RowSize, Uint64{4});
+            RowSize = AlignUp(RowSize, UInt64{4});
             MipSize = RowSize * MipLevelProps.LogicalHeight;
         }
         m_Mips[m]                = DataBlobImpl::Create(TexLoadInfo.pAllocator, StaticCast<size_t>(MipSize));
@@ -358,7 +295,7 @@ void TextureLoaderImpl::LoadFromImage(RefCntAutoPtr<Image> pImage, const Texture
     }
 }
 
-inline TEXTURE_FORMAT GetCompressedTextureFormat(Uint32 NumComponents, Uint32 NumSrcComponents, bool IsSRGB)
+inline TEXTURE_FORMAT GetCompressedTextureFormat(UInt32 NumComponents, UInt32 NumSrcComponents, bool IsSRGB)
 {
     switch (NumComponents)
     {
@@ -381,7 +318,7 @@ inline TEXTURE_FORMAT GetCompressedTextureFormat(Uint32 NumComponents, Uint32 Nu
     }
 }
 
-void TextureLoaderImpl::CompressSubresources(Uint32 NumComponents, Uint32 NumSrcComponents, const TextureLoadInfo& TexLoadInfo)
+void TextureLoaderImpl::CompressSubresources(UInt32 NumComponents, UInt32 NumSrcComponents, const TextureLoadInfo& TexLoadInfo)
 {
     const TEXTURE_FORMAT CompressedFormat = GetCompressedTextureFormat(NumComponents, NumSrcComponents, TexLoadInfo.IsSRGB);
     if (CompressedFormat == TEX_FORMAT_UNKNOWN)
@@ -391,33 +328,33 @@ void TextureLoaderImpl::CompressSubresources(Uint32 NumComponents, Uint32 NumSrc
     const TextureFormatAttribs& FmtAttribs = GetTextureFormatAttribs(CompressedFormat);
 
     std::vector<RefCntAutoPtr<IDataBlob>> CompressedMips(m_SubResources.size());
-    for (Uint32 slice = 0; slice < m_TexDesc.GetArraySize(); ++slice)
+    for (UInt32 slice = 0; slice < m_TexDesc.GetArraySize(); ++slice)
     {
-        for (Uint32 mip = 0; mip < m_TexDesc.MipLevels; ++mip)
+        for (UInt32 mip = 0; mip < m_TexDesc.MipLevels; ++mip)
         {
-            const Uint32              SubResIndex   = slice * m_TexDesc.MipLevels + mip;
+            const UInt32              SubResIndex   = slice * m_TexDesc.MipLevels + mip;
             TextureSubResData&        SubResData    = m_SubResources[SubResIndex];
             RefCntAutoPtr<IDataBlob>& CompressedMip = CompressedMips[SubResIndex];
 
             const MipLevelProperties CompressedMipProps = GetMipLevelProperties(m_TexDesc, mip);
-            const Uint32             MaxCol             = CompressedMipProps.LogicalWidth - 1;
-            const Uint32             MaxRow             = CompressedMipProps.LogicalHeight - 1;
+            const UInt32             MaxCol             = CompressedMipProps.LogicalWidth - 1;
+            const UInt32             MaxRow             = CompressedMipProps.LogicalHeight - 1;
             const size_t             CompressedStride   = static_cast<size_t>(CompressedMipProps.RowSize);
             CompressedMip                               = DataBlobImpl::Create(TexLoadInfo.pAllocator, CompressedStride * CompressedMipProps.StorageHeight);
 
-            for (Uint32 row = 0; row < CompressedMipProps.StorageHeight; row += FmtAttribs.BlockHeight)
+            for (UInt32 row = 0; row < CompressedMipProps.StorageHeight; row += FmtAttribs.BlockHeight)
             {
-                const Uint32 row0 = row;
-                const Uint32 row1 = std::min(row + 1, MaxRow);
-                const Uint32 row2 = std::min(row + 2, MaxRow);
-                const Uint32 row3 = std::min(row + 3, MaxRow);
+                const UInt32 row0 = row;
+                const UInt32 row1 = std::min(row + 1, MaxRow);
+                const UInt32 row2 = std::min(row + 2, MaxRow);
+                const UInt32 row3 = std::min(row + 3, MaxRow);
 
-                for (Uint32 col = 0; col < CompressedMipProps.StorageWidth; col += FmtAttribs.BlockWidth)
+                for (UInt32 col = 0; col < CompressedMipProps.StorageWidth; col += FmtAttribs.BlockWidth)
                 {
-                    const Uint32 col0 = col;
-                    const Uint32 col1 = std::min(col + 1, MaxCol);
-                    const Uint32 col2 = std::min(col + 2, MaxCol);
-                    const Uint32 col3 = std::min(col + 3, MaxCol);
+                    const UInt32 col0 = col;
+                    const UInt32 col1 = std::min(col + 1, MaxCol);
+                    const UInt32 col2 = std::min(col + 2, MaxCol);
+                    const UInt32 col3 = std::min(col + 3, MaxCol);
 
                     auto ReadBlockData = [&](auto& BlockData) {
                         using T = typename std::decay_t<decltype(BlockData)>::value_type;
@@ -436,20 +373,20 @@ void TextureLoaderImpl::CompressSubresources(Uint32 NumComponents, Uint32 NumSrc
                         return reinterpret_cast<const unsigned char*>(BlockData.data());
                     };
 
-                    Uint8* pDst = CompressedMip->GetDataPtr<Uint8>() + (col / FmtAttribs.BlockWidth) * FmtAttribs.ComponentSize + CompressedStride * (row / FmtAttribs.BlockHeight);
+                    UInt8* pDst = CompressedMip->GetDataPtr<UInt8>() + (col / FmtAttribs.BlockWidth) * FmtAttribs.ComponentSize + CompressedStride * (row / FmtAttribs.BlockHeight);
                     if (NumComponents == 1)
                     {
-                        std::array<Uint8, 16> BlockData8;
+                        std::array<UInt8, 16> BlockData8;
                         stb_compress_bc4_block(pDst, ReadBlockData(BlockData8));
                     }
                     else if (NumComponents == 2)
                     {
-                        std::array<Uint16, 16> BlockData16;
+                        std::array<UInt16, 16> BlockData16;
                         stb_compress_bc5_block(pDst, ReadBlockData(BlockData16));
                     }
                     else if (NumComponents == 4)
                     {
-                        std::array<Uint32, 16> BlockData32;
+                        std::array<UInt32, 16> BlockData32;
                         const int              StbDxtMode = (TexLoadInfo.CompressMode == TEXTURE_LOAD_COMPRESS_MODE_BC_HIGH_QUAL) ? STB_DXT_HIGHQUAL : STB_DXT_NORMAL;
                         const int              StoreAlpha = NumSrcComponents == 4 ? 1 : 0;
                         stb_compress_dxt_block(pDst, ReadBlockData(BlockData32), StoreAlpha, StbDxtMode);
@@ -492,7 +429,7 @@ void CreateTextureLoaderFromFile(const char*            FilePath,
         File->Read(pFileData);
 
         RefCntAutoPtr<TextureLoaderImpl> pTexLoader{
-            MakeNewRCObj<TextureLoaderImpl>()(TexLoadInfo, pFileData->GetConstDataPtr<Uint8>(), pFileData->GetSize(), std::move(pFileData)),
+            MakeNewRCObj<TextureLoaderImpl>()(TexLoadInfo, pFileData->GetConstDataPtr<UInt8>(), pFileData->GetSize(), std::move(pFileData)),
         };
         if (pTexLoader)
             pTexLoader->QueryInterface(IID_TextureLoader, ppLoader);
@@ -518,7 +455,7 @@ void CreateTextureLoaderFromMemory(const void*            pData,
             pDataCopy = DataBlobImpl::Create(TexLoadInfo.pAllocator, Size, pData);
             pData     = pDataCopy->GetConstDataPtr();
         }
-        RefCntAutoPtr<ITextureLoader> pTexLoader{MakeNewRCObj<TextureLoaderImpl>()(TexLoadInfo, reinterpret_cast<const Uint8*>(pData), Size, std::move(pDataCopy))};
+        RefCntAutoPtr<ITextureLoader> pTexLoader{MakeNewRCObj<TextureLoaderImpl>()(TexLoadInfo, reinterpret_cast<const UInt8*>(pData), Size, std::move(pDataCopy))};
         if (pTexLoader)
             pTexLoader->QueryInterface(IID_TextureLoader, ppLoader);
     }
@@ -534,7 +471,7 @@ void CreateTextureLoaderFromDataBlob(RefCntAutoPtr<IDataBlob> pDataBlob,
 {
     try
     {
-        const Uint8* pData = pDataBlob->GetConstDataPtr<Uint8>();
+        const UInt8* pData = pDataBlob->GetConstDataPtr<UInt8>();
         const size_t Size  = pDataBlob->GetSize();
 
         RefCntAutoPtr<ITextureLoader> pTexLoader{MakeNewRCObj<TextureLoaderImpl>()(TexLoadInfo, pData, Size, std::move(pDataBlob))};
@@ -575,7 +512,7 @@ size_t GetTextureLoaderMemoryRequirement(const void*            pData,
                                          size_t                 Size,
                                          const TextureLoadInfo& TexLoadInfo)
 {
-    const IMAGE_FILE_FORMAT ImgFileFormat = Image::GetFileFormat(static_cast<const Uint8*>(pData), Size);
+    const IMAGE_FILE_FORMAT ImgFileFormat = Image::GetFileFormat(static_cast<const UInt8*>(pData), Size);
     if (ImgFileFormat == IMAGE_FILE_FORMAT_UNKNOWN)
     {
         return 0;
@@ -584,7 +521,7 @@ size_t GetTextureLoaderMemoryRequirement(const void*            pData,
     if (Image::IsSupportedFileFormat(ImgFileFormat))
     {
         const ImageDesc ImgDesc     = Image::GetDesc(ImgFileFormat, pData, Size);
-        const Uint32    ImgCompSize = GetValueSize(ImgDesc.ComponentType);
+        const UInt32    ImgCompSize = GetValueSize(ImgDesc.ComponentType);
 
         TextureDesc TexDesc;
         TexDescFromImageDesc(ImgDesc, TexLoadInfo, TexDesc);

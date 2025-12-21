@@ -50,10 +50,10 @@ struct PipelineStateNotation
     const Char**      ppResourceSignatureNames    DEFAULT_INITIALIZER(nullptr);
 
     /// The number of resource signature names in ppResourceSignatureNames array.
-    Uint32            ResourceSignaturesNameCount DEFAULT_INITIALIZER(0);
+    UInt32            ResourceSignaturesNameCount DEFAULT_INITIALIZER(0);
 
     // Required to ensure correct memory layout for inherited structs on clang/gcc.
-    Uint32            _Padding                    DEFAULT_INITIALIZER(~0u);
+    UInt32            _Padding                    DEFAULT_INITIALIZER(~0u);
 
 #if DILIGENT_CPP_INTERFACE
     /// Comparison operator tests if two structures are equivalent
@@ -62,7 +62,7 @@ struct PipelineStateNotation
         if (!(PSODesc == RHS.PSODesc) || !(Flags == RHS.Flags) || !(ResourceSignaturesNameCount == RHS.ResourceSignaturesNameCount))
             return false;
 
-        for (Uint32 SignatureID = 0; SignatureID < ResourceSignaturesNameCount; SignatureID++)
+        for (UInt32 SignatureID = 0; SignatureID < ResourceSignaturesNameCount; SignatureID++)
             if (!SafeStrEqual(ppResourceSignatureNames[SignatureID], RHS.ppResourceSignatureNames[SignatureID]))
                 return false;
 
@@ -292,28 +292,28 @@ struct RayTracingPipelineNotation DILIGENT_DERIVE(PipelineStateNotation)
     const RTGeneralShaderGroupNotation*          pGeneralShaders          DEFAULT_INITIALIZER(nullptr);
 
     /// The number of general shader groups in pGeneralShaders array.
-    Uint32                                       GeneralShaderCount       DEFAULT_INITIALIZER(0);
+    UInt32                                       GeneralShaderCount       DEFAULT_INITIALIZER(0);
 
     /// A pointer to an array of TriangleHitShaderCount RTTriangleHitShaderGroupNotation structures that contain shader group description.
     const RTTriangleHitShaderGroupNotation*      pTriangleHitShaders      DEFAULT_INITIALIZER(nullptr);
 
     /// The number of triangle hit shader groups in pTriangleHitShaders array.
-    Uint32                                       TriangleHitShaderCount   DEFAULT_INITIALIZER(0);
+    UInt32                                       TriangleHitShaderCount   DEFAULT_INITIALIZER(0);
 
     /// A pointer to an array of ProceduralHitShaderCount RTProceduralHitShaderGroupNotation structures that contain shader group description.
     const RTProceduralHitShaderGroupNotation*    pProceduralHitShaders    DEFAULT_INITIALIZER(nullptr);
 
     /// The number of procedural shader groups in pProceduralHitShaders array.
-    Uint32                                       ProceduralHitShaderCount DEFAULT_INITIALIZER(0);
+    UInt32                                       ProceduralHitShaderCount DEFAULT_INITIALIZER(0);
 
     /// The name of the constant buffer that will be used by the local root signature.
     const char*                                  pShaderRecordName        DEFAULT_INITIALIZER(nullptr);
 
     /// The maximum hit shader attribute size in bytes.
-    Uint32                                       MaxAttributeSize         DEFAULT_INITIALIZER(0);
+    UInt32                                       MaxAttributeSize         DEFAULT_INITIALIZER(0);
 
     /// The maximum payload size in bytes.
-    Uint32                                       MaxPayloadSize           DEFAULT_INITIALIZER(0);
+    UInt32                                       MaxPayloadSize           DEFAULT_INITIALIZER(0);
 
 #if DILIGENT_CPP_INTERFACE
     /// Comparison operator tests if two structures are equivalent
@@ -331,15 +331,15 @@ struct RayTracingPipelineNotation DILIGENT_DERIVE(PipelineStateNotation)
             !SafeStrEqual(pShaderRecordName, RHS.pShaderRecordName))
             return false;
 
-        for (Uint32 GroupID = 0; GroupID < GeneralShaderCount; GroupID++)
+        for (UInt32 GroupID = 0; GroupID < GeneralShaderCount; GroupID++)
             if (!(pGeneralShaders[GroupID] == RHS.pGeneralShaders[GroupID]))
                 return false;
 
-        for (Uint32 GroupID = 0; GroupID < TriangleHitShaderCount; GroupID++)
+        for (UInt32 GroupID = 0; GroupID < TriangleHitShaderCount; GroupID++)
             if (!(pTriangleHitShaders[GroupID] == RHS.pTriangleHitShaders[GroupID]))
                 return false;
 
-        for (Uint32 GroupID = 0; GroupID < ProceduralHitShaderCount; GroupID++)
+        for (UInt32 GroupID = 0; GroupID < ProceduralHitShaderCount; GroupID++)
             if (!(pProceduralHitShaders[GroupID] == RHS.pProceduralHitShaders[GroupID]))
                 return false;
 
@@ -357,16 +357,16 @@ typedef struct RayTracingPipelineNotation RayTracingPipelineNotation;
 struct RenderStateNotationParserInfo 
 {
     /// The number of parsed resource signatures.
-    Uint32 ResourceSignatureCount DEFAULT_INITIALIZER(0);
+    UInt32 ResourceSignatureCount DEFAULT_INITIALIZER(0);
 
     /// The number of parsed shaders.
-    Uint32 ShaderCount            DEFAULT_INITIALIZER(0);
+    UInt32 ShaderCount            DEFAULT_INITIALIZER(0);
 
     /// The number of parsed render passes.
-    Uint32 RenderPassCount        DEFAULT_INITIALIZER(0);
+    UInt32 RenderPassCount        DEFAULT_INITIALIZER(0);
 
     /// The number of parsed pipeline states.
-    Uint32 PipelineStateCount     DEFAULT_INITIALIZER(0);
+    UInt32 PipelineStateCount     DEFAULT_INITIALIZER(0);
 };
 typedef struct RenderStateNotationParserInfo RenderStateNotationParserInfo;
 
@@ -433,7 +433,7 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \remarks This method must be externally synchronized.
     VIRTUAL Bool METHOD(ParseString)(THIS_
                                      const Char*                      Source,
-                                     Uint32                           Length,
+                                     UInt32                           Length,
                                      IShaderSourceInputStreamFactory* pStreamFactory,
                                      IShaderSourceInputStreamFactory* pReloadFactory DEFAULT_VALUE(nullptr)) PURE;
 
@@ -484,7 +484,7 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     ///
     /// \remarks This method must be externally synchronized.
     VIRTUAL CONST PipelineStateNotation* METHOD(GetPipelineStateByIndex)(THIS_
-                                                                         Uint32 Index) CONST PURE;
+                                                                         UInt32 Index) CONST PURE;
 
     /// Returns the pipeline resource signature description by its index.
 
@@ -495,7 +495,7 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     ///
     /// \remarks This method must be externally synchronized.
     VIRTUAL CONST PipelineResourceSignatureDesc* METHOD(GetResourceSignatureByIndex)(THIS_
-                                                                                     Uint32 Index) CONST PURE;
+                                                                                     UInt32 Index) CONST PURE;
 
     /// Returns the shader create info by its index.
 
@@ -506,7 +506,7 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     ///
     /// \remarks This method must be externally synchronized.
     VIRTUAL CONST ShaderCreateInfo* METHOD(GetShaderByIndex)(THIS_
-                                                             Uint32 Index) CONST PURE;
+                                                             UInt32 Index) CONST PURE;
 
     /// Returns the render pass description by its index.
 
@@ -517,7 +517,7 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     ///
     /// \remarks This method must be externally synchronized.
     VIRTUAL CONST RenderPassDesc* METHOD(GetRenderPassByIndex)(THIS_
-                                                               Uint32 Index) CONST PURE;
+                                                               UInt32 Index) CONST PURE;
 
     /// Checks if the given signature is in the ignored list.
     /// 

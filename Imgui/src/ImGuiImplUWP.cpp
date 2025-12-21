@@ -57,8 +57,8 @@ ImGuiImplUWP::~ImGuiImplUWP()
 {
 }
 
-void ImGuiImplUWP::NewFrame(Uint32            RenderSurfaceWidth,
-                            Uint32            RenderSurfaceHeight,
+void ImGuiImplUWP::NewFrame(UInt32            RenderSurfaceWidth,
+                            UInt32            RenderSurfaceHeight,
                             SURFACE_TRANSFORM SurfacePreTransform)
 {
     ImGuiIO& io = ImGui::GetIO();

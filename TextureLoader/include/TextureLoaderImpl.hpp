@@ -41,7 +41,7 @@ public:
 
     TextureLoaderImpl(IReferenceCounters*      pRefCounters,
                       const TextureLoadInfo&   TexLoadInfo,
-                      const Uint8*             pData,
+                      const UInt8*             pData,
                       size_t                   DataSize,
                       RefCntAutoPtr<IDataBlob> pDataBlob);
 
@@ -59,24 +59,24 @@ public:
         return m_TexDesc;
     }
 
-    virtual const TextureSubResData& DILIGENT_CALL_TYPE GetSubresourceData(Uint32 MipLevel,
-                                                                           Uint32 ArraySlice) const override final
+    virtual const TextureSubResData& DILIGENT_CALL_TYPE GetSubresourceData(UInt32 MipLevel,
+                                                                           UInt32 ArraySlice) const override final
     {
-        const Uint32 Subres = ArraySlice * m_TexDesc.MipLevels + MipLevel;
+        const UInt32 Subres = ArraySlice * m_TexDesc.MipLevels + MipLevel;
         VERIFY_EXPR(Subres < m_SubResources.size());
         return m_SubResources[Subres];
     }
 
     virtual TextureData DILIGENT_CALL_TYPE GetTextureData() override final
     {
-        return TextureData{m_SubResources.data(), static_cast<Uint32>(m_SubResources.size())};
+        return TextureData{m_SubResources.data(), static_cast<UInt32>(m_SubResources.size())};
     }
 
 private:
     void LoadFromImage(RefCntAutoPtr<Image> pImage, const TextureLoadInfo& TexLoadInfo);
-    void LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const Uint8* pData, size_t DataSize);
-    void LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const Uint8* pData, size_t DataSize);
-    void CompressSubresources(Uint32 NumComponents, Uint32 NumSrcComponents, const TextureLoadInfo& TexLoadInfo);
+    void LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const UInt8* pData, size_t DataSize);
+    void LoadFromDDS(const TextureLoadInfo& TexLoadInfo, const UInt8* pData, size_t DataSize);
+    void CompressSubresources(UInt32 NumComponents, UInt32 NumSrcComponents, const TextureLoadInfo& TexLoadInfo);
 
 private:
     RefCntAutoPtr<IDataBlob> m_pDataBlob;

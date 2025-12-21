@@ -45,8 +45,8 @@ ImGuiImplTVOS::~ImGuiImplTVOS()
 {
 }
 
-void ImGuiImplTVOS::NewFrame(Uint32            RenderSurfaceWidth,
-                             Uint32            RenderSurfaceHeight,
+void ImGuiImplTVOS::NewFrame(UInt32            RenderSurfaceWidth,
+                             UInt32            RenderSurfaceHeight,
                              SURFACE_TRANSFORM SurfacePreTransform)
 {
     std::lock_guard<std::mutex> Lock{m_Mtx};

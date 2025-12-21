@@ -67,7 +67,7 @@ ImGuiImplDiligent::~ImGuiImplDiligent()
     ImGui::DestroyContext();
 }
 
-void ImGuiImplDiligent::NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform)
+void ImGuiImplDiligent::NewFrame(UInt32 RenderSurfaceWidth, UInt32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform)
 {
     m_pRenderer->NewFrame(RenderSurfaceWidth, RenderSurfaceHeight, SurfacePreTransform);
     ImGui::NewFrame();

@@ -73,7 +73,7 @@ void RenderStateNotationLoaderImpl::LoadPipelineState(const LoadPipelineStateInf
                     PIPELINE_TYPE_RAY_TRACING,
                     PIPELINE_TYPE_TILE};
 
-                for (Uint32 i = 0; i < _countof(PipelineTypes) && pPipeline == nullptr; i++)
+                for (UInt32 i = 0; i < _countof(PipelineTypes) && pPipeline == nullptr; i++)
                     pPipeline = FindPipeline(LoadInfo.Name, PipelineTypes[i]);
             }
         }
@@ -165,7 +165,7 @@ void RenderStateNotationLoaderImpl::LoadPipelineState(const LoadPipelineStateInf
                 PipelineCI.Flags                   = DescRSN.Flags;
                 PipelineCI.ResourceSignaturesCount = DescRSN.ResourceSignaturesNameCount;
                 PipelineCI.ppResourceSignatures    = Allocator.ConstructArray<IPipelineResourceSignature*>(DescRSN.ResourceSignaturesNameCount);
-                for (Uint32 SignatureID = 0; SignatureID < PipelineCI.ResourceSignaturesCount; ++SignatureID)
+                for (UInt32 SignatureID = 0; SignatureID < PipelineCI.ResourceSignaturesCount; ++SignatureID)
                     PipelineCI.ppResourceSignatures[SignatureID] = FindResourceSignature(DescRSN.ppResourceSignatureNames[SignatureID]);
             };
 
@@ -244,7 +244,7 @@ void RenderStateNotationLoaderImpl::LoadPipelineState(const LoadPipelineStateInf
                     {
                         RayTracingGeneralShaderGroup* pData = Allocator.ConstructArray<RayTracingGeneralShaderGroup>(pPipelineDescRSN->GeneralShaderCount);
 
-                        for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->GeneralShaderCount; ShaderID++)
+                        for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->GeneralShaderCount; ShaderID++)
                         {
                             pData[ShaderID].Name    = pPipelineDescRSN->pGeneralShaders[ShaderID].Name;
                             pData[ShaderID].pShader = FindShader(pPipelineDescRSN->pGeneralShaders[ShaderID].pShaderName, SHADER_TYPE_RAY_GEN);
@@ -257,7 +257,7 @@ void RenderStateNotationLoaderImpl::LoadPipelineState(const LoadPipelineStateInf
                     {
                         RayTracingTriangleHitShaderGroup* pData = Allocator.ConstructArray<RayTracingTriangleHitShaderGroup>(pPipelineDescRSN->TriangleHitShaderCount);
 
-                        for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->TriangleHitShaderCount; ++ShaderID)
+                        for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->TriangleHitShaderCount; ++ShaderID)
                         {
                             pData[ShaderID].Name              = pPipelineDescRSN->pTriangleHitShaders[ShaderID].Name;
                             pData[ShaderID].pAnyHitShader     = FindShader(pPipelineDescRSN->pTriangleHitShaders[ShaderID].pAnyHitShaderName, SHADER_TYPE_RAY_ANY_HIT);
@@ -271,7 +271,7 @@ void RenderStateNotationLoaderImpl::LoadPipelineState(const LoadPipelineStateInf
                     {
                         RayTracingProceduralHitShaderGroup* pData = Allocator.ConstructArray<RayTracingProceduralHitShaderGroup>(pPipelineDescRSN->ProceduralHitShaderCount);
 
-                        for (Uint32 ShaderID = 0; ShaderID < pPipelineDescRSN->ProceduralHitShaderCount; ++ShaderID)
+                        for (UInt32 ShaderID = 0; ShaderID < pPipelineDescRSN->ProceduralHitShaderCount; ++ShaderID)
                         {
                             pData[ShaderID].Name                = pPipelineDescRSN->pProceduralHitShaders[ShaderID].Name;
                             pData[ShaderID].pAnyHitShader       = FindShader(pPipelineDescRSN->pProceduralHitShaders[ShaderID].pAnyHitShaderName, SHADER_TYPE_RAY_ANY_HIT);

@@ -31,7 +31,7 @@
 /// Defines Diligent::ImGuiImplDiligent class implementing ImGui renderer for Diligent Engine.
 
 #include <memory>
-#include "../../../DiligentCore/Primitives/interface/BasicTypes.h"
+#include "CommonDefinitions.h"
 
 namespace Diligent
 {
@@ -39,8 +39,8 @@ namespace Diligent
 struct IRenderDevice;
 struct IDeviceContext;
 struct SwapChainDesc;
-enum TEXTURE_FORMAT : Uint16;
-enum SURFACE_TRANSFORM : Uint32;
+enum TEXTURE_FORMAT : UInt16;
+enum SURFACE_TRANSFORM : UInt32;
 
 class ImGuiDiligentRenderer;
 
@@ -49,7 +49,7 @@ class ImGuiDiligentRenderer;
 /// Imgui colors are defined in sRGB space.
 /// Depending on the use case, they may need
 /// to be converted to linear space.
-enum IMGUI_COLOR_CONVERSION_MODE : Uint8
+enum IMGUI_COLOR_CONVERSION_MODE : UInt8
 {
     /// Select the color conversion mode automatically:
     /// * Use SRGB_TO_LINEAR mode for sRGB framebuffers
@@ -65,8 +65,8 @@ enum IMGUI_COLOR_CONVERSION_MODE : Uint8
 
 struct ImGuiDiligentCreateInfo
 {
-    static constexpr Uint32 DefaultInitialVBSize = 1024;
-    static constexpr Uint32 DefaultInitialIBSize = 2048;
+    static constexpr UInt32 DefaultInitialVBSize = 1024;
+    static constexpr UInt32 DefaultInitialIBSize = 2048;
 
     IRenderDevice* pDevice = nullptr;
 
@@ -75,8 +75,8 @@ struct ImGuiDiligentCreateInfo
 
     IMGUI_COLOR_CONVERSION_MODE ColorConversion = IMGUI_COLOR_CONVERSION_MODE_AUTO;
 
-    Uint32 InitialVertexBufferSize = DefaultInitialVBSize;
-    Uint32 InitialIndexBufferSize  = DefaultInitialIBSize;
+    UInt32 InitialVertexBufferSize = DefaultInitialVBSize;
+    UInt32 InitialIndexBufferSize  = DefaultInitialIBSize;
 
     ImGuiDiligentCreateInfo() noexcept {}
     ImGuiDiligentCreateInfo(IRenderDevice* _pDevice,
@@ -109,8 +109,8 @@ public:
     ///                                   Most of the time this is the actual swap chain height.
     /// \param [in] SurfacePreTransform - Render surface pre-transform.
     ///                                   Most of the time this is the swap chain pre-transform.
-    virtual void NewFrame(Uint32            RenderSurfaceWidth,
-                          Uint32            RenderSurfaceHeight,
+    virtual void NewFrame(UInt32            RenderSurfaceWidth,
+                          UInt32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform);
 
     virtual void EndFrame();

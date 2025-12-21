@@ -41,17 +41,17 @@ namespace
 
 TEST(Tools_TextureLoader, PNGCodec)
 {
-    constexpr Uint32 TestImgWidth  = 256;
-    constexpr Uint32 TestImgHeight = 128;
+    constexpr UInt32 TestImgWidth  = 256;
+    constexpr UInt32 TestImgHeight = 128;
 
     for (int EncodeAlpha = 0; EncodeAlpha <= 1; ++EncodeAlpha)
     {
-        const Uint32 NumComponents = EncodeAlpha ? 4u : 3u;
+        const UInt32 NumComponents = EncodeAlpha ? 4u : 3u;
 
-        std::vector<Uint8> RefPixels(TestImgWidth * TestImgHeight * NumComponents);
-        for (Uint32 y = 0; y < TestImgHeight; ++y)
+        std::vector<UInt8> RefPixels(TestImgWidth * TestImgHeight * NumComponents);
+        for (UInt32 y = 0; y < TestImgHeight; ++y)
         {
-            for (Uint32 x = 0; x < TestImgWidth; ++x)
+            for (UInt32 x = 0; x < TestImgWidth; ++x)
             {
                 auto idx = x + y * TestImgWidth;
 
@@ -91,16 +91,16 @@ TEST(Tools_TextureLoader, PNGCodec)
             ASSERT_EQ(DecodedImgDesc.NumComponents, NumComponents);
             ASSERT_EQ(DecodedImgDesc.ComponentType, VT_UINT8);
 
-            const Uint8* pTestPixels = pDecodedPixelsBlob->GetConstDataPtr<Uint8>();
-            for (Uint32 y = 0; y < TestImgHeight; ++y)
+            const UInt8* pTestPixels = pDecodedPixelsBlob->GetConstDataPtr<UInt8>();
+            for (UInt32 y = 0; y < TestImgHeight; ++y)
             {
-                for (Uint32 x = 0; x < TestImgWidth; ++x)
+                for (UInt32 x = 0; x < TestImgWidth; ++x)
                 {
-                    for (Uint32 c = 0; c < NumComponents; ++c)
+                    for (UInt32 c = 0; c < NumComponents; ++c)
                     {
-                        Uint8 RefVal  = RefPixels[(x + y * TestImgWidth) * NumComponents + c];
-                        Uint8 TestVal = pTestPixels[x * DecodedImgDesc.NumComponents + c + y * DecodedImgDesc.RowStride];
-                        EXPECT_EQ(static_cast<Uint32>(RefVal), static_cast<Uint32>(TestVal)) << "[" << x << "," << y << "][" << c << "]";
+                        UInt8 RefVal  = RefPixels[(x + y * TestImgWidth) * NumComponents + c];
+                        UInt8 TestVal = pTestPixels[x * DecodedImgDesc.NumComponents + c + y * DecodedImgDesc.RowStride];
+                        EXPECT_EQ(static_cast<UInt32>(RefVal), static_cast<UInt32>(TestVal)) << "[" << x << "," << y << "][" << c << "]";
                     }
                 }
             }

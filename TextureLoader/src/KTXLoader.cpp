@@ -212,12 +212,12 @@ struct KTX10Header
     std::uint32_t BytesOfKeyValueData;
 };
 
-void TextureLoaderImpl::LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const Uint8* pData, size_t DataSize)
+void TextureLoaderImpl::LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const UInt8* pData, size_t DataSize)
 {
 #ifdef DILIGENT_DEBUG
-    const Uint8* pOrigDataPtr = pData;
+    const UInt8* pOrigDataPtr = pData;
 #endif
-    static constexpr Uint8 KTX10FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+    static constexpr UInt8 KTX10FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
     if (DataSize >= 12 && memcmp(pData, KTX10FileIdentifier, sizeof(KTX10FileIdentifier)) == 0)
     {
         pData += sizeof(KTX10FileIdentifier);
@@ -269,12 +269,12 @@ void TextureLoaderImpl::LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const Ui
         m_SubResources.resize(size_t{m_TexDesc.MipLevels} * size_t{ArraySize});
 
         // NB: unlike DDS, subresource in KTX are arranged by mip levels first.
-        for (Uint32 mip = 0; mip < SrcMipLevels; ++mip)
+        for (UInt32 mip = 0; mip < SrcMipLevels; ++mip)
         {
             pData += sizeof(std::uint32_t);
             MipLevelProperties MipInfo = GetMipLevelProperties(m_TexDesc, mip);
 
-            for (Uint32 layer = 0; layer < ArraySize; ++layer)
+            for (UInt32 layer = 0; layer < ArraySize; ++layer)
             {
                 if (mip < m_TexDesc.MipLevels)
                 {

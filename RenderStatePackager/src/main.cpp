@@ -49,8 +49,8 @@ ParseStatus ParseCommandLine(int argc, char* argv[], ParsingEnvironmentCreateInf
     args::ValueFlag<std::string>     ArgumentDeviceConfig{Parser, "path", "Path to the config file", {'c', "config"}, ""};
     args::ValueFlag<std::string>     ArgumentOutput{Parser, "path", "Output binary archive", {'o', "output"}, "Archive.bin"};
     args::ValueFlag<std::string>     ArgumentDumpBytecode{Parser, "dir", "Dump bytecode directory", {'d', "dump_dir"}, ""};
-    args::ValueFlag<Uint32>          ArgumentThreadCount{Parser, "count", "Count of threads", {'t', "thread"}, 0};
-    args::ValueFlag<Uint32>          ArgumentContentVersion{Parser, "version", "User-defined content version", {'v', "content_version"}, 0};
+    args::ValueFlag<UInt32>          ArgumentThreadCount{Parser, "count", "Count of threads", {'t', "thread"}, 0};
+    args::ValueFlag<UInt32>          ArgumentContentVersion{Parser, "version", "User-defined content version", {'v', "content_version"}, 0};
 
     args::Group GroupDeviceFlags{Parser, "Device Flags:", args::Group::Validators::AtLeastOne};
     args::Flag  ArgumentDeviceFlagDx11{GroupDeviceFlags, "dx11", "D3D11", {"dx11"}};

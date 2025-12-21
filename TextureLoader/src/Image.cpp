@@ -57,7 +57,7 @@
 #define STB_IMAGE_STATIC
 #define STBI_ONLY_HDR
 #define STBI_ONLY_TGA
-#include "../../ThirdParty/stb/stb_image.h"
+#include <stb_image.h>
 #ifdef __clang__
 #    pragma clang diagnostic pop
 #endif
@@ -83,7 +83,7 @@ public:
     {
         TIFFClientOpenWrapper* pThis = static_cast<TIFFClientOpenWrapper*>(pClientData);
         VERIFY(pThis->m_pData != nullptr, "TIFF file was not opened for reading");
-        const void* pSrcPtr = static_cast<const Uint8*>(pThis->m_pData) + pThis->m_Offset;
+        const void* pSrcPtr = static_cast<const UInt8*>(pThis->m_pData) + pThis->m_Offset;
         memcpy(pBuffer, pSrcPtr, Size);
         pThis->m_Offset += Size;
         return Size;
@@ -168,17 +168,17 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
     TIFFGetField(TiffFile, TIFFTAG_IMAGEWIDTH, &Desc.Width);
     TIFFGetField(TiffFile, TIFFTAG_IMAGELENGTH, &Desc.Height);
 
-    Uint16 SamplesPerPixel = 0;
+    UInt16 SamplesPerPixel = 0;
     // SamplesPerPixel is usually 1 for bilevel, grayscale, and palette-color images.
     // SamplesPerPixel is usually 3 for RGB images. If this value is higher, ExtraSamples
     // should give an indication of the meaning of the additional channels.
     TIFFGetField(TiffFile, TIFFTAG_SAMPLESPERPIXEL, &SamplesPerPixel);
     Desc.NumComponents = SamplesPerPixel;
 
-    Uint16 BitsPerSample = 0;
+    UInt16 BitsPerSample = 0;
     TIFFGetField(TiffFile, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
 
-    Uint16 SampleFormat = 0;
+    UInt16 SampleFormat = 0;
     TIFFGetField(TiffFile, TIFFTAG_SAMPLEFORMAT, &SampleFormat);
     if (SampleFormat == 0)
         SampleFormat = SAMPLEFORMAT_UINT;
@@ -227,7 +227,7 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
             break;
 
         default:
-            LOG_ERROR_AND_THROW("Unknown sample format: ", Uint32{SampleFormat});
+            LOG_ERROR_AND_THROW("Unknown sample format: ", UInt32{SampleFormat});
     }
 
     if (pDstPixels != nullptr)
@@ -236,30 +236,30 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
         Desc.RowStride      = AlignUp(Desc.Width * Desc.NumComponents * (BitsPerSample / 8), 4u);
         pDstPixels->Resize(size_t{Desc.Height} * size_t{Desc.RowStride});
 
-        Uint16 PlanarConfig = 0;
+        UInt16 PlanarConfig = 0;
         TIFFGetField(TiffFile, TIFFTAG_PLANARCONFIG, &PlanarConfig);
         if (PlanarConfig == PLANARCONFIG_CONTIG || Desc.NumComponents == 1)
         {
             VERIFY_EXPR(Desc.RowStride >= ScanlineSize);
-            Uint8* pDataPtr = pDstPixels->GetDataPtr<Uint8>();
-            for (Uint32 row = 0; row < Desc.Height; row++, pDataPtr += Desc.RowStride)
+            UInt8* pDataPtr = pDstPixels->GetDataPtr<UInt8>();
+            for (UInt32 row = 0; row < Desc.Height; row++, pDataPtr += Desc.RowStride)
             {
                 TIFFReadScanline(TiffFile, pDataPtr, row);
             }
         }
         else if (PlanarConfig == PLANARCONFIG_SEPARATE)
         {
-            std::vector<Uint8> ScanlineData(ScanlineSize);
-            for (Uint32 row = 0; row < Desc.Height; ++row)
+            std::vector<UInt8> ScanlineData(ScanlineSize);
+            for (UInt32 row = 0; row < Desc.Height; ++row)
             {
-                for (Uint16 comp = 0; comp < Desc.NumComponents; ++comp)
+                for (UInt16 comp = 0; comp < Desc.NumComponents; ++comp)
                 {
-                    Uint8* const pDstRow = pDstPixels->GetDataPtr<Uint8>() + Desc.RowStride * row + comp;
+                    UInt8* const pDstRow = pDstPixels->GetDataPtr<UInt8>() + Desc.RowStride * row + comp;
 
                     TIFFReadScanline(TiffFile, ScanlineData.data(), row, comp);
 
                     auto CopyComponet = [Width = Desc.Width, NumComp = Desc.NumComponents](const auto* pSrc, auto* pDst) {
-                        for (Uint32 x = 0; x < Width; ++x)
+                        for (UInt32 x = 0; x < Width; ++x)
                         {
                             pDst[x * NumComp] = pSrc[x];
                         }
@@ -268,15 +268,15 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
                     switch (BitsPerSample)
                     {
                         case 8:
-                            CopyComponet(reinterpret_cast<const Uint8*>(ScanlineData.data()), reinterpret_cast<Uint8*>(pDstRow));
+                            CopyComponet(reinterpret_cast<const UInt8*>(ScanlineData.data()), reinterpret_cast<UInt8*>(pDstRow));
                             break;
 
                         case 16:
-                            CopyComponet(reinterpret_cast<const Uint16*>(ScanlineData.data()), reinterpret_cast<Uint16*>(pDstRow));
+                            CopyComponet(reinterpret_cast<const UInt16*>(ScanlineData.data()), reinterpret_cast<UInt16*>(pDstRow));
                             break;
 
                         case 32:
-                            CopyComponet(reinterpret_cast<const Uint32*>(ScanlineData.data()), reinterpret_cast<Uint32*>(pDstRow));
+                            CopyComponet(reinterpret_cast<const UInt32*>(ScanlineData.data()), reinterpret_cast<UInt32*>(pDstRow));
                             break;
 
                         default:
@@ -341,8 +341,8 @@ static bool LoadImageSTB(const void* pSrcImage,
     }
 
     pDstImgDesc->ComponentType = ComponentType;
-    pDstImgDesc->Width         = static_cast<Uint32>(Width);
-    pDstImgDesc->Height        = static_cast<Uint32>(Height);
+    pDstImgDesc->Width         = static_cast<UInt32>(Width);
+    pDstImgDesc->Height        = static_cast<UInt32>(Height);
     pDstImgDesc->NumComponents = NumComponents;
 
     if (pDstPixels != nullptr)
@@ -494,7 +494,7 @@ void Image::CreateFromPixels(const ImageDesc&         Desc,
 
 
 
-static const std::array<Uint8, 4> GetRGBAOffsets(TEXTURE_FORMAT Format)
+static const std::array<UInt8, 4> GetRGBAOffsets(TEXTURE_FORMAT Format)
 {
     switch (Format)
     {
@@ -507,10 +507,10 @@ static const std::array<Uint8, 4> GetRGBAOffsets(TEXTURE_FORMAT Format)
     }
 }
 
-std::vector<Uint8> Image::ConvertImageData(Uint32         Width,
-                                           Uint32         Height,
-                                           const Uint8*   pData,
-                                           Uint32         Stride,
+std::vector<UInt8> Image::ConvertImageData(UInt32         Width,
+                                           UInt32         Height,
+                                           const UInt8*   pData,
+                                           UInt32         Stride,
                                            TEXTURE_FORMAT SrcFormat,
                                            TEXTURE_FORMAT DstFormat,
                                            bool           KeepAlpha,
@@ -521,21 +521,21 @@ std::vector<Uint8> Image::ConvertImageData(Uint32         Width,
     VERIFY(SrcFmtAttribs.ComponentSize == 1, "Only 8-bit formats are currently supported");
     VERIFY(DstFmtAttribs.ComponentSize == 1, "Only 8-bit formats are currently supported");
 
-    Uint8 NumDstComponents = SrcFmtAttribs.NumComponents;
+    UInt8 NumDstComponents = SrcFmtAttribs.NumComponents;
     if (!KeepAlpha)
-        NumDstComponents = std::min(NumDstComponents, Uint8{3});
+        NumDstComponents = std::min(NumDstComponents, UInt8{3});
 
     auto SrcOffsets = GetRGBAOffsets(SrcFormat);
     auto DstOffsets = GetRGBAOffsets(DstFormat);
 
-    std::vector<Uint8> ConvertedData(size_t{DstFmtAttribs.ComponentSize} * size_t{NumDstComponents} * Width * Height);
+    std::vector<UInt8> ConvertedData(size_t{DstFmtAttribs.ComponentSize} * size_t{NumDstComponents} * Width * Height);
 
     for (size_t j = 0; j < Height; ++j)
     {
         size_t SrcJ = FlipY ? Height - 1 - j : j;
         for (size_t i = 0; i < Width; ++i)
         {
-            for (Uint32 c = 0; c < NumDstComponents; ++c)
+            for (UInt32 c = 0; c < NumDstComponents; ++c)
             {
                 ConvertedData[j * Width * NumDstComponents + i * NumDstComponents + DstOffsets[c]] =
                     pData[SrcJ * Stride + i * SrcFmtAttribs.NumComponents + SrcOffsets[c]];
@@ -552,7 +552,7 @@ void Image::Encode(const EncodeInfo& Info, IDataBlob** ppEncodedData)
     RefCntAutoPtr<DataBlobImpl> pEncodedData = DataBlobImpl::Create(Info.pAllocator);
     if (Info.FileFormat == IMAGE_FILE_FORMAT_JPEG)
     {
-        std::vector<Uint8> RGBData = ConvertImageData(Info.Width, Info.Height, reinterpret_cast<const Uint8*>(Info.pData), Info.Stride, Info.TexFormat, TEX_FORMAT_RGBA8_UNORM, false, Info.FlipY);
+        std::vector<UInt8> RGBData = ConvertImageData(Info.Width, Info.Height, reinterpret_cast<const UInt8*>(Info.pData), Info.Stride, Info.TexFormat, TEX_FORMAT_RGBA8_UNORM, false, Info.FlipY);
 
         ENCODE_JPEG_RESULT Res = EncodeJpeg(RGBData.data(), Info.Width, Info.Height, Info.JpegQuality, pEncodedData);
         if (Res != ENCODE_JPEG_RESULT_OK)
@@ -560,12 +560,12 @@ void Image::Encode(const EncodeInfo& Info, IDataBlob** ppEncodedData)
     }
     else if (Info.FileFormat == IMAGE_FILE_FORMAT_PNG)
     {
-        const Uint8*       pData  = reinterpret_cast<const Uint8*>(Info.pData);
-        Uint32             Stride = Info.Stride;
-        std::vector<Uint8> ConvertedData;
+        const UInt8*       pData  = reinterpret_cast<const UInt8*>(Info.pData);
+        UInt32             Stride = Info.Stride;
+        std::vector<UInt8> ConvertedData;
         if (!((Info.TexFormat == TEX_FORMAT_RGBA8_UNORM || Info.TexFormat == TEX_FORMAT_RGBA8_UNORM_SRGB) && Info.KeepAlpha && !Info.FlipY))
         {
-            ConvertedData = ConvertImageData(Info.Width, Info.Height, reinterpret_cast<const Uint8*>(Info.pData), Info.Stride, Info.TexFormat, TEX_FORMAT_RGBA8_UNORM, Info.KeepAlpha, Info.FlipY);
+            ConvertedData = ConvertImageData(Info.Width, Info.Height, reinterpret_cast<const UInt8*>(Info.pData), Info.Stride, Info.TexFormat, TEX_FORMAT_RGBA8_UNORM, Info.KeepAlpha, Info.FlipY);
             pData         = ConvertedData.data();
             Stride        = Info.Width * (Info.KeepAlpha ? 4 : 3);
         }
@@ -581,7 +581,7 @@ void Image::Encode(const EncodeInfo& Info, IDataBlob** ppEncodedData)
     pEncodedData->QueryInterface(IID_DataBlob, ppEncodedData);
 }
 
-IMAGE_FILE_FORMAT Image::GetFileFormat(const Uint8* pData, size_t Size, const char* FilePath)
+IMAGE_FILE_FORMAT Image::GetFileFormat(const UInt8* pData, size_t Size, const char* FilePath)
 {
     if (pData != nullptr)
     {
@@ -603,14 +603,14 @@ IMAGE_FILE_FORMAT Image::GetFileFormat(const Uint8* pData, size_t Size, const ch
         if (Size >= 4 && pData[0] == 0x44 && pData[1] == 0x44 && pData[2] == 0x53 && pData[3] == 0x20)
             return IMAGE_FILE_FORMAT_DDS;
 
-        static constexpr Uint8 KTX10FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
-        static constexpr Uint8 KTX20FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+        static constexpr UInt8 KTX10FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+        static constexpr UInt8 KTX20FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
         if (Size >= 12 &&
             (memcmp(pData, KTX10FileIdentifier, sizeof(KTX10FileIdentifier)) == 0 ||
              memcmp(pData, KTX20FileIdentifier, sizeof(KTX20FileIdentifier)) == 0))
             return IMAGE_FILE_FORMAT_KTX;
 
-        static constexpr Uint8 HDRFileIdentifier[11] = {0x23, 0x3F, 0x52, 0x41, 0x44, 0x49, 0x41, 0x4E, 0x43, 0x45, 0x0A};
+        static constexpr UInt8 HDRFileIdentifier[11] = {0x23, 0x3F, 0x52, 0x41, 0x44, 0x49, 0x41, 0x4E, 0x43, 0x45, 0x0A};
         if (Size >= 11 && memcmp(pData, HDRFileIdentifier, sizeof(HDRFileIdentifier)) == 0)
             return IMAGE_FILE_FORMAT_HDR;
 
@@ -673,22 +673,22 @@ bool Image::IsSupportedFileFormat(IMAGE_FILE_FORMAT Format)
 }
 
 template <typename T>
-bool IsImageUniform(const void* pData, Uint32 Width, Uint32 Height, Uint32 NumComponents, Uint32 RowStride)
+bool IsImageUniform(const void* pData, UInt32 Width, UInt32 Height, UInt32 NumComponents, UInt32 RowStride)
 {
     if (Width == 0 || Height == 0 || NumComponents == 0)
         return false;
 
     const T* pFirstPixel = static_cast<const T*>(pData);
-    for (Uint32 Pass = 0; Pass < 2; ++Pass)
+    for (UInt32 Pass = 0; Pass < 2; ++Pass)
     {
         // On the first pass, sparsely sample the image to quickly detect non-uniform images
-        const Uint32 Step = (Pass == 0) ? 32 : 1;
-        for (Uint32 y = 0; y < Height; y += Step)
+        const UInt32 Step = (Pass == 0) ? 32 : 1;
+        for (UInt32 y = 0; y < Height; y += Step)
         {
-            const T* pRow = reinterpret_cast<const T*>(static_cast<const Uint8*>(pData) + y * RowStride);
-            for (Uint32 x = 0; x < Width; x += Step)
+            const T* pRow = reinterpret_cast<const T*>(static_cast<const UInt8*>(pData) + y * RowStride);
+            for (UInt32 x = 0; x < Width; x += Step)
             {
-                for (Uint32 c = 0; c < NumComponents; ++c)
+                for (UInt32 c = 0; c < NumComponents; ++c)
                 {
                     if (pRow[x * NumComponents + c] != pFirstPixel[c])
                         return false;
@@ -705,20 +705,20 @@ bool Image::IsUniform() const
     if (!m_pData)
         return false;
 
-    Uint32 ComponentSize = GetValueSize(m_Desc.ComponentType);
+    UInt32 ComponentSize = GetValueSize(m_Desc.ComponentType);
     switch (ComponentSize)
     {
         case 1:
-            return IsImageUniform<Uint8>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
+            return IsImageUniform<UInt8>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
 
         case 2:
-            return IsImageUniform<Uint16>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
+            return IsImageUniform<UInt16>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
 
         case 4:
-            return IsImageUniform<Uint32>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
+            return IsImageUniform<UInt32>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
 
         case 8:
-            return IsImageUniform<Uint64>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
+            return IsImageUniform<UInt64>(m_pData->GetConstDataPtr(), m_Desc.Width, m_Desc.Height, m_Desc.NumComponents, m_Desc.RowStride);
 
         default:
             UNEXPECTED("Unexpected component size (", ComponentSize, ")");
@@ -740,7 +740,7 @@ IMAGE_FILE_FORMAT CreateImageFromFile(const Char* FilePath,
         RefCntAutoPtr<DataBlobImpl> pFileData = DataBlobImpl::Create();
         pFileStream->ReadBlob(pFileData);
 
-        ImgFileFormat = Image::GetFileFormat(pFileData->GetConstDataPtr<Uint8>(), pFileData->GetSize(), FilePath);
+        ImgFileFormat = Image::GetFileFormat(pFileData->GetConstDataPtr<UInt8>(), pFileData->GetSize(), FilePath);
         if (ImgFileFormat == IMAGE_FILE_FORMAT_UNKNOWN)
         {
             LOG_ERROR_AND_THROW("Unable to derive image format for file '", FilePath, "\".");
@@ -778,7 +778,7 @@ IMAGE_FILE_FORMAT CreateImageFromMemory(const void* pImageData,
     IMAGE_FILE_FORMAT ImgFileFormat = IMAGE_FILE_FORMAT_UNKNOWN;
     try
     {
-        ImgFileFormat = Image::GetFileFormat(static_cast<const Uint8*>(pImageData), DataSize);
+        ImgFileFormat = Image::GetFileFormat(static_cast<const UInt8*>(pImageData), DataSize);
         if (ImgFileFormat == IMAGE_FILE_FORMAT_UNKNOWN)
         {
             LOG_ERROR_AND_THROW("Unable to derive image format");

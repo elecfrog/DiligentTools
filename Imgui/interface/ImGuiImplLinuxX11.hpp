@@ -41,12 +41,12 @@ class ImGuiImplLinuxX11 final : public ImGuiImplDiligent
 {
 public:
     static std::unique_ptr<ImGuiImplLinuxX11> Create(const ImGuiDiligentCreateInfo& CI,
-                                                     Uint32                         DisplayWidth,
-                                                     Uint32                         DisplayHeight);
+                                                     UInt32                         DisplayWidth,
+                                                     UInt32                         DisplayHeight);
 
     ImGuiImplLinuxX11(const ImGuiDiligentCreateInfo& CI,
-                      Uint32                         DisplayWidth,
-                      Uint32                         DisplayHeight);
+                      UInt32                         DisplayWidth,
+                      UInt32                         DisplayHeight);
     ~ImGuiImplLinuxX11();
 
     // clang-format off
@@ -57,8 +57,8 @@ public:
     // clang-format on
 
     bool         HandleXEvent(_XEvent* event);
-    virtual void NewFrame(Uint32            RenderSurfaceWidth,
-                          Uint32            RenderSurfaceHeight,
+    virtual void NewFrame(UInt32            RenderSurfaceWidth,
+                          UInt32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform) override final;
 
 private:

@@ -29,7 +29,7 @@
 /// \file
 /// BC texture decompression functions.
 
-#include "../../../DiligentCore/Primitives/interface/BasicTypes.h"
+#include "CommonDefinitions.h"
 
 DILIGENT_BEGIN_NAMESPACE(Diligent)
 
@@ -41,17 +41,17 @@ DILIGENT_BEGIN_NAMESPACE(Diligent)
 /// \param[out] DstBuffer   - Pointer to the output 4x4 RGB or RGBA buffer.
 /// \param[in]  DstChannels - The number of components in the output buffer.
 ///                           Must be 3 (RGB) or 4 (RGBA).
-void DecompressBC1Block(const Uint8* Bits,
-                        Uint8*       DstBuffer,
-                        Uint32       DstChannels DEFAULT_VALUE(4));
+void DecompressBC1Block(const UInt8* Bits,
+                        UInt8*       DstBuffer,
+                        UInt32       DstChannels DEFAULT_VALUE(4));
 
 
 /// Decompresses BC3 block (4x4 RGB+A).
 
 /// \param[in]  Bits      - Compressed block bits.
 /// \param[out] DstBuffer - Pointer to the output 4x4 RGBA buffer.
-void DecompressBC3Block(const Uint8* Bits,
-                        Uint8*       DstBuffer);
+void DecompressBC3Block(const UInt8* Bits,
+                        UInt8*       DstBuffer);
 
 
 /// Decompresses BC4 block (4x4 R).
@@ -59,9 +59,9 @@ void DecompressBC3Block(const Uint8* Bits,
 /// \param[in]  Bits        - Compressed block bits.
 /// \param[out] DstBuffer   - Pointer to the output 4x4 pixel buffer.
 /// \param[in]  DstChannels - The number of components in the output buffer.
-void DecompressBC4Block(const Uint8* Bits,
-                        Uint8*       DstBuffer,
-                        Uint32       DstChannels DEFAULT_VALUE(1));
+void DecompressBC4Block(const UInt8* Bits,
+                        UInt8*       DstBuffer,
+                        UInt32       DstChannels DEFAULT_VALUE(1));
 
 
 /// Decompresses BC5 block (4x4 R+G).
@@ -70,9 +70,9 @@ void DecompressBC4Block(const Uint8* Bits,
 /// \param[out] DstBuffer   - Pointer to the output 4x4 pixel buffer.
 /// \param[in]  DstChannels - The number of components in the output buffer.
 ///                           Must be greater than 2.
-void DecompressBC5Block(const Uint8* Bits,
-                        Uint8*       DstBuffer,
-                        Uint32       DstChannels DEFAULT_VALUE(2));
+void DecompressBC5Block(const UInt8* Bits,
+                        UInt8*       DstBuffer,
+                        UInt32       DstChannels DEFAULT_VALUE(2));
 
 // clang-format on
 

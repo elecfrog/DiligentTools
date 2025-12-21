@@ -43,13 +43,13 @@ class ImGuiImplLinuxXCB final : public ImGuiImplDiligent
 public:
     static std::unique_ptr<ImGuiImplLinuxXCB> Create(const ImGuiDiligentCreateInfo& CI,
                                                      xcb_connection_t*              connection,
-                                                     Uint32                         DisplayWidth,
-                                                     Uint32                         DisplayHeight);
+                                                     UInt32                         DisplayWidth,
+                                                     UInt32                         DisplayHeight);
 
     ImGuiImplLinuxXCB(const ImGuiDiligentCreateInfo& CI,
                       xcb_connection_t*              connection,
-                      Uint32                         DisplayWidth,
-                      Uint32                         DisplayHeight);
+                      UInt32                         DisplayWidth,
+                      UInt32                         DisplayHeight);
     ~ImGuiImplLinuxXCB();
 
     // clang-format off
@@ -60,8 +60,8 @@ public:
     // clang-format on
 
     bool         HandleXCBEvent(xcb_generic_event_t* event);
-    virtual void NewFrame(Uint32            RenderSurfaceWidth,
-                          Uint32            RenderSurfaceHeight,
+    virtual void NewFrame(UInt32            RenderSurfaceWidth,
+                          UInt32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform) override final;
 
 private:

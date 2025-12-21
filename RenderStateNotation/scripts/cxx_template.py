@@ -138,7 +138,7 @@ inline void WriteRSN(nlohmann::json& Json, const void* pData, size_t Size, Dynam
 template <>
 inline void ParseRSN(const nlohmann::json& Json, const void*& pObject, size_t& Size, DynamicLinearAllocator& Allocator)
 {
-    auto* pData = Allocator.ConstructArray<Uint8>(Json.get_binary().size());
+    auto* pData = Allocator.ConstructArray<UInt8>(Json.get_binary().size());
     std::memcpy(pData, Json.get_binary().data(), Json.get_binary().size());
     pObject = pData;
     Size    = Json.get_binary().size();
@@ -177,24 +177,24 @@ inline void ParseRSN(const nlohmann::json& Json, ShaderMacroArray& Macros, Dynam
         ParseRSN(Json[i], pData[i], Allocator);
 
     Macros.Elements = pData;
-    Macros.Count    = static_cast<Uint32>(Json.size());
+    Macros.Count    = static_cast<UInt32>(Json.size());
 }
 
-inline void ParseRSN(const nlohmann::json& Json, const Char**& pObjects, Uint32& NumElements, DynamicLinearAllocator& Allocator)
+inline void ParseRSN(const nlohmann::json& Json, const Char**& pObjects, UInt32& NumElements, DynamicLinearAllocator& Allocator)
 {
     auto* pData = Allocator.ConstructArray<const char*>(Json.size());
     for (size_t i = 0; i < Json.size(); i++)
         pData[i] = Allocator.CopyString(Json[i].get<std::string>());
 
     pObjects    = pData;
-    NumElements = static_cast<Uint32>(Json.size());
+    NumElements = static_cast<UInt32>(Json.size());
 }
 
 template <typename Type>
 inline void SerializeBitwiseEnum(nlohmann::json& Json, Type EnumBits, DynamicLinearAllocator& Allocator)
 {
     auto BitArray = nlohmann::json::array();
-    for (Uint32 Bits = EnumBits; Bits != 0;)
+    for (UInt32 Bits = EnumBits; Bits != 0;)
         BitArray.push_back(static_cast<const Type>(ExtractLSB(Bits)));
 
     if (BitArray.size() > 1)

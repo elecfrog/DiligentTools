@@ -4,6 +4,8 @@ if(NOT DILIGENT_CORE_FOUND)
 	message(FATAL_ERROR "DiligentCore module is not found. Please add DiligentCore module to the project before DiligentTools module.")
 endif()
 
+link_libraries(sparrow_common)
+
 set(DILIGENT_TOOLS_FOUND TRUE CACHE INTERNAL "DiligentTools module is found")
 
 file(RELATIVE_PATH DILIGENT_TOOLS_DIR "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")

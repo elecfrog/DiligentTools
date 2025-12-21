@@ -55,7 +55,7 @@ public:
                                               IShaderSourceInputStreamFactory* pReloadFactory) override final;
 
     virtual Bool DILIGENT_CALL_TYPE ParseString(const Char*                      Source,
-                                                Uint32                           Length,
+                                                UInt32                           Length,
                                                 IShaderSourceInputStreamFactory* pStreamFactory,
                                                 IShaderSourceInputStreamFactory* pReloadFactory) override final;
 
@@ -67,13 +67,13 @@ public:
 
     virtual const RenderPassDesc* DILIGENT_CALL_TYPE GetRenderPassByName(const Char* Name) const override final;
 
-    virtual const PipelineStateNotation* DILIGENT_CALL_TYPE GetPipelineStateByIndex(Uint32 Index) const override final;
+    virtual const PipelineStateNotation* DILIGENT_CALL_TYPE GetPipelineStateByIndex(UInt32 Index) const override final;
 
-    virtual const PipelineResourceSignatureDesc* DILIGENT_CALL_TYPE GetResourceSignatureByIndex(Uint32 Index) const override final;
+    virtual const PipelineResourceSignatureDesc* DILIGENT_CALL_TYPE GetResourceSignatureByIndex(UInt32 Index) const override final;
 
-    virtual const ShaderCreateInfo* DILIGENT_CALL_TYPE GetShaderByIndex(Uint32 Index) const override final;
+    virtual const ShaderCreateInfo* DILIGENT_CALL_TYPE GetShaderByIndex(UInt32 Index) const override final;
 
-    virtual const RenderPassDesc* DILIGENT_CALL_TYPE GetRenderPassByIndex(Uint32 Index) const override final;
+    virtual const RenderPassDesc* DILIGENT_CALL_TYPE GetRenderPassByIndex(UInt32 Index) const override final;
 
     virtual Bool DILIGENT_CALL_TYPE IsSignatureIgnored(const Char* Name) const override final;
 
@@ -88,7 +88,7 @@ private:
                            IShaderSourceInputStreamFactory* pStreamFactory);
 
     Bool ParseStringInternal(const Char*                      Source,
-                             Uint32                           Length,
+                             UInt32                           Length,
                              IShaderSourceInputStreamFactory* pStreamFactory);
 
 private:
@@ -117,10 +117,10 @@ private:
     std::vector<RenderPassDesc>                                      m_RenderPasses;
     std::vector<std::reference_wrapper<const PipelineStateNotation>> m_PipelineStates;
 
-    TNamedObjectHashMap<Uint32>   m_ResourceSignatureNames;
-    TNamedObjectHashMap<Uint32>   m_ShaderNames;
-    TNamedObjectHashMap<Uint32>   m_RenderPassNames;
-    TNamedPipelineHashMap<Uint32> m_PipelineStateNames;
+    TNamedObjectHashMap<UInt32>   m_ResourceSignatureNames;
+    TNamedObjectHashMap<UInt32>   m_ShaderNames;
+    TNamedObjectHashMap<UInt32>   m_RenderPassNames;
+    TNamedPipelineHashMap<UInt32> m_PipelineStateNames;
 
     RenderStateNotationParserInfo m_ParseInfo;
 

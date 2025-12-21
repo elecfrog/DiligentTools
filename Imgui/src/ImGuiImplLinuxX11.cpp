@@ -53,15 +53,15 @@ namespace Diligent
 {
 
 std::unique_ptr<ImGuiImplLinuxX11> ImGuiImplLinuxX11::Create(const ImGuiDiligentCreateInfo& CI,
-                                                             Uint32                         DisplayWidth,
-                                                             Uint32                         DisplayHeight)
+                                                             UInt32                         DisplayWidth,
+                                                             UInt32                         DisplayHeight)
 {
     return std::make_unique<ImGuiImplLinuxX11>(CI, DisplayWidth, DisplayHeight);
 }
 
 ImGuiImplLinuxX11::ImGuiImplLinuxX11(const ImGuiDiligentCreateInfo& CI,
-                                     Uint32                         DisplayWidth,
-                                     Uint32                         DisplayHeight) :
+                                     UInt32                         DisplayWidth,
+                                     UInt32                         DisplayHeight) :
     ImGuiImplDiligent{CI}
 {
 
@@ -77,8 +77,8 @@ ImGuiImplLinuxX11::~ImGuiImplLinuxX11()
 {
 }
 
-void ImGuiImplLinuxX11::NewFrame(Uint32            RenderSurfaceWidth,
-                                 Uint32            RenderSurfaceHeight,
+void ImGuiImplLinuxX11::NewFrame(UInt32            RenderSurfaceWidth,
+                                 UInt32            RenderSurfaceHeight,
                                  SURFACE_TRANSFORM SurfacePreTransform)
 {
     auto now        = std::chrono::high_resolution_clock::now();

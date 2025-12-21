@@ -45,7 +45,7 @@ ImGuiImplIOS::~ImGuiImplIOS()
 {
 }
 
-void ImGuiImplIOS::NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform)
+void ImGuiImplIOS::NewFrame(UInt32 RenderSurfaceWidth, UInt32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform)
 {
     std::lock_guard<std::mutex> Lock(m_Mtx);
     if (m_Time == 0.0)

@@ -44,7 +44,7 @@
 DILIGENT_BEGIN_NAMESPACE(Diligent)
 
 /// Image file format
-DILIGENT_TYPED_ENUM(IMAGE_FILE_FORMAT, Uint8){
+DILIGENT_TYPED_ENUM(IMAGE_FILE_FORMAT, UInt8){
     /// Unknown format
     IMAGE_FILE_FORMAT_UNKNOWN = 0,
 
@@ -97,19 +97,19 @@ typedef struct ImageLoadInfo ImageLoadInfo;
 struct ImageDesc
 {
     /// Image width in pixels
-    Uint32 Width DEFAULT_INITIALIZER(0);
+    UInt32 Width DEFAULT_INITIALIZER(0);
 
     /// Image height in pixels
-    Uint32 Height DEFAULT_INITIALIZER(0);
+    UInt32 Height DEFAULT_INITIALIZER(0);
 
     /// Component type
     VALUE_TYPE ComponentType DEFAULT_INITIALIZER(VT_UNDEFINED);
 
     /// Number of color components
-    Uint32 NumComponents DEFAULT_INITIALIZER(0);
+    UInt32 NumComponents DEFAULT_INITIALIZER(0);
 
     /// Image row stride in bytes
-    Uint32 RowStride DEFAULT_INITIALIZER(0);
+    UInt32 RowStride DEFAULT_INITIALIZER(0);
 };
 typedef struct ImageDesc ImageDesc;
 
@@ -140,13 +140,13 @@ struct Image : public ObjectBase<IObject>
 
     struct EncodeInfo
     {
-        Uint32                   Width       = 0;
-        Uint32                   Height      = 0;
+        UInt32                   Width       = 0;
+        UInt32                   Height      = 0;
         TEXTURE_FORMAT           TexFormat   = TEX_FORMAT_UNKNOWN;
         bool                     KeepAlpha   = false;
         bool                     FlipY       = false;
         const void*              pData       = nullptr;
-        Uint32                   Stride      = 0;
+        UInt32                   Stride      = 0;
         IMAGE_FILE_FORMAT        FileFormat  = IMAGE_FILE_FORMAT_JPEG;
         int                      JpegQuality = 95;
         struct IMemoryAllocator* pAllocator  = nullptr;
@@ -161,10 +161,10 @@ struct Image : public ObjectBase<IObject>
 
     const IDataBlob* GetData() const { return m_pData; }
 
-    static std::vector<Uint8> ConvertImageData(Uint32         Width,
-                                               Uint32         Height,
-                                               const Uint8*   pData,
-                                               Uint32         Stride,
+    static std::vector<UInt8> ConvertImageData(UInt32         Width,
+                                               UInt32         Height,
+                                               const UInt8*   pData,
+                                               UInt32         Stride,
                                                TEXTURE_FORMAT SrcFormat,
                                                TEXTURE_FORMAT DstFormat,
                                                bool           KeepAlpha,
@@ -172,7 +172,7 @@ struct Image : public ObjectBase<IObject>
 
     static bool IsSupportedFileFormat(IMAGE_FILE_FORMAT Format);
 
-    static IMAGE_FILE_FORMAT GetFileFormat(const Uint8* pData, size_t Size, const char* FilePath = nullptr);
+    static IMAGE_FILE_FORMAT GetFileFormat(const UInt8* pData, size_t Size, const char* FilePath = nullptr);
 
     static ImageDesc GetDesc(IMAGE_FILE_FORMAT FileFormat, const void* pSrcData, size_t SrcDataSize);
 

@@ -30,28 +30,28 @@
 namespace Diligent
 {
 
-inline void DecompressColorBlock(const Uint8* Bits,
-                                 Uint8*       DstBuffer,
-                                 Uint32       DstChannels)
+inline void DecompressColorBlock(const UInt8* Bits,
+                                 UInt8*       DstBuffer,
+                                 UInt32       DstChannels)
 {
     VERIFY_EXPR(DstChannels >= 3);
-    const Uint32 RGB[2] =
+    const UInt32 RGB[2] =
         {
-            Uint32{Bits[0]} | ((Uint32{Bits[1]}) << 8),
-            Uint32{Bits[2]} | ((Uint32{Bits[3]}) << 8) //
+            UInt32{Bits[0]} | ((UInt32{Bits[1]}) << 8),
+            UInt32{Bits[2]} | ((UInt32{Bits[3]}) << 8) //
         };
 
-    static constexpr Uint32 ROffset = 11;
-    static constexpr Uint32 GOffset = 5;
-    static constexpr Uint32 BOffset = 0;
+    static constexpr UInt32 ROffset = 11;
+    static constexpr UInt32 GOffset = 5;
+    static constexpr UInt32 BOffset = 0;
 
-    static constexpr Uint32 RMask = (1 << 5) - 1;
-    static constexpr Uint32 GMask = (1 << 6) - 1;
-    static constexpr Uint32 BMask = (1 << 5) - 1;
+    static constexpr UInt32 RMask = (1 << 5) - 1;
+    static constexpr UInt32 GMask = (1 << 6) - 1;
+    static constexpr UInt32 BMask = (1 << 5) - 1;
 
-    Uint32 R[4] = {(RGB[0] >> ROffset) & RMask, (RGB[1] >> ROffset) & RMask, 0, 0};
-    Uint32 G[4] = {(RGB[0] >> GOffset) & GMask, (RGB[1] >> GOffset) & GMask, 0, 0};
-    Uint32 B[4] = {(RGB[0] >> BOffset) & BMask, (RGB[1] >> BOffset) & BMask, 0, 0};
+    UInt32 R[4] = {(RGB[0] >> ROffset) & RMask, (RGB[1] >> ROffset) & RMask, 0, 0};
+    UInt32 G[4] = {(RGB[0] >> GOffset) & GMask, (RGB[1] >> GOffset) & GMask, 0, 0};
+    UInt32 B[4] = {(RGB[0] >> BOffset) & BMask, (RGB[1] >> BOffset) & BMask, 0, 0};
 
     if (RGB[0] > RGB[1])
     {
@@ -70,10 +70,10 @@ inline void DecompressColorBlock(const Uint8* Bits,
         B[2] = (2 * B[0] + 1 * B[1]) / 2;
     }
 
-    const Uint8* Palette = Bits + 4;
-    for (Uint32 i = 0; i < 16; ++i)
+    const UInt8* Palette = Bits + 4;
+    for (UInt32 i = 0; i < 16; ++i)
     {
-        const Uint32 Idx = (Palette[i / 4u] >> ((i % 4u) * 2u)) & 0x03u;
+        const UInt32 Idx = (Palette[i / 4u] >> ((i % 4u) * 2u)) & 0x03u;
 
         DstBuffer[i * DstChannels + 0] = (R[Idx] << 3u) & 0xFFu;
         DstBuffer[i * DstChannels + 1] = (G[Idx] << 2u) & 0xFFu;
@@ -81,21 +81,21 @@ inline void DecompressColorBlock(const Uint8* Bits,
     }
 }
 
-inline void DecompressAlphaBlock(const Uint8* Bits,
-                                 Uint8*       DstBuffer,
-                                 Uint32       DstChannels)
+inline void DecompressAlphaBlock(const UInt8* Bits,
+                                 UInt8*       DstBuffer,
+                                 UInt32       DstChannels)
 {
-    Uint32 Alpha[8] = {Bits[0], Bits[1]};
+    UInt32 Alpha[8] = {Bits[0], Bits[1]};
     if (Alpha[0] > Alpha[1])
     {
-        for (Uint32 i = 2; i < 8; ++i)
+        for (UInt32 i = 2; i < 8; ++i)
         {
             Alpha[i] = ((8 - i) * Alpha[0] + (i - 1) * Alpha[1]) / 7;
         }
     }
     else
     {
-        for (Uint32 i = 2; i < 6; ++i)
+        for (UInt32 i = 2; i < 6; ++i)
         {
             Alpha[i] = ((6 - i) * Alpha[0] + (i - 1) * Alpha[1]) / 5;
         }
@@ -105,43 +105,43 @@ inline void DecompressAlphaBlock(const Uint8* Bits,
 
     for (size_t p = 0; p < 2; ++p)
     {
-        const Uint8* PaletteBits = Bits + 2 + p * 3;
-        const Uint32 Palette0    = Uint32{PaletteBits[0]} | (Uint32{PaletteBits[1]} << 8) | (Uint32{PaletteBits[2]} << 16);
-        for (Uint32 i = 0; i < 8; ++i)
+        const UInt8* PaletteBits = Bits + 2 + p * 3;
+        const UInt32 Palette0    = UInt32{PaletteBits[0]} | (UInt32{PaletteBits[1]} << 8) | (UInt32{PaletteBits[2]} << 16);
+        for (UInt32 i = 0; i < 8; ++i)
         {
-            Uint32 Idx = (Palette0 >> (i * 3)) & 0x07;
+            UInt32 Idx = (Palette0 >> (i * 3)) & 0x07;
 
             DstBuffer[(p * 8 + i) * DstChannels] = Alpha[Idx] & 0xFFu;
         }
     }
 }
 
-void DecompressBC1Block(const Uint8* Bits,
-                        Uint8*       DstBuffer,
-                        Uint32       DstChannels)
+void DecompressBC1Block(const UInt8* Bits,
+                        UInt8*       DstBuffer,
+                        UInt32       DstChannels)
 {
     VERIFY_EXPR(DstChannels >= 3);
     DecompressColorBlock(Bits, DstBuffer, DstChannels);
 }
 
-void DecompressBC3Block(const Uint8* Bits,
-                        Uint8*       DstBuffer)
+void DecompressBC3Block(const UInt8* Bits,
+                        UInt8*       DstBuffer)
 {
     DecompressColorBlock(Bits + 8, DstBuffer, 4);
     DecompressAlphaBlock(Bits, DstBuffer + 3, 4);
 }
 
-void DecompressBC4Block(const Uint8* Bits,
-                        Uint8*       DstBuffer,
-                        Uint32       DstChannels)
+void DecompressBC4Block(const UInt8* Bits,
+                        UInt8*       DstBuffer,
+                        UInt32       DstChannels)
 {
     VERIFY_EXPR(DstChannels >= 1);
     DecompressAlphaBlock(Bits, DstBuffer, DstChannels);
 }
 
-void DecompressBC5lock(const Uint8* Bits,
-                       Uint8*       DstBuffer,
-                       Uint32       DstChannels)
+void DecompressBC5lock(const UInt8* Bits,
+                       UInt8*       DstBuffer,
+                       UInt32       DstChannels)
 {
     VERIFY_EXPR(DstChannels >= 2);
     DecompressAlphaBlock(Bits, DstBuffer, DstChannels);

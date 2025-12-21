@@ -1,30 +1,3 @@
-/*
- *  Copyright 2019-2024 Diligent Graphics LLC
- *  Copyright 2015-2019 Egor Yusov
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *  In no event and under no legal theory, whether in tort (including negligence),
- *  contract, or otherwise, unless required by applicable law (such as deliberate
- *  and grossly negligent acts) or agreed to in writing, shall any Contributor be
- *  liable for any damages, including any direct, indirect, special, incidental,
- *  or consequential damages of any character arising as a result of this License or
- *  out of the use or inability to use the software (including but not limited to damages
- *  for loss of goodwill, work stoppage, computer failure or malfunction, or any and
- *  all other commercial damages or losses), even if such Contributor has been advised
- *  of the possibility of such damages.
- */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,8 +8,8 @@
 
 struct PNGReadFnState
 {
-    const IDataBlob* pPngBits;
-    size_t           Offset;
+    const Diligent::IDataBlob* pPngBits;
+    size_t                     Offset;
 };
 typedef struct PNGReadFnState PNGReadFnState;
 
@@ -48,10 +21,10 @@ static void PngReadCallback(png_structp pngPtr, png_bytep data, png_size_t lengt
     pState->Offset += length;
 }
 
-DECODE_PNG_RESULT Diligent_DecodePng(const void* pSrcPngBits,
-                                     size_t      PngDataSize,
-                                     IDataBlob*  pDstPixels,
-                                     ImageDesc*  pDstImgDesc)
+DECODE_PNG_RESULT DecodePng(const void*          pSrcPngBits,
+                                     size_t               PngDataSize,
+                                     Diligent::IDataBlob* pDstPixels,
+                                     Diligent::ImageDesc* pDstImgDesc)
 {
     if (!pSrcPngBits || !pDstImgDesc)
         return DECODE_PNG_RESULT_INVALID_ARGUMENTS;
@@ -92,7 +65,7 @@ DECODE_PNG_RESULT Diligent_DecodePng(const void* pSrcPngBits,
     }
 
     PNGReadFnState ReadState;
-    ReadState.pPngBits = pSrcPngBits;
+    ReadState.pPngBits = (const Diligent::IDataBlob*)pSrcPngBits;
     ReadState.Offset   = 0;
 
     png_set_read_fn(png, (png_voidp)&ReadState, PngReadCallback);
@@ -150,9 +123,9 @@ DECODE_PNG_RESULT Diligent_DecodePng(const void* pSrcPngBits,
     pDstImgDesc->NumComponents = png_get_channels(png, info);
     switch (bit_depth)
     {
-        case 8: pDstImgDesc->ComponentType = VT_UINT8; break;
-        case 16: pDstImgDesc->ComponentType = VT_UINT16; break;
-        case 32: pDstImgDesc->ComponentType = VT_UINT32; break;
+        case 8: pDstImgDesc->ComponentType = Diligent::VT_UINT8; break;
+        case 16: pDstImgDesc->ComponentType = Diligent::VT_UINT16; break;
+        case 32: pDstImgDesc->ComponentType = Diligent::VT_UINT32; break;
         default:
         {
             png_destroy_read_struct(&png, &info, (png_infopp)0);
@@ -163,15 +136,15 @@ DECODE_PNG_RESULT Diligent_DecodePng(const void* pSrcPngBits,
     if (pDstPixels != NULL)
     {
         //Array of row pointers. One for every row.
-        rowPtrs = malloc(sizeof(png_bytep) * pDstImgDesc->Height);
+        rowPtrs = (png_bytep*)malloc(sizeof(png_bytep) * pDstImgDesc->Height);
 
         //Allocate a buffer with enough space.
-        pDstImgDesc->RowStride = pDstImgDesc->Width * (Uint32)bit_depth * pDstImgDesc->NumComponents / 8u;
+        pDstImgDesc->RowStride = pDstImgDesc->Width * (UInt32)bit_depth * pDstImgDesc->NumComponents / 8u;
         // Align stride to 4 bytes
         pDstImgDesc->RowStride = (pDstImgDesc->RowStride + 3u) & ~3u;
 
-        IDataBlob_Resize(pDstPixels, pDstImgDesc->Height * (size_t)pDstImgDesc->RowStride);
-        png_bytep pRow0 = IDataBlob_GetDataPtr(pDstPixels, 0);
+        pDstPixels->Resize(pDstImgDesc->Height * (size_t)pDstImgDesc->RowStride);
+        png_bytep pRow0 = (png_bytep)pDstPixels->GetDataPtr(0);
         for (size_t i = 0; i < pDstImgDesc->Height; i++)
             rowPtrs[i] = pRow0 + i * pDstImgDesc->RowStride;
 
@@ -189,19 +162,19 @@ DECODE_PNG_RESULT Diligent_DecodePng(const void* pSrcPngBits,
 
 static void PngWriteCallback(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-    IDataBlob* pEncodedData = (IDataBlob*)png_get_io_ptr(png_ptr);
-    size_t     PrevSize     = IDataBlob_GetSize(pEncodedData);
-    IDataBlob_Resize(pEncodedData, PrevSize + length);
-    Uint8* pBytes = (Uint8*)IDataBlob_GetDataPtr(pEncodedData, 0);
+    Diligent::IDataBlob* pEncodedData = (Diligent::IDataBlob*)png_get_io_ptr(png_ptr);
+    size_t               PrevSize     = pEncodedData->GetSize();
+    pEncodedData->Resize(PrevSize + length);
+    UInt8* pBytes = (UInt8*)pEncodedData->GetDataPtr(0);
     memcpy(pBytes + PrevSize, data, length);
 }
 
-ENCODE_PNG_RESULT Diligent_EncodePng(const Uint8* pSrcPixels,
-                                     Uint32       Width,
-                                     Uint32       Height,
-                                     Uint32       StrideInBytes,
-                                     int          PngColorType,
-                                     IDataBlob*   pDstPngBits)
+ENCODE_PNG_RESULT EncodePng(const UInt8*         pSrcPixels,
+                                     UInt                 Width,
+                                     UInt                 Height,
+                                     UInt                 StrideInBytes,
+                                     int                  PngColorType,
+                                     Diligent::IDataBlob* pDstPngBits)
 {
     if (!pSrcPixels || !pDstPngBits || Width == 0 || Height == 0 || StrideInBytes == 0)
         return ENCODE_PNG_RESULT_INVALID_ARGUMENTS;
@@ -235,9 +208,9 @@ ENCODE_PNG_RESULT Diligent_EncodePng(const Uint8* pSrcPixels,
                  PNG_FILTER_TYPE_DEFAULT);
 
     //png_set_compression_level(p, 1);
-    rowPtrs = malloc(sizeof(png_bytep) * Height);
+    rowPtrs = (png_bytep*)malloc(sizeof(png_bytep) * Height);
     for (size_t y = 0; y < Height; ++y)
-        rowPtrs[y] = (Uint8*)pSrcPixels + y * StrideInBytes;
+        rowPtrs[y] = (UInt8*)pSrcPixels + y * StrideInBytes;
 
     png_set_rows(strct, info, rowPtrs);
 
