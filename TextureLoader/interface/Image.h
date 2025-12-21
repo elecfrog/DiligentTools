@@ -41,7 +41,7 @@
 #    include "../../../DiligentCore/Common/interface/ObjectBase.hpp"
 #endif
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent {
 
 /// Image file format
 DILIGENT_TYPED_ENUM(IMAGE_FILE_FORMAT, UInt8){
@@ -225,4 +225,4 @@ IMAGE_FILE_FORMAT CreateImageFromMemory(const void* pImageData,
 
 #endif
 
-DILIGENT_END_NAMESPACE // namespace Diligent
+ } // namespace Diligent

@@ -991,7 +991,7 @@ definition of the variable range_limit in h2v1_merged_upsample(), at the head
 of the block that handles odd image width (about line 268 in v6 jdmerge.c):
   /* If image width is odd, do the last output column separately */
   if (cinfo->output_width & 1) {
-    register JSAMPLE * range_limit = cinfo->sample_range_limit; /* ADD THIS */
+    register JSAMPLE * range_limit = cinfo->sample_range_limit; /* ADD   */
     cb = GETJSAMPLE(*inptr1);
 Pretty bizarre, especially since the very similar routine h2v2_merged_upsample
 doesn't trigger the bug.

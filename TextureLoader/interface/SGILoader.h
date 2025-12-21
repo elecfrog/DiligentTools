@@ -31,7 +31,7 @@
 
 #include "Image.h"
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent {
 
 /// Loads an SGI image.
 
@@ -48,4 +48,4 @@ bool DILIGENT_GLOBAL_FUNCTION(LoadSGI)(const void* pSGIData,
                                        IDataBlob*  pDstPixels,
                                        ImageDesc*  pDstImgDesc);
 
-DILIGENT_END_NAMESPACE // namespace Diligent
+ } // namespace Diligent

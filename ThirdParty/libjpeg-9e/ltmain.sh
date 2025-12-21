@@ -6469,7 +6469,7 @@ func_win32_import_lib_p ()
 }
 
 # func_suncc_cstd_abi
-# !!ONLY CALL THIS FOR SUN CC AFTER $compile_command IS FULLY EXPANDED!!
+# !!ONLY CALL   FOR SUN CC AFTER $compile_command IS FULLY EXPANDED!!
 # Several compiler flags select an ABI that is incompatible with the
 # Cstd library. Avoid specifying it if any are in CXXFLAGS.
 func_suncc_cstd_abi ()

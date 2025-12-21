@@ -34,7 +34,7 @@
 #include "../../../DiligentCore/Graphics/GraphicsTools/interface/RenderStateCache.h"
 
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent {
 
 #include "../../../DiligentCore/Primitives/interface/DefineRefMacro.h"
 
@@ -80,7 +80,7 @@ struct LoadResourceSignatureInfo
 
     /// An optional function to be called by the render state notation loader
     /// to let the application modify the pipeline resource signature descriptor.
-    void (*Modify)(PipelineResourceSignatureDesc REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*Modify)(PipelineResourceSignatureDesc  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the Modify function.
     void* pUserData                                          DEFAULT_INITIALIZER(nullptr);
@@ -112,7 +112,7 @@ struct LoadRenderPassInfo
 
     /// An optional function to be called by the render state notation loader
     /// to let the application modify the render pass descriptor.
-    void (*Modify)(RenderPassDesc REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*Modify)(RenderPassDesc  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the Modify function.
     void* pUserData                           DEFAULT_INITIALIZER(nullptr);
@@ -144,7 +144,7 @@ struct LoadShaderInfo
 
     /// An optional function to be called by the render state notation loader
     /// to let the application modify the shader create info.
-    void (*Modify)(ShaderCreateInfo REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*Modify)(ShaderCreateInfo  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the Modify function.
     void* pUserData                             DEFAULT_INITIALIZER(nullptr);
@@ -200,7 +200,7 @@ struct LoadPipelineStateInfo
     ///  - ModifyRenderPass
     ///  - ModifyShader
     ///  - ModifyPipeline
-    void (*ModifyPipeline)(PipelineStateCreateInfo REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*ModifyPipeline)(PipelineStateCreateInfo  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the ModifyPipeline function.
     void* pModifyPipelineData                                  DEFAULT_INITIALIZER(nullptr);
@@ -222,7 +222,7 @@ struct LoadPipelineStateInfo
     ///
     /// The third (bool) parameter indicates whether the modified shader object
     /// should be added to the internal cache and should be set by the callee.
-    void (*ModifyShader)(ShaderCreateInfo REF, SHADER_TYPE, bool REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*ModifyShader)(ShaderCreateInfo  &, SHADER_TYPE, bool  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the ModifyShader function.
     void* pModifyShaderData                                                  DEFAULT_INITIALIZER(nullptr);
@@ -232,7 +232,7 @@ struct LoadPipelineStateInfo
     ///
     /// The second (`bool`) parameter indicates whether the modified resource signature object
     /// should be added to the internal cache and should be set by the callee.
-    void (*ModifyResourceSignature)(PipelineResourceSignatureDesc REF, bool REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*ModifyResourceSignature)(PipelineResourceSignatureDesc  &, bool  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the ModifyResourceSignature function.
     void* pModifyResourceSignatureData                                                  DEFAULT_INITIALIZER(nullptr);
@@ -242,7 +242,7 @@ struct LoadPipelineStateInfo
     ///
     /// The second (`bool`) parameter indicates whether the modified render pass object
     /// should be added to the internal cache and should be set by the callee.
-    void (*ModifyRenderPass)(RenderPassDesc REF, bool REF, void*) DEFAULT_INITIALIZER(nullptr);
+    void (*ModifyRenderPass)(RenderPassDesc  &, bool  &, void*) DEFAULT_INITIALIZER(nullptr);
 
     /// A pointer to the user data to pass to the ModifyRenderPass function.
     void* pModifyRenderPassData                                   DEFAULT_INITIALIZER(nullptr);
@@ -251,12 +251,9 @@ typedef struct LoadPipelineStateInfo LoadPipelineStateInfo;
 
 // clang-format on
 
-#include "../../../DiligentCore/Primitives/interface/UndefRefMacro.h"
-
 // {FD9B12C5-3BC5-4729-A2B4-924DF374B3D3}
-static DILIGENT_CONSTEXPR INTERFACE_ID IID_RenderStateNotationLoader = {0xFD9B12C5, 0x3BC5, 0x4729, {0xA2, 0xB4, 0x92, 0x4D, 0xF3, 0x74, 0xB3, 0xD3}};
+static constexpr INTERFACE_ID IID_RenderStateNotationLoader = {0xFD9B12C5, 0x3BC5, 0x4729, {0xA2, 0xB4, 0x92, 0x4D, 0xF3, 0x74, 0xB3, 0xD3}};
 
-#define DILIGENT_INTERFACE_NAME IRenderStateNotationLoader
 #include "../../../DiligentCore/Primitives/interface/DefineInterfaceHelperMacros.h"
 
 #define IRenderStateNotationLoaderInclusiveMethods \
@@ -274,9 +271,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationLoader, IObject)
     /// \param [out] ppPSO    - Address of the memory location where a pointer to the pipeline state object will be stored.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL void METHOD(LoadPipelineState)(THIS_
-                                           const LoadPipelineStateInfo REF LoadInfo, 
-                                           IPipelineState**                ppPSO) PURE;
+    virtual void METHOD(LoadPipelineState)(
+                                           const LoadPipelineStateInfo  & LoadInfo,
+                                           IPipelineState**                ppPSO) =0;
 
     /// Loads a resource signature from the render state notation parser.
 
@@ -284,9 +281,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationLoader, IObject)
     /// \param [out] ppSignature - Address of the memory location where a pointer to the pipeline resource signature object will be stored.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL void METHOD(LoadResourceSignature)(THIS_
-                                               const LoadResourceSignatureInfo REF LoadInfo,
-                                               IPipelineResourceSignature**        ppSignature) PURE;
+    virtual void METHOD(LoadResourceSignature)(
+                                               const LoadResourceSignatureInfo  & LoadInfo,
+                                               IPipelineResourceSignature**        ppSignature) =0;
 
     /// Loads a render pass from the render state notation parser.
 
@@ -294,9 +291,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationLoader, IObject)
     /// \param [out] ppRenderPass - Address of the memory location where a pointer to the loaded render pass object will be stored.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL void METHOD(LoadRenderPass)(THIS_
-                                        const LoadRenderPassInfo REF LoadInfo,
-                                        IRenderPass**                ppRenderPass) PURE;
+    virtual void METHOD(LoadRenderPass)(
+                                        const LoadRenderPassInfo  & LoadInfo,
+                                        IRenderPass**                ppRenderPass) =0;
 
     /// Loads a shader from the render state notation parser.
 
@@ -304,9 +301,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationLoader, IObject)
     /// \param [out] ppShader - Address of the memory location where a pointer to the loaded shader object will be stored.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL void METHOD(LoadShader)(THIS_
-                                    const LoadShaderInfo REF LoadInfo,
-                                    IShader**                ppShader) PURE;
+    virtual void METHOD(LoadShader)(
+                                    const LoadShaderInfo  & LoadInfo,
+                                    IShader**                ppShader) =0;
 
     /// Reloads all states.
     
@@ -320,9 +317,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationLoader, IObject)
     /// exceptions:
     /// - Pipeline resource layouts and signatures can't be modified
     /// - Shaders can be reloaded, but can't be replaced (e.g. a PSO can't use another shader after the reload)
-    VIRTUAL bool METHOD(Reload)(THIS) PURE;
+    virtual bool METHOD(Reload)( ) =0;
 };
-DILIGENT_END_INTERFACE
+
 
 #include "../../../DiligentCore/Primitives/interface/UndefInterfaceHelperMacros.h"
 
@@ -340,9 +337,9 @@ DILIGENT_END_INTERFACE
 
 #include "../../../DiligentCore/Primitives/interface/DefineGlobalFuncHelperMacros.h"
 
-void DILIGENT_GLOBAL_FUNCTION(CreateRenderStateNotationLoader)(const RenderStateNotationLoaderCreateInfo REF CreateInfo,
+void DILIGENT_GLOBAL_FUNCTION(CreateRenderStateNotationLoader)(const RenderStateNotationLoaderCreateInfo  & CreateInfo,
                                                                IRenderStateNotationLoader**                  ppLoader);
 
 #include "../../../DiligentCore/Primitives/interface/UndefGlobalFuncHelperMacros.h"
 
-DILIGENT_END_NAMESPACE // namespace Diligent
+ } // namespace Diligent

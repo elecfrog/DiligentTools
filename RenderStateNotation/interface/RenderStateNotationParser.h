@@ -32,7 +32,7 @@
 /// Defines Diligent::IRenderStateNotationParser interface
 #include "../../../DiligentCore/Graphics/GraphicsEngine/interface/RenderDevice.h"
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent {
 
 /// Pipeline state notation.
 
@@ -381,9 +381,8 @@ typedef struct RenderStateNotationParserCreateInfo RenderStateNotationParserCrea
 // clang-format on
 
 // {355AC9f7-5D9D-423D-AE35-80E0028DE17E}
-static DILIGENT_CONSTEXPR INTERFACE_ID IID_RenderStateNotationParser = {0x355AC9F7, 0x5D9D, 0x423D, {0xAE, 0x35, 0x80, 0xE0, 0x02, 0x8D, 0xE1, 0x7E}};
+static constexpr INTERFACE_ID IID_RenderStateNotationParser = {0x355AC9F7, 0x5D9D, 0x423D, {0xAE, 0x35, 0x80, 0xE0, 0x02, 0x8D, 0xE1, 0x7E}};
 
-#define DILIGENT_INTERFACE_NAME IRenderStateNotationParser
 #include "../../../DiligentCore/Primitives/interface/DefineInterfaceHelperMacros.h"
 
 #define IRenderStateNotationParserInclusiveMethods \
@@ -393,7 +392,7 @@ static DILIGENT_CONSTEXPR INTERFACE_ID IID_RenderStateNotationParser = {0x355AC9
 // clang-format off
 
 /// Render state notation parser interface.
-DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
+struct IRenderStateNotationParser : public IObject
 {
     /// Parses a render state notation file.
 
@@ -408,10 +407,10 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// - False otherwise.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL Bool METHOD(ParseFile)(THIS_
+    virtual Bool METHOD(ParseFile)(
                                    const Char*                      FilePath,
                                    IShaderSourceInputStreamFactory* pStreamFactory,
-                                   IShaderSourceInputStreamFactory* pReloadFactory DEFAULT_VALUE(nullptr)) PURE;
+                                   IShaderSourceInputStreamFactory* pReloadFactory DEFAULT_VALUE(nullptr)) =0;
 
     /// Parses a render state notation string.
 
@@ -431,11 +430,11 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// - False otherwise.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL Bool METHOD(ParseString)(THIS_
+    virtual Bool METHOD(ParseString)(
                                      const Char*                      Source,
                                      UInt32                           Length,
                                      IShaderSourceInputStreamFactory* pStreamFactory,
-                                     IShaderSourceInputStreamFactory* pReloadFactory DEFAULT_VALUE(nullptr)) PURE;
+                                     IShaderSourceInputStreamFactory* pReloadFactory DEFAULT_VALUE(nullptr)) =0;
 
     /// Returns the pipeline state notation by its name. If the resource is not found, returns nullptr.
 
@@ -444,9 +443,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the PipelineStateNotation structure, see Diligent::PipelineStateNotation.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST PipelineStateNotation* METHOD(GetPipelineStateByName)(THIS_
+    virtual const PipelineStateNotation* METHOD(GetPipelineStateByName)(
                                                                         const Char*   Name,
-                                                                        PIPELINE_TYPE PipelineType DEFAULT_VALUE(PIPELINE_TYPE_INVALID)) CONST PURE;
+                                                                        PIPELINE_TYPE PipelineType DEFAULT_VALUE(PIPELINE_TYPE_INVALID)) const =0;
 
     /// Returns the resource signature notation by its name. If the resource is not found, returns nullptr.
 
@@ -454,8 +453,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the PipelineResourceSignatureDesc structure, see Diligent::PipelineResourceSignatureDesc.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST PipelineResourceSignatureDesc* METHOD(GetResourceSignatureByName)(THIS_
-                                                                                    const Char* Name) CONST PURE;
+    virtual const PipelineResourceSignatureDesc* METHOD(GetResourceSignatureByName)(
+                                                                                    const Char* Name) const =0;
 
     /// Returns the shader create info by its name. If the resource is not found, returns nullptr.
 
@@ -463,8 +462,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the ShaderCreateInfo structure, see Diligent::ShaderCreateInfo.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST ShaderCreateInfo* METHOD(GetShaderByName)(THIS_
-                                                            const Char* Name) CONST PURE;
+    virtual const ShaderCreateInfo* METHOD(GetShaderByName)(
+                                                            const Char* Name) const =0;
 
     /// Returns the render pass description by its name. If the resource is not found, returns nullptr.
 
@@ -472,8 +471,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the RenderPassDesc structure, see Diligent::RenderPassDesc.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST RenderPassDesc*  METHOD(GetRenderPassByName)(THIS_
-                                                               const Char* Name) CONST PURE;
+    virtual const RenderPassDesc*  METHOD(GetRenderPassByName)(
+                                                               const Char* Name) const =0;
 
     /// Returns the pipeline state notation by its index.
 
@@ -483,8 +482,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the PipelineStateNotation structure.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST PipelineStateNotation* METHOD(GetPipelineStateByIndex)(THIS_
-                                                                         UInt32 Index) CONST PURE;
+    virtual const PipelineStateNotation* METHOD(GetPipelineStateByIndex)(
+                                                                         UInt32 Index) const =0;
 
     /// Returns the pipeline resource signature description by its index.
 
@@ -494,8 +493,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the PipelineResourceSignatureDesc structure.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST PipelineResourceSignatureDesc* METHOD(GetResourceSignatureByIndex)(THIS_
-                                                                                     UInt32 Index) CONST PURE;
+    virtual const PipelineResourceSignatureDesc* METHOD(GetResourceSignatureByIndex)(
+                                                                                     UInt32 Index) const =0;
 
     /// Returns the shader create info by its index.
 
@@ -505,8 +504,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the ShaderCreateInfo structure.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST ShaderCreateInfo* METHOD(GetShaderByIndex)(THIS_
-                                                             UInt32 Index) CONST PURE;
+    virtual const ShaderCreateInfo* METHOD(GetShaderByIndex)(
+                                                             UInt32 Index) const =0;
 
     /// Returns the render pass description by its index.
 
@@ -516,8 +515,8 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return Const pointer to the RenderPassDesc structure.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST RenderPassDesc* METHOD(GetRenderPassByIndex)(THIS_
-                                                               UInt32 Index) CONST PURE;
+    virtual const RenderPassDesc* METHOD(GetRenderPassByIndex)(
+                                                               UInt32 Index) const =0;
 
     /// Checks if the given signature is in the ignored list.
     /// 
@@ -525,18 +524,18 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     /// \return true if the given signature is ignored, and false otherwise.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL Bool METHOD(IsSignatureIgnored)(THIS_
-                                            const Char* Name) CONST PURE;
+    virtual Bool METHOD(IsSignatureIgnored)(
+                                            const Char* Name) const =0;
 
     /// Returns the render state notation parser info.
 
     /// \return Const reference to the RenderStateNotationParserInfo structure.
     ///
     /// \remarks This method must be externally synchronized.
-    VIRTUAL CONST RenderStateNotationParserInfo REF METHOD(GetInfo)(THIS) CONST PURE;
+    virtual const RenderStateNotationParserInfo  & METHOD(GetInfo)( ) const =0;
 
     /// Resets the parser to default state.
-    VIRTUAL void METHOD(Reset)(THIS) PURE;
+    virtual void METHOD(Reset)( ) =0;
 
     /// Reload all states. 
     ///
@@ -544,9 +543,9 @@ DILIGENT_BEGIN_INTERFACE(IRenderStateNotationParser, IObject)
     ///
     /// \note   This method is only allowed if the EnableReload member of RenderStateNotationParserCreateInfo
     ///         struct was set to true when the parser was created.
-    VIRTUAL bool METHOD(Reload)(THIS) PURE;
+    virtual bool METHOD(Reload)( ) =0;
 };
-DILIGENT_END_INTERFACE
+
 
 #include "../../../DiligentCore/Primitives/interface/UndefInterfaceHelperMacros.h"
 
@@ -572,10 +571,10 @@ DILIGENT_END_INTERFACE
 
 #include "../../../DiligentCore/Primitives/interface/DefineGlobalFuncHelperMacros.h"
 
-void DILIGENT_GLOBAL_FUNCTION(CreateRenderStateNotationParser)(const RenderStateNotationParserCreateInfo REF CreateInfo,
+void DILIGENT_GLOBAL_FUNCTION(CreateRenderStateNotationParser)(const RenderStateNotationParserCreateInfo  & CreateInfo,
                                                                IRenderStateNotationParser**                  pParser);
 
 
 #include "../../../DiligentCore/Primitives/interface/UndefGlobalFuncHelperMacros.h"
 
-DILIGENT_END_NAMESPACE // namespace Diligent
+ } // namespace Diligent

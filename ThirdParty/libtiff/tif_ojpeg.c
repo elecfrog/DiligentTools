@@ -34,7 +34,7 @@
    OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
    WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
    LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
-   OF THIS SOFTWARE.
+   OF   SOFTWARE.
 
    Joris Van Damme and/or AWare Systems may be available for custom
    development. If you like what you see, and need anything similar or related,

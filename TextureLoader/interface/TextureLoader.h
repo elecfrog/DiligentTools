@@ -39,7 +39,8 @@
 #    include "../../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
 #endif
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent
+{
 
 struct Image;
 struct IMemoryAllocator;
@@ -181,10 +182,9 @@ typedef struct TextureLoadInfo TextureLoadInfo;
 
 
 // {E04FE6D5-8665-4183-A872-852E0F7CE242}
-static DILIGENT_CONSTEXPR struct INTERFACE_ID IID_TextureLoader =
+static constexpr struct INTERFACE_ID IID_TextureLoader =
     {0xe04fe6d5, 0x8665, 0x4183, {0xa8, 0x72, 0x85, 0x2e, 0xf, 0x7c, 0xe2, 0x42}};
 
-#define DILIGENT_INTERFACE_NAME ITextureLoader
 #include "../../../DiligentCore/Primitives/interface/DefineInterfaceHelperMacros.h"
 
 #define ITextureLoaderInclusiveMethods \
@@ -197,25 +197,23 @@ static DILIGENT_CONSTEXPR struct INTERFACE_ID IID_TextureLoader =
 DILIGENT_BEGIN_INTERFACE(ITextureLoader, IObject)
 {
     /// Creates a texture using the prepared subresource data.
-    VIRTUAL void METHOD(CreateTexture)(THIS_
+    virtual void METHOD(CreateTexture)(
                                        IRenderDevice* pDevice,
-                                       ITexture**     ppTexture) PURE;
+                                       ITexture**     ppTexture) =0;
 
     /// Returns the texture description.
-    VIRTUAL const TextureDesc REF METHOD(GetTextureDesc)(THIS) CONST PURE;
+    virtual const TextureDesc  & METHOD(GetTextureDesc)( ) const =0;
 
     /// Returns the subresource data for the given subresource.
-    VIRTUAL const TextureSubResData REF METHOD(GetSubresourceData)(THIS_
+    virtual const TextureSubResData  & METHOD(GetSubresourceData)(
                                                                    UInt32 MipLevel,
-                                                                   UInt32 ArraySlice DEFAULT_VALUE(0)) CONST PURE;
+                                                                   UInt32 ArraySlice DEFAULT_VALUE(0)) const =0;
 
     /// Returns the texture initialization data.
-    VIRTUAL TextureData METHOD(GetTextureData)(THIS) PURE;
+    virtual TextureData METHOD(GetTextureData)( ) =0;
 };
-DILIGENT_END_INTERFACE
-// clang-format on
 
-#include "../../../DiligentCore/Primitives/interface/UndefInterfaceHelperMacros.h"
+// clang-format on
 
 #if DILIGENT_C_INTERFACE
 
@@ -228,16 +226,14 @@ DILIGENT_END_INTERFACE
 
 #endif
 
-#include "../../../DiligentCore/Primitives/interface/DefineGlobalFuncHelperMacros.h"
-
 /// Creates a texture loader from image.
 
 /// \param [in]  pSrcImage   - Pointer to the source image object.
 /// \param [in]  TexLoadInfo - Texture loading information, see Diligent::TextureLoadInfo.
 /// \param [out] ppLoader    - Memory location where a pointer to the created texture loader will be written.
-void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromImage)(struct Image*             pSrcImage,
-                                                            const TextureLoadInfo REF TexLoadInfo,
-                                                            ITextureLoader**          ppLoader);
+void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromImage)(struct Image*          pSrcImage,
+                                                            const TextureLoadInfo& TexLoadInfo,
+                                                            ITextureLoader**       ppLoader);
 
 /// Creates a texture loader from file.
 
@@ -246,10 +242,10 @@ void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromImage)(struct Image*       
 ///                           the format will be derived from the file contents.
 /// \param [in]  TexLoadInfo - Texture loading information, see Diligent::TextureLoadInfo.
 /// \param [out] ppLoader   - Memory location where a pointer to the created texture loader will be written.
-void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromFile)(const char*               FilePath,
-                                                           IMAGE_FILE_FORMAT         FileFormat,
-                                                           const TextureLoadInfo REF TexLoadInfo,
-                                                           ITextureLoader**          ppLoader);
+void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromFile)(const char*            FilePath,
+                                                           IMAGE_FILE_FORMAT      FileFormat,
+                                                           const TextureLoadInfo& TexLoadInfo,
+                                                           ITextureLoader**       ppLoader);
 
 /// Creates a texture loader from memory.
 
@@ -261,11 +257,11 @@ void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromFile)(const char*          
 ///
 /// \remarks    If MakeCopy is false, the pointer to the memory must remain valid until the
 ///             texture loader object is destroyed.
-void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromMemory)(const void*               pData,
-                                                             size_t                    Size,
-                                                             bool                      MakeCopy,
-                                                             const TextureLoadInfo REF TexLoadInfo,
-                                                             ITextureLoader**          ppLoader);
+void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromMemory)(const void*            pData,
+                                                             size_t                 Size,
+                                                             bool                   MakeCopy,
+                                                             const TextureLoadInfo& TexLoadInfo,
+                                                             ITextureLoader**       ppLoader);
 
 /// Creates a texture loader from data blob.
 ///
@@ -274,9 +270,9 @@ void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromMemory)(const void*        
 /// \param [out] ppLoader    - Memory location where a pointer to the created texture loader will be written.
 ///
 /// \remarks    If needed, the loader will keep a strong reference to the data blob.
-void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromDataBlob)(IDataBlob*                pDataBlob,
-                                                               const TextureLoadInfo REF TexLoadInfo,
-                                                               ITextureLoader**          ppLoader);
+void DILIGENT_GLOBAL_FUNCTION(CreateTextureLoaderFromDataBlob)(IDataBlob*             pDataBlob,
+                                                               const TextureLoadInfo& TexLoadInfo,
+                                                               ITextureLoader**       ppLoader);
 
 #if DILIGENT_CPP_INTERFACE
 void CreateTextureLoaderFromDataBlob(RefCntAutoPtr<IDataBlob> pDataBlob,
@@ -297,9 +293,9 @@ void CreateTextureLoaderFromDataBlob(RefCntAutoPtr<IDataBlob> pDataBlob,
 /// intermediate data structures used by the loader. It does not include the size of
 /// the source image data.
 /// The actual memory used by the loader may be slightly different.
-size_t DILIGENT_GLOBAL_FUNCTION(GetTextureLoaderMemoryRequirement)(const void*               pData,
-                                                                   size_t                    Size,
-                                                                   const TextureLoadInfo REF TexLoadInfo);
+size_t DILIGENT_GLOBAL_FUNCTION(GetTextureLoaderMemoryRequirement)(const void*            pData,
+                                                                   size_t                 Size,
+                                                                   const TextureLoadInfo& TexLoadInfo);
 
 
 /// Writes texture data as DDS file.
@@ -308,9 +304,9 @@ size_t DILIGENT_GLOBAL_FUNCTION(GetTextureLoaderMemoryRequirement)(const void*  
 /// \param [in]  Desc     - Texture description.
 /// \param [in]  TexData  - Texture subresource data.
 /// \return     true if the file has been written successfully, and false otherwise.
-bool DILIGENT_GLOBAL_FUNCTION(SaveTextureAsDDS)(const char*           FilePath,
-                                                const TextureDesc REF Desc,
-                                                const TextureData REF TexData);
+bool DILIGENT_GLOBAL_FUNCTION(SaveTextureAsDDS)(const char*        FilePath,
+                                                const TextureDesc& Desc,
+                                                const TextureData& TexData);
 
 
 /// Writes texture as DDS to a file stream.
@@ -319,10 +315,8 @@ bool DILIGENT_GLOBAL_FUNCTION(SaveTextureAsDDS)(const char*           FilePath,
 /// \param [in]  Desc        - Texture description.
 /// \param [in]  TexData     - Texture subresource data.
 /// \return     true if the texture has been written successfully, and false otherwise.
-bool DILIGENT_GLOBAL_FUNCTION(WriteDDSToStream)(IFileStream*          pFileStream,
-                                                const TextureDesc REF Desc,
-                                                const TextureData REF TexData);
+bool DILIGENT_GLOBAL_FUNCTION(WriteDDSToStream)(IFileStream*       pFileStream,
+                                                const TextureDesc& Desc,
+                                                const TextureData& TexData);
 
-#include "../../../DiligentCore/Primitives/interface/UndefGlobalFuncHelperMacros.h"
-
-DILIGENT_END_NAMESPACE // namespace Diligent
+} // namespace Diligent

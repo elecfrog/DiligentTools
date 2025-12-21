@@ -688,7 +688,7 @@ process_restart (j_decompress_ptr cinfo)
  * but are not dequantized.
  *
  * The i'th block of the MCU is stored into the block pointed to by
- * MCU_data[i].  WE ASSUME THIS AREA IS INITIALLY ZEROED BY THE CALLER.
+ * MCU_data[i].  WE ASSUME   AREA IS INITIALLY ZEROED BY THE CALLER.
  * (Wholesale zeroing is usually a little faster than retail...)
  *
  * We return FALSE if data source requested suspension.  In that case no

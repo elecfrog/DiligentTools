@@ -31,7 +31,7 @@
 
 #include "CommonDefinitions.h"
 
-DILIGENT_BEGIN_NAMESPACE(Diligent)
+namespace Diligent {
 
 // clang-format off
 
@@ -76,4 +76,4 @@ void DecompressBC5Block(const UInt8* Bits,
 
 // clang-format on
 
-DILIGENT_END_NAMESPACE // namespace Diligent
+ } // namespace Diligent

@@ -51,15 +51,15 @@ public:
 
     IMPLEMENT_QUERY_INTERFACE_IN_PLACE(IID_TextureLoader, TBase)
 
-    virtual void DILIGENT_CALL_TYPE CreateTexture(IRenderDevice* pDevice,
+    virtual void CALLTYPE CreateTexture(IRenderDevice* pDevice,
                                                   ITexture**     ppTexture) override final;
 
-    virtual const TextureDesc& DILIGENT_CALL_TYPE GetTextureDesc() const override final
+    virtual const TextureDesc& CALLTYPE GetTextureDesc() const override final
     {
         return m_TexDesc;
     }
 
-    virtual const TextureSubResData& DILIGENT_CALL_TYPE GetSubresourceData(UInt32 MipLevel,
+    virtual const TextureSubResData& CALLTYPE GetSubresourceData(UInt32 MipLevel,
                                                                            UInt32 ArraySlice) const override final
     {
         const UInt32 Subres = ArraySlice * m_TexDesc.MipLevels + MipLevel;
@@ -67,7 +67,7 @@ public:
         return m_SubResources[Subres];
     }
 
-    virtual TextureData DILIGENT_CALL_TYPE GetTextureData() override final
+    virtual TextureData CALLTYPE GetTextureData() override final
     {
         return TextureData{m_SubResources.data(), static_cast<UInt32>(m_SubResources.size())};
     }
