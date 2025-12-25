@@ -105,6 +105,6 @@ bool TestBitwiseEnum(DynamicLinearAllocator& Allocator, Type MaxBit)
     return true;
 }
 
-#define CHECK_STRUCT_SIZE(Struct, Size) ASSERT_SIZEOF64(Struct, Size, "Did you add new members to " #Struct " struct? You may need to update this test.")
+#define CHECK_STRUCT_SIZE(Struct, Size) SPW_ASSERT_SIZEOF(Struct, Size, "Did you add new members to " #Struct " struct? You may need to update this test.")
 
 } // namespace Diligent

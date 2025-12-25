@@ -27,7 +27,7 @@
 
 #include "HLSL2GLSLConverterApp.h"
 
-#include "Errors.hpp"
+#include "Primitives.h"
 #include "HLSL2GLSLConverter.h"
 #include "RefCntAutoPtr.hpp"
 #include "EngineFactoryOpenGL.h"

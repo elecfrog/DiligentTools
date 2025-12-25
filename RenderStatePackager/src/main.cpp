@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
         case ParseStatus::SuccessHelp:
             return EXIT_SUCCESS;
         case ParseStatus::Failed:
-            LOG_FATAL_ERROR("Failed to parse command line");
+            LOG_CRITICAL("Failed to parse command line");
             return EXIT_FAILURE;
         default:
             UNEXPECTED("Unexpected parse status");
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
     auto pEnvironment = std::make_unique<ParsingEnvironment>(EnvironmentCI);
     if (!pEnvironment->Initialize())
     {
-        LOG_FATAL_ERROR("Failed to initialize ParsingEnvironment");
+        LOG_CRITICAL("Failed to initialize ParsingEnvironment");
         return EXIT_FAILURE;
     }
 
@@ -164,20 +164,20 @@ int main(int argc, char* argv[])
 
     if (!Packager.ParseFiles(InputFilePaths))
     {
-        LOG_FATAL_ERROR("Failed to parse files");
+        LOG_CRITICAL("Failed to parse files");
         return EXIT_FAILURE;
     }
 
     if (!Packager.Execute(pArchiver, EnvironmentCI.DumpBytecodeDir.empty() ? nullptr : EnvironmentCI.DumpBytecodeDir.c_str()))
     {
-        LOG_FATAL_ERROR("Failed to create the archive");
+        LOG_CRITICAL("Failed to create the archive");
         return EXIT_FAILURE;
     }
 
     RefCntAutoPtr<IDataBlob> pData;
     if (!pArchiver->SerializeToBlob(EnvironmentCI.ContentVersion, &pData))
     {
-        LOG_FATAL_ERROR("Failed to serialize to Data Blob");
+        LOG_CRITICAL("Failed to serialize to Data Blob");
         return EXIT_FAILURE;
     }
 
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
     FileWrapper File{OutputFilePath.c_str(), EFileAccessMode::Overwrite};
     if (!File)
     {
-        LOG_FATAL_ERROR("Failed to open file: '", OutputFilePath, "'.");
+        LOG_CRITICAL("Failed to open file: '", OutputFilePath, "'.");
         return EXIT_FAILURE;
     }
 

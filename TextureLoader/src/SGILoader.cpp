@@ -30,7 +30,7 @@
 
 #include "DataBlob.h"
 #include "PlatformMisc.hpp"
-#include "Errors.hpp"
+#include "Primitives.h"
 
 namespace Diligent
 {

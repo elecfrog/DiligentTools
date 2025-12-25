@@ -466,7 +466,7 @@ void CreateRenderStateNotationLoader(const RenderStateNotationLoaderCreateInfo& 
     }
     catch (...)
     {
-        DG_LOG_ERROR("Failed to create render state notation loader");
+        LOG_ERROR("Failed to create render state notation loader");
     }
 }
 

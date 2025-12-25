@@ -31,7 +31,7 @@
 #include <array>
 
 #include "Image.h"
-#include "Errors.hpp"
+#include "Primitives.h"
 
 #include "tiffio.h"
 #include "png.h"
@@ -191,7 +191,7 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
                 case 8: Desc.ComponentType = VT_UINT8; break;
                 case 16: Desc.ComponentType = VT_UINT16; break;
                 case 32: Desc.ComponentType = VT_UINT32; break;
-                default: LOG_ERROR_AND_THROW(BitsPerSample, " is not a valid UINT component bit depth. Only 8, 16 and 32 are allowed");
+                default: LOG_ERROR_AND_THROW("{} is not a valid UINT component bit depth. Only 8, 16 and 32 are allowed", BitsPerSample);
             }
             break;
 
@@ -201,7 +201,7 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
                 case 8: Desc.ComponentType = VT_INT8; break;
                 case 16: Desc.ComponentType = VT_INT16; break;
                 case 32: Desc.ComponentType = VT_INT32; break;
-                default: LOG_ERROR_AND_THROW(BitsPerSample, " is not a valid INT component bit depth. Only 8, 16 and 32 are allowed");
+                default: LOG_ERROR_AND_THROW("{} is not a valid INT component bit depth. Only 8, 16 and 32 are allowed", BitsPerSample);
             }
             break;
 
@@ -210,7 +210,7 @@ void Image::LoadTiffFile(const void* pData, size_t Size, IDataBlob* pDstPixels, 
             {
                 case 16: Desc.ComponentType = VT_FLOAT16; break;
                 case 32: Desc.ComponentType = VT_FLOAT32; break;
-                default: LOG_ERROR_AND_THROW(BitsPerSample, " is not a valid FLOAT component bit depth. Only 16 and 32 are allowed");
+                default: LOG_ERROR_AND_THROW("{} is not a valid FLOAT component bit depth. Only 16 and 32 are allowed", BitsPerSample);
             }
             break;
 
@@ -759,7 +759,7 @@ IMAGE_FILE_FORMAT CreateImageFromFile(const Char* FilePath,
     }
     catch (std::runtime_error& err)
     {
-        DG_LOG_ERROR("Failed to create image from file: ", err.what());
+        LOG_ERROR("Failed to create image from file: ", err.what());
     }
 
     return ImgFileFormat;
@@ -793,7 +793,7 @@ IMAGE_FILE_FORMAT CreateImageFromMemory(const void* pImageData,
     }
     catch (std::runtime_error& err)
     {
-        DG_LOG_ERROR("Failed to create image from file: ", err.what());
+        LOG_ERROR("Failed to create image from file: ", err.what());
     }
 
     return ImgFileFormat;

@@ -30,5 +30,5 @@
 #include "CommonDefinitions.h"
 #include "RenderDevice.h"
 #include "DeviceContext.h"
-#include "Errors.hpp"
+#include "Primitives.h"
 #include "DebugUtilities.hpp"

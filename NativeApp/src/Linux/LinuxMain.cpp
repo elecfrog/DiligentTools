@@ -31,7 +31,7 @@
 #include "NativeAppBase.hpp"
 #include "StringTools.hpp"
 #include "Timer.hpp"
-#include "Errors.hpp"
+#include "Primitives.h"
 #include "CommandLineParser.hpp"
 
 
@@ -448,7 +448,7 @@ int x_main(int argc, const char* const* argv)
 
     if (glXCreateContextAttribsARB == nullptr)
     {
-        DG_LOG_ERROR("glXCreateContextAttribsARB entry point not found. Aborting.");
+        LOG_ERROR("glXCreateContextAttribsARB entry point not found. Aborting.");
         return 1;
     }
 
@@ -472,7 +472,7 @@ int x_main(int argc, const char* const* argv)
     GLXContext    ctx  = glXCreateContextAttribsARB(display, fbc[0], NULL, True, context_attribs);
     if (!ctx)
     {
-        DG_LOG_ERROR("Failed to create GL context.");
+        LOG_ERROR("Failed to create GL context.");
         return 1;
     }
     XFree(fbc);
@@ -481,7 +481,7 @@ int x_main(int argc, const char* const* argv)
     glXMakeCurrent(display, win, ctx);
     if (!TheApp->OnGLContextCreated(display, win))
     {
-        DG_LOG_ERROR("Unable to initialize the application in OpenGL mode. Aborting");
+        LOG_ERROR("Unable to initialize the application in OpenGL mode. Aborting");
         return 1;
     }
 
