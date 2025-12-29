@@ -30,13 +30,13 @@
 /// \file
 /// Texture loader interface.
 
-#include "../../../DiligentCore/Primitives/interface/FileStream.h"
-#include "../../../DiligentCore/Graphics/GraphicsEngine/interface/RenderDevice.h"
-#include "../../../DiligentCore/Graphics/GraphicsEngine/interface/Texture.h"
+#include "../../DiligentCore/Primitives/interface/FileStream.h"
+#include "../../DiligentCore/Graphics/GraphicsEngine/interface/RenderDevice.h"
+#include "../../DiligentCore/Graphics/GraphicsEngine/interface/Texture.h"
 #include "Image.h"
 
 #if DILIGENT_CPP_INTERFACE
-#    include "../../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
+#    include "../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
 #endif
 
 namespace Diligent
@@ -185,7 +185,7 @@ typedef struct TextureLoadInfo TextureLoadInfo;
 static constexpr struct INTERFACE_ID IID_TextureLoader =
     {0xe04fe6d5, 0x8665, 0x4183, {0xa8, 0x72, 0x85, 0x2e, 0xf, 0x7c, 0xe2, 0x42}};
 
-#include "../../../DiligentCore/Primitives/interface/DefineInterfaceHelperMacros.h"
+#include "../../DiligentCore/Primitives/interface/DefineInterfaceHelperMacros.h"
 
 #define ITextureLoaderInclusiveMethods \
     IObjectInclusiveMethods;           \

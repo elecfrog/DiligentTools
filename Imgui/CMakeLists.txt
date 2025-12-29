@@ -20,10 +20,6 @@ set(INTERFACE
 )
 
 if(EXISTS "${DILIGENT_DEAR_IMGUI_PATH}/backends")
-    list(APPEND SOURCE src/ImGuiImplSDL2.cpp)
-    list(APPEND SOURCE src/ImGuiImplSDL3.cpp)
-    list(APPEND INTERFACE interface/ImGuiImplSDL2.hpp)
-    list(APPEND INTERFACE interface/ImGuiImplSDL3.hpp)
     if(PLATFORM_WIN32)
         list(APPEND SOURCE src/ImGuiImplWin32.cpp)
         list(APPEND INTERFACE interface/ImGuiImplWin32.hpp)
@@ -55,7 +51,6 @@ add_library(Diligent-Imgui STATIC
     ${SOURCE}
     ${INCLUDE}
     ${INTERFACE}
-    ${IMGUIZMO_QUAT_SOURCE}
 )
 
 if(TARGET imgui)

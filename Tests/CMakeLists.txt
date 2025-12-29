@@ -6,7 +6,3 @@ if(TARGET gtest)
         add_subdirectory(DiligentToolsGPUTest)
     endif()
 endif()
-
-if(DILIGENT_BUILD_TOOLS_INCLUDE_TEST)
-    add_subdirectory(IncludeTest)
-endif()

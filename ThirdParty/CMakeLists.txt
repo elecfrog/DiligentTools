@@ -11,17 +11,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
     target_compile_options(NO_WERROR INTERFACE -Wno-error)
 endif()
 
-if(NOT IMGUIZMO_QUAT_PATH)
-    set(IMGUIZMO_QUAT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/imGuIZMO.quat CACHE PATH "imGuIZMO.quat source directory")
-endif()
-
-install(FILES imGuIZMO.quat/license.txt DESTINATION ${LICENSE_INSTALL_PATH} RENAME imGuIZMO.quat-license.txt)
-
-
-#add_library(Diligent-JSON INTERFACE)
-#target_compile_definitions(Diligent-JSON INTERFACE JSON_DIAGNOSTICS=1)
-
-
 if (NOT DILIGENT_DEAR_IMGUI_PATH)
     set(DILIGENT_DEAR_IMGUI_PATH "${CMAKE_CURRENT_SOURCE_DIR}/imgui" CACHE PATH "imgui source directory")
 endif()

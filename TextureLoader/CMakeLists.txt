@@ -1,47 +1,38 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(Diligent-TextureLoader VERSION 1.0.0 LANGUAGES CXX)
 
-set(INCLUDE
-        include/dxgiformat.h
-        include/pch.h
-        include/TextureLoaderImpl.hpp
+set(TEXTURE_LOADER_SOURCES
+
+        dxgiformat.h
+        pch.h
+        TextureLoaderImpl.hpp
+
+        JPEGCodec.h
+        PNGCodec.h
+        SGILoader.h
+        BCTools.h
+        Image.h
+        TextureLoader.h
+        TextureUtilities.h
+
+        BCTools.cpp
+        DDSLoader.cpp
+        JPEGCodec.cpp
+        Image.cpp
+        KTXLoader.cpp
+        SGILoader.cpp
+        PNGCodec.cpp
+        STBImpl.cpp
+        TextureLoaderImpl.cpp
+        TextureUtilities.cpp
 )
 
-set(INTERFACE
-        interface/JPEGCodec.h
-        interface/PNGCodec.h
-        interface/SGILoader.h
-        interface/BCTools.h
-        interface/Image.h
-        interface/TextureLoader.h
-        interface/TextureUtilities.h
-)
-
-set(SOURCE
-        src/BCTools.cpp
-        src/DDSLoader.cpp
-        src/JPEGCodec.cpp
-        src/Image.cpp
-        src/KTXLoader.cpp
-        src/SGILoader.cpp
-        src/PNGCodec.cpp
-        src/STBImpl.cpp
-        src/TextureLoaderImpl.cpp
-        src/TextureUtilities.cpp
-)
-
-add_library(Diligent-TextureLoader STATIC ${SOURCE} ${INCLUDE} ${INTERFACE})
+add_library(Diligent-TextureLoader STATIC ${TEXTURE_LOADER_SOURCES})
 set_common_target_properties(Diligent-TextureLoader)
-
-set_property(SOURCE src/PNGCodec.cpp src/Image.cpp
-        APPEND PROPERTY INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/libpng" # png_static target does not define any public include directories
-        "${CMAKE_CURRENT_BINARY_DIR}/../ThirdParty/libpng" # pnglibconf.h is generated in the binary directory
-)
 
 find_package(PNG REQUIRED)
 find_package(Stb REQUIRED)
@@ -50,17 +41,10 @@ find_package(JPEG REQUIRED)
 
 target_include_directories(Diligent-TextureLoader
         PUBLIC
-        interface
-        PRIVATE
-        include
+        ${CMAKE_CURRENT_SOURCE_DIR}
         ${Stb_INCLUDE_DIR}
         ${GEOTIFF_INCLUDE_DIR}
 )
-
-source_group("source" FILES ${SOURCE})
-source_group("include" FILES ${INCLUDE})
-source_group("interface" FILES ${INTERFACE})
-
 
 target_link_libraries(Diligent-TextureLoader
         PRIVATE
