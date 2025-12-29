@@ -45,6 +45,7 @@ set_property(SOURCE src/PNGCodec.cpp src/Image.cpp
 
 find_package(PNG REQUIRED)
 find_package(Stb REQUIRED)
+find_package(GeoTIFF CONFIG REQUIRED)
 
 target_include_directories(Diligent-TextureLoader
         PUBLIC
@@ -52,6 +53,7 @@ target_include_directories(Diligent-TextureLoader
         PRIVATE
         include
         ${Stb_INCLUDE_DIR}
+        ${GEOTIFF_INCLUDE_DIR}
 )
 
 source_group("source" FILES ${SOURCE})
@@ -68,8 +70,8 @@ target_link_libraries(Diligent-TextureLoader
         Diligent-GraphicsAccessories
         Diligent-GraphicsTools
         PNG::PNG
-        TIFF::TIFF
         ZLIB::ZLIB
+        ${GEOTIFF_LIBRARIES}
 )
 
 if (NOT DILIGENT_EXTERNAL_LIBJPEG)
