@@ -11,13 +11,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
     target_compile_options(NO_WERROR INTERFACE -Wno-error)
 endif()
 
-
-if (NOT TARGET JPEG::JPEG)
-    add_subdirectory(libjpeg-9e)
-    install(FILES libjpeg-9e/README DESTINATION ${LICENSE_INSTALL_PATH} RENAME libjpeg-readme.txt)
-    list(APPEND THIRD_PARTY_TARGETS LibJpeg)
-endif()
-
 if(NOT IMGUIZMO_QUAT_PATH)
     set(IMGUIZMO_QUAT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/imGuIZMO.quat CACHE PATH "imGuIZMO.quat source directory")
 endif()

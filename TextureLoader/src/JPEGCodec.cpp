@@ -213,7 +213,7 @@ ENCODE_JPEG_RESULT EncodeJpeg(UInt8* pSrcRGBPixels, UInt Width, UInt Height, int
     /* Step 2: specify data destination (memory) */
     /* Note: steps 2 and 3 can be done in either order. */
     unsigned char* mem      = NULL;
-    size_t         mem_size = 0;
+    unsigned long  mem_size = 0;
     jpeg_mem_dest(&cinfo, &mem, &mem_size);
 
     /* Step 3: set parameters for compression */
