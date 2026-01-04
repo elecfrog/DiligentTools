@@ -63,7 +63,7 @@ void ImGuiImplWin32::NewFrame(UInt32 RenderSurfaceWidth, UInt32 RenderSurfaceHei
     ImGui_ImplWin32_NewFrame();
     ImGuiImplDiligent::NewFrame(RenderSurfaceWidth, RenderSurfaceHeight, SurfacePreTransform);
 
-#ifdef DILIGENT_DEBUG
+#ifdef SPW_DEBUG
     {
         ImGuiIO& io = ImGui::GetIO();
         VERIFY(io.DisplaySize.x == 0 || io.DisplaySize.x == static_cast<float>(RenderSurfaceWidth),

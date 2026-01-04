@@ -214,7 +214,7 @@ struct KTX10Header
 
 void TextureLoaderImpl::LoadFromKTX(const TextureLoadInfo& TexLoadInfo, const UInt8* pData, size_t DataSize)
 {
-#ifdef DILIGENT_DEBUG
+#ifdef SPW_DEBUG
     const UInt8* pOrigDataPtr = pData;
 #endif
     static constexpr UInt8 KTX10FileIdentifier[12] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
