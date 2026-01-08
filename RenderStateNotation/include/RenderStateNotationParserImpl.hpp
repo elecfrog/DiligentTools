@@ -50,38 +50,38 @@ public:
 
     IMPLEMENT_QUERY_INTERFACE_IN_PLACE(IID_RenderStateNotationParser, TBase)
 
-    virtual Bool DG_CALL_TYPE ParseFile(const Char*                      FilePath,
+    virtual Bool  ParseFile(const Char*                      FilePath,
                                               IShaderSourceInputStreamFactory* pStreamFactory,
                                               IShaderSourceInputStreamFactory* pReloadFactory) override final;
 
-    virtual Bool DG_CALL_TYPE ParseString(const Char*                      Source,
+    virtual Bool  ParseString(const Char*                      Source,
                                                 UInt32                           Length,
                                                 IShaderSourceInputStreamFactory* pStreamFactory,
                                                 IShaderSourceInputStreamFactory* pReloadFactory) override final;
 
-    virtual const PipelineStateNotation* DG_CALL_TYPE GetPipelineStateByName(const Char* Name, PIPELINE_TYPE PipelineType) const override final;
+    virtual const PipelineStateNotation*  GetPipelineStateByName(const Char* Name, PIPELINE_TYPE PipelineType) const override final;
 
-    virtual const PipelineResourceSignatureDesc* DG_CALL_TYPE GetResourceSignatureByName(const Char* Name) const override final;
+    virtual const PipelineResourceSignatureDesc*  GetResourceSignatureByName(const Char* Name) const override final;
 
-    virtual const ShaderCreateInfo* DG_CALL_TYPE GetShaderByName(const Char* Name) const override final;
+    virtual const ShaderCreateInfo*  GetShaderByName(const Char* Name) const override final;
 
-    virtual const RenderPassDesc* DG_CALL_TYPE GetRenderPassByName(const Char* Name) const override final;
+    virtual const RenderPassDesc*  GetRenderPassByName(const Char* Name) const override final;
 
-    virtual const PipelineStateNotation* DG_CALL_TYPE GetPipelineStateByIndex(UInt32 Index) const override final;
+    virtual const PipelineStateNotation*  GetPipelineStateByIndex(UInt32 Index) const override final;
 
-    virtual const PipelineResourceSignatureDesc* DG_CALL_TYPE GetResourceSignatureByIndex(UInt32 Index) const override final;
+    virtual const PipelineResourceSignatureDesc*  GetResourceSignatureByIndex(UInt32 Index) const override final;
 
-    virtual const ShaderCreateInfo* DG_CALL_TYPE GetShaderByIndex(UInt32 Index) const override final;
+    virtual const ShaderCreateInfo*  GetShaderByIndex(UInt32 Index) const override final;
 
-    virtual const RenderPassDesc* DG_CALL_TYPE GetRenderPassByIndex(UInt32 Index) const override final;
+    virtual const RenderPassDesc*  GetRenderPassByIndex(UInt32 Index) const override final;
 
-    virtual Bool DG_CALL_TYPE IsSignatureIgnored(const Char* Name) const override final;
+    virtual Bool  IsSignatureIgnored(const Char* Name) const override final;
 
-    virtual const RenderStateNotationParserInfo& DG_CALL_TYPE GetInfo() const override final;
+    virtual const RenderStateNotationParserInfo&  GetInfo() const override final;
 
-    virtual void DG_CALL_TYPE Reset() override final;
+    virtual void  Reset() override final;
 
-    virtual bool DG_CALL_TYPE Reload() override final;
+    virtual bool  Reload() override final;
 
 private:
     Bool ParseFileInternal(const Char*                      FilePath,

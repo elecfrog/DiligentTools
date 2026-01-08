@@ -49,15 +49,15 @@ public:
 
     IMPLEMENT_QUERY_INTERFACE_IN_PLACE(IID_RenderStateNotationLoader, TBase)
 
-    virtual void DG_CALL_TYPE LoadPipelineState(const LoadPipelineStateInfo& LoadInfo, IPipelineState** ppPSO) override final;
+    virtual void  LoadPipelineState(const LoadPipelineStateInfo& LoadInfo, IPipelineState** ppPSO) override final;
 
-    virtual void DG_CALL_TYPE LoadResourceSignature(const LoadResourceSignatureInfo& LoadInfo, IPipelineResourceSignature** ppSignature) override final;
+    virtual void  LoadResourceSignature(const LoadResourceSignatureInfo& LoadInfo, IPipelineResourceSignature** ppSignature) override final;
 
-    virtual void DG_CALL_TYPE LoadRenderPass(const LoadRenderPassInfo& LoadInfo, IRenderPass** ppRenderPass) override final;
+    virtual void  LoadRenderPass(const LoadRenderPassInfo& LoadInfo, IRenderPass** ppRenderPass) override final;
 
-    virtual void DG_CALL_TYPE LoadShader(const LoadShaderInfo& LoadInfo, IShader** ppShader) override final;
+    virtual void  LoadShader(const LoadShaderInfo& LoadInfo, IShader** ppShader) override final;
 
-    virtual bool DG_CALL_TYPE Reload() override final;
+    virtual bool  Reload() override final;
 
 private:
     struct PipelineHasher
