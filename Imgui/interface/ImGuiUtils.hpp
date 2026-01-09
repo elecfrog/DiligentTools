@@ -111,7 +111,7 @@ bool Combo(const char* label, ItemType* current_item, const std::pair<ItemType, 
         UNEXPECTED("Current item was not found in the items list");
         return false;
     }
-    auto names = std::make_unique<const char*[]>(items_count);
+    auto names = std::make_unique<const char*[]>(static_cast<size_t>(items_count));
     for (int i = 0; i < items_count; ++i)
         names[i] = c_str(items[i].second);
     bool value_changed = Combo(label, &item_idx, names.get(), items_count, popup_max_height_in_items);
